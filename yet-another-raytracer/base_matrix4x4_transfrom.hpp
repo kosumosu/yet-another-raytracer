@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base_vector3.hpp"
+//#include "base_vector3.hpp"
 #include "base_matrix4x4.hpp"
 #include "base_matrix_operations.hpp"
 
@@ -11,7 +11,7 @@
 namespace math
 {
 	template <typename T>
-	base_matrix<T, 4, 4> inline translate(const base_vector<T, 3> & vec)
+	base_matrix<T, 4, 4> inline translate(const vector<T, 3> & vec)
 	{
 		base_matrix<T, 4, 4> res;
 
@@ -23,7 +23,7 @@ namespace math
 	}
 
 	template <typename T>
-	base_matrix<T, 4, 4> inline scale(const base_vector<T, 3> & vec)
+	base_matrix<T, 4, 4> inline scale(const vector<T, 3> & vec)
 	{
 		base_matrix<T, 4, 4> res;
 
@@ -35,22 +35,22 @@ namespace math
 	}
 
 	template <typename T>
-	base_matrix<T, 4, 4> inline rotate(const base_vector<T, 3> & axis, T radians)
+	base_matrix<T, 4, 4> inline rotate(const vector<T, 3> & axis, T radians)
 	{
 		T sinTheta = std::sin(radians);
 		T cosTheta = std::cos(radians);
 
 		base_matrix<T, 4, 4> a_star(
-			T(0),		-axis.z(),	axis.y(),	T(0),
-			axis.z(),	T(0),		-axis.x(),	T(0),
-			-axis.y(),	axis.x(),	T(0),		T(0),
+			T(0),		-axis[2],	axis[1],	T(0),
+			axis[2],	T(0),		-axis[0],	T(0),
+			-axis[1],	axis[0],	T(0),		T(0),
 			T(0),		T(0),		T(0),		T(0)
 			);
 
 		base_matrix<T, 4, 4> a_aT(
-			axis.x() * axis.x(), axis.x() * axis.y(), axis.x() * axis.z(), T(0),
-			axis.y() * axis.x(), axis.y() * axis.y(), axis.y() * axis.z(), T(0),
-			axis.z() * axis.x(), axis.z() * axis.y(), axis.z() * axis.z(), T(0),
+			axis[0] * axis[0], axis[0] * axis[1], axis[0] * axis[2], T(0),
+			axis[1] * axis[0], axis[1] * axis[1], axis[1] * axis[2], T(0),
+			axis[2] * axis[0], axis[2] * axis[1], axis[2] * axis[2], T(0),
 			T(0),                T(0),                T(0),                T(0)
 			);
 
@@ -60,7 +60,7 @@ namespace math
 	}
 
 	template <typename T>
-	base_matrix<T, 4, 4> inline rotate_degrees(const base_vector<T, 3> & axis, T degrees)
+	base_matrix<T, 4, 4> inline rotate_degrees(const vector<T, 3> & axis, T degrees)
 	{
 		T radians = T(M_PI) / T(180) * degrees;
 		return rotate(axis, radians);

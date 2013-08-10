@@ -1,8 +1,8 @@
 #pragma once
 
 #include "allocation.h"
-#include "base_vector.hpp"
-#include "base_vector_operations.hpp"
+#include "vector.hpp"
+#include "vector_operations.hpp"
 #include <crtdefs.h>
 
 namespace math
@@ -77,19 +77,19 @@ namespace math
 		size_t num_rows() const { return 4; }
 		size_t num_cols() const { return 4; }
 
-		base_vector<T, 4> & operator[](std::size_t index)
+		vector<T, 4> & operator[](std::size_t index)
 		{
 			return m_rows[index];
 		}
 
-		const base_vector<T, 4> & operator[](std::size_t index) const
+		const vector<T, 4> & operator[](std::size_t index) const
 		{
 			return m_rows[index];
 		}
 
-		base_vector<T, 4> get_column(std::size_t index) const
+		vector<T, 4> get_column(std::size_t index) const
 		{
-			base_vector<T, 4> res;
+			vector<T, 4> res;
 			res[0] = m_rows[0][index];
 			res[1] = m_rows[1][index];
 			res[2] = m_rows[2][index];
@@ -98,6 +98,6 @@ namespace math
 		}
 
 	private:
-		base_vector<T, 4> m_rows[4];
+		vector<T, 4> m_rows[4];
 	};
 }

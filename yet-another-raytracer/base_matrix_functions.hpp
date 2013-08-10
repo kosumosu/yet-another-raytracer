@@ -172,9 +172,9 @@ namespace math
 
 	// last column is treated as translation and ignored
 	template <typename T, size_t COLS, size_t ROWS>
-	inline base_vector<T, ROWS> extractBoundsScale(const base_matrix<T, COLS, ROWS> & matrix)
+	inline vector<T, ROWS> extractBoundsScale(const base_matrix<T, COLS, ROWS> & matrix)
 	{
-		base_vector<T, ROWS> scale;
+		vector<T, ROWS> scale;
 		for (int i = 0; i < ROWS; i++)
 		{
 			scale[i] = length(matrix[i].reduce());
@@ -183,7 +183,7 @@ namespace math
 	}
 
 	template <typename T, size_t COLS, size_t ROWS>
-	inline base_vector<T, ROWS - 1> extractTranslate(const base_matrix<T, COLS, ROWS> & matrix)
+	inline vector<T, ROWS - 1> extractTranslate(const base_matrix<T, COLS, ROWS> & matrix)
 	{
 		auto amount = matrix.get_column(ROWS - 1).reduce();
 		return amount;

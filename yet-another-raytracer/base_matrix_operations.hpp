@@ -1,7 +1,7 @@
 #pragma once
 
 #include "base_matrix.hpp"
-#include "base_vector_operations.hpp"
+#include "vector_operations.hpp"
 
 namespace math
 {
@@ -9,12 +9,12 @@ namespace math
 	template <typename T, size_t COLS, size_t ROWS>
 	bool inline operator == (const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
-		for (size_t i = 0; i < ROWS; i++)
+		bool equals = true;
+		iterate<0, ROWS - 1>([&](size_t i)
 		{
-			if (one[i] != another[i])
-				return false;
-		}
-		return true;
+			equals &= one[i] == another[i];
+		});
+		return equals;
 	}
 
 	template <typename T, size_t COLS, size_t ROWS>
@@ -85,9 +85,9 @@ namespace math
 
 
 	template <typename T, size_t COLS, size_t ROWS>
-	base_vector<T, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const base_vector<T, COLS> & another)
+	vector<T, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const vector<T, COLS> & another)
 	{
-		base_vector<T, ROWS> res;
+		vector<T, ROWS> res;
 		for (size_t i = 0; i < ROWS; i++)
 		{
 			res[i] = math::dot( one[i] , another );

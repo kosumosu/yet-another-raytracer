@@ -54,7 +54,7 @@ unsigned int KDTreeNode::GetSplittingAxis( const BoundingBox & box ) const
 	auto diff = box.max_corner() - box.min_corner();
 	
 	unsigned int max_axis = 0;
-	for (unsigned int i = 1; i < diff.size(); i++)
+	for (unsigned int i = 1; i < diff.dimensions; i++)
 	{
 		if (diff[i] > diff[max_axis])
 			max_axis = i;

@@ -22,8 +22,6 @@
 #define NO_MIN_MAX
 #include <Windows.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 
 void callback(unsigned int x, unsigned int y, float progress)
@@ -265,111 +263,10 @@ std::string GetPathWithoutExtension(const std::string & input)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////
 
-bool TestMatMatMult()
-{
-	math::base_matrix<float, 3, 2> mat1;
-	mat1[0][0] = 2.0f;
-	mat1[0][1] = 1.0f;
-	mat1[0][2] = 3.0f;
-
-	mat1[1][0] = 6.0f;
-	mat1[1][1] = 4.0f;
-	mat1[1][2] = 5.0f;
-
-	math::base_matrix<float, 2, 3> mat2;
-	mat2[0][0] = 3.0f;
-	mat2[0][1] = 1.0f;
-
-	mat2[1][0] = 1.0f;
-	mat2[1][1] = 2.0f;
-
-	mat2[2][0] = 5.0f;
-	mat2[2][1] = 3.0f;
-
-	auto res = mat1 * mat2;
-
-	math::base_matrix<float, 2, 2> mat3;
-	mat3[0][0] = 22.0f;
-	mat3[0][1] = 13.0f;
-
-	mat3[1][0] = 47.0f;
-	mat3[1][1] = 29.0f;
-
-	return res == mat3;
-}
-
-bool TestMatInverse()
-{
-	math::base_matrix<float, 3, 3> mat;
-	mat[0][0] = -2.0f;
-	mat[0][1] = 2.0f;
-	mat[0][2] = 3.0f;
-
-	mat[1][0] = -1.0f;
-	mat[1][1] = 1.0f;
-	mat[1][2] = 3.0f;
-
-	mat[2][0] = 2.0f;
-	mat[2][1] = 0.0f;
-	mat[2][2] = -1.0f;
-
-	auto inversed = math::inverse(mat);
-
-	auto ident = mat * inversed;
-
-	return ident == math::base_matrix<float, 3, 3>();
-}
-
-bool CompareWithGLM(const math::base_matrix<float, 4, 4> & one, const glm::mat4 & another)
-{
-	for (size_t j = 0; j < 4; j++)
-	{
-		for (size_t i = 0; i < 4; i++)
-		{
-			if (one[j][i] != another[i][j])
-				return false;
-		}
-	}
-	return true;
-}
-
-bool TestMatTranslate()
-{
-	auto translate = math::translate(math::base_vector<float, 3>(1.0f, 2.0f, 3.0f));
-
-	auto glm_translate = glm::translate(glm::mat4(), glm::vec3(1.0f, 2.0f, 3.0f));
-
-	return CompareWithGLM(translate, glm_translate);
-}
-
-bool TestMatScale()
-{
-	auto scale = math::scale(math::base_vector<float, 3>(4.0f, 5.0f, 6.0f));
-
-	auto glm_scale = glm::scale(glm::mat4(), glm::vec3(4.0f, 5.0f, 6.0f));
-
-	return CompareWithGLM(scale, glm_scale);
-}
-
-bool TestMatRotate()
-{
-	auto rotate = math::rotate(math::base_vector<float, 3>(1.0f, 0.0f, 0.0f), float(M_PI / 2.0));
-
-	auto glm_rotate = glm::rotate(glm::mat4(), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-
-	return CompareWithGLM(rotate, glm_rotate);
-}
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	//std::cout << "mat * mat\t\t" << (TestMatMatMult() ? "ok" : "failed") << std::endl;
-	//std::cout << "mat inverse\t\t" << (TestMatInverse() ? "ok" : "failed") << std::endl;
-	//std::cout << "mat translate\t\t" << (TestMatTranslate() ? "ok" : "failed") << std::endl;
-	//std::cout << "mat scale\t\t" << (TestMatScale() ? "ok" : "failed") << std::endl;
-	//std::cout << "mat rotate\t\t" << (TestMatRotate() ? "ok" : "failed") << std::endl;
-
 	if (argc < 2)
 		return 0;
 

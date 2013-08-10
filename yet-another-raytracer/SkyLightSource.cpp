@@ -1,7 +1,5 @@
 #include "SkyLightSource.h"
 
-#include <glm/gtc/random.hpp>
-
 SkyLightSource::SkyLightSource(void)
 	: m_samples(20)
 	, m_color(color_real(0.5))

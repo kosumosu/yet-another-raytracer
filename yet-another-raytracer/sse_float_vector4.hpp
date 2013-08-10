@@ -1,7 +1,7 @@
 #pragma once
 
 #include "allocation.h"
-#include "base_vector.hpp"
+#include "vector.hpp"
 #include "sse_float_vector3.hpp"
 #include <nmmintrin.h>
 #include <crtdefs.h>
@@ -12,59 +12,59 @@
 namespace math
 {
 	template<>
-	class __declspec(align(MM_ALIGNMENT)) base_vector<float, 4>
+	class __declspec(align(MM_ALIGNMENT)) vector<float, 4>
 	{
 	public:
-		base_vector()
+		vector()
 		{
 			m_values = _mm_setzero_ps();
 		}
 
-		base_vector(const float & value)
+		vector(const float & value)
 		{
 			m_values = _mm_set_ps(value, value, value, value);
 		}
 
-		base_vector(const float values[4])
+		vector(const float values[4])
 		{
 			m_values = _mm_set_ps(values[3], values[2], values[1], values[0]);
 		}
 
-		base_vector(const __m128 & xmm)
+		vector(const __m128 & xmm)
 		{
 			m_values = xmm;
 		}
 
 		template<typename TOther>
-		base_vector(const base_vector<TOther, 4> & other)
+		vector(const vector<TOther, 4> & other)
 		{
 			m_values = _mm_set_ps(other[3], other[2], other[1], other[0]);
 		}
 
 		template<typename TOther>
-		base_vector(const base_vector<TOther, 3> & other, const float & w)
+		vector(const vector<TOther, 3> & other, const float & w)
 		{
 			m_values = _mm_set_ps(w, other[2], other[1], other[0]);
 		}
 
 
-		base_vector(const base_vector<float, 4> & other)
+		vector(const vector<float, 4> & other)
 		{
 			m_values = other.values();
 		}
 
-		base_vector(const base_vector<float, 3> & other)
+		vector(const vector<float, 3> & other)
 		{
 			m_values = other.values();
 		}
 
 		__declspec(noinline)
-		base_vector(const base_vector<float, 3> & other, const float & w)
+		vector(const vector<float, 3> & other, const float & w)
 		{
 			m_values = _mm_blend_ps(other.values(), _mm_set1_ps(w), 0x8);
 		}
 
-		base_vector(const float & x, const float & y, const float & z, const float & w)
+		vector(const float & x, const float & y, const float & z, const float & w)
 		{
 			m_values = _mm_set_ps(w, z, y, x);
 		}
@@ -81,10 +81,10 @@ namespace math
 			return m_values.m128_f32[index];
 		}
 
-		base_vector<float, 3> reduce() const
+		vector<float, 3> reduce() const
 		{
 			__m128 reg = m_values;
-			return base_vector<float, 3>(_mm_blend_ps(m_values, _mm_setzero_ps(), 0x8));
+			return vector<float, 3>(_mm_blend_ps(m_values, _mm_setzero_ps(), 0x8));
 		}
 
 		float & x() { return (*this)[0]; }

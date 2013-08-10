@@ -27,7 +27,7 @@ public:
 
 	bool empty() const
 	{
-		return m_min_corner.x() > m_max_corner.x() || m_min_corner.y() > m_max_corner.y() || m_min_corner.z() > m_max_corner.z();
+		return m_min_corner[0] > m_max_corner[0] || m_min_corner[1] > m_max_corner[1] || m_min_corner[2] > m_max_corner[2];
 	}
 
 	const vector3 & min_corner() const { return m_min_corner; }
@@ -48,8 +48,8 @@ public:
 		auto dist_min = math::min(dist0, dist1);
 		auto dist_max = math::max(dist0, dist1);
 
-		space_real dist_near = std::max(dist_min.x(), std::max(dist_min.y(), dist_min.z()));
-		space_real dist_far = std::min(dist_max.x(), std::min(dist_max.y(), dist_max.z()));
+		space_real dist_near = std::max(dist_min[0], std::max(dist_min[1], dist_min[2]));
+		space_real dist_far = std::min(dist_max[0], std::min(dist_max[1], dist_max[2]));
 
 		return BoundingBoxHit(dist_near, dist_far, dist_far > space_real(0.0) && dist_near <= dist_far);
 	}
@@ -84,8 +84,8 @@ public:
 
 	bool Contains(const vector3 & point) const
 	{
-		return !empty() && point.x() >= m_min_corner.x() && point.y() >= m_min_corner.y() && point.z() >= m_min_corner.z() &&
-			point.x() <= m_max_corner.x() && point.y() <= m_max_corner.y() && point.z() <= m_max_corner.z();
+		return !empty() && point[0] >= m_min_corner[0] && point[1] >= m_min_corner[1] && point[2] >= m_min_corner[2] &&
+			point[0] <= m_max_corner[0] && point[1] <= m_max_corner[1] && point[2] <= m_max_corner[2];
 	}
 
 	void Intersect(const BoundingBox & other)
@@ -103,8 +103,8 @@ public:
 
 	bool FullyInside(const BoundingBox & container) const
 	{
-		return m_min_corner.x() >= container.min_corner().x() && m_min_corner.y() >= container.min_corner().y() && m_min_corner.z() >= container.min_corner().z()
-			&& m_max_corner.x() <= container.max_corner().x() && m_max_corner.y() <= container.max_corner().y() && m_max_corner.z() <= container.max_corner().z();
+		return m_min_corner[0] >= container.min_corner()[0] && m_min_corner[1] >= container.min_corner()[1] && m_min_corner[2] >= container.min_corner()[2]
+			&& m_max_corner[0] <= container.max_corner()[0] && m_max_corner[1] <= container.max_corner()[1] && m_max_corner[2] <= container.max_corner()[2];
 	}
 
 	void Split(unsigned int axis, space_real coord, BoundingBox & box_left, BoundingBox & box_right) const

@@ -69,22 +69,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>
     </LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
     <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\Release Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
     <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\x64\Release Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
     <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\Release Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
     <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\x64\Release Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -169,11 +169,10 @@
     <ClInclude Include="base_matrix4x4.hpp" />
     <ClInclude Include="base_matrix_functions.hpp" />
     <ClInclude Include="base_matrix_operations.hpp" />
-    <ClInclude Include="base_vector.hpp" />
-    <ClInclude Include="base_vector3_operations.hpp" />
-    <ClInclude Include="base_vector4.hpp" />
-    <ClInclude Include="base_vector_functions.hpp" />
-    <ClInclude Include="base_vector_operations.hpp" />
+    <ClInclude Include="vector.hpp" />
+    <ClInclude Include="vector3_operations.hpp" />
+    <ClInclude Include="vector_functions.hpp" />
+    <ClInclude Include="vector_operations.hpp" />
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="BoundingBoxHit.h" />
     <ClInclude Include="Camera.h" />
@@ -187,6 +186,7 @@
     <ClInclude Include="FlatTriangleObject.h" />
     <ClInclude Include="Flux.h" />
     <ClInclude Include="GeometryObject.h" />
+    <ClInclude Include="helper.hpp" />
     <ClInclude Include="Hit.h" />
     <ClInclude Include="HRTimer.h" />
     <ClInclude Include="KDTraverseFrame.h" />
@@ -236,7 +236,6 @@
     <ClInclude Include="KDTreeNode.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Types_old.h" />
-    <ClInclude Include="base_vector3.hpp" />
     <ClInclude Include="vector3.hpp" />
   </ItemGroup>
   <ItemGroup>

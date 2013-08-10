@@ -252,12 +252,6 @@
     <ClInclude Include="SkyLightSource.h">
       <Filter>Header Files\Engine\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="base_vector3.hpp">
-      <Filter>Header Files\Engine\Math\Vectors</Filter>
-    </ClInclude>
-    <ClInclude Include="base_vector3_operations.hpp">
-      <Filter>Header Files\Engine\Math\Vectors</Filter>
-    </ClInclude>
     <ClInclude Include="sse_float_vector3_operations.hpp">
       <Filter>Header Files\Engine\Math\Vectors</Filter>
     </ClInclude>
@@ -267,26 +261,14 @@
     <ClInclude Include="sse_float_vector3.hpp">
       <Filter>Header Files\Engine\Math\Vectors</Filter>
     </ClInclude>
-    <ClInclude Include="base_vector.hpp">
-      <Filter>Header Files\Engine\Math\Vectors</Filter>
-    </ClInclude>
-    <ClInclude Include="base_vector_operations.hpp">
-      <Filter>Header Files\Engine\Math\Vectors</Filter>
-    </ClInclude>
     <ClInclude Include="base_matrix.hpp">
       <Filter>Header Files\Engine\Math\Matrices</Filter>
     </ClInclude>
     <ClInclude Include="base_matrix_operations.hpp">
       <Filter>Header Files\Engine\Math\Matrices</Filter>
     </ClInclude>
-    <ClInclude Include="base_vector4.hpp">
-      <Filter>Header Files\Engine\Math\Vectors</Filter>
-    </ClInclude>
     <ClInclude Include="base_matrix_functions.hpp">
       <Filter>Header Files\Engine\Math\Matrices</Filter>
-    </ClInclude>
-    <ClInclude Include="base_vector_functions.hpp">
-      <Filter>Header Files\Engine\Math\Vectors</Filter>
     </ClInclude>
     <ClInclude Include="base_matrix4x4_transfrom.hpp">
       <Filter>Header Files\Engine\Math\Matrices</Filter>
@@ -320,6 +302,21 @@
     </ClInclude>
     <ClInclude Include="KDTraverseFrame.h">
       <Filter>Header Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="helper.hpp">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="vector3_operations.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="vector_functions.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="vector_operations.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

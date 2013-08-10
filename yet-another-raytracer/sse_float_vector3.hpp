@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base_vector.hpp"
+#include "vector.hpp"
 #include <nmmintrin.h>
 #include <crtdefs.h>
 
@@ -12,41 +12,41 @@
 namespace math
 {
 	template<>
-	class __declspec(align(16)) base_vector<float, 3>
+	class __declspec(align(16)) vector<float, 3>
 	{
 	public:
-		base_vector()
+		vector()
 		{
 			m_values = _mm_setzero_ps();
 		}
 
-		base_vector(const float & value)
+		vector(const float & value)
 		{
 			m_values = _mm_set_ps(float(0), value, value, value);
 		}
 
-		base_vector(const float values[3])
+		vector(const float values[3])
 		{
 			m_values = _mm_set_ps(float(0), values[2], values[1], values[0]);
 		}
 
-		base_vector(const __m128 & xmm)
+		vector(const __m128 & xmm)
 		{
 			m_values = xmm;
 		}
 
 		template<typename TOther>
-		base_vector(const base_vector<TOther, 3> & other)
+		vector(const vector<TOther, 3> & other)
 		{
 			m_values = _mm_set_ps(float(0), other[2], other[1], other[0]);
 		}
 
-		base_vector(const base_vector<float, 3> & other)
+		vector(const vector<float, 3> & other)
 		{
 			m_values = other.values();
 		}
 
-		base_vector(const float & x, const float & y, const float & z)
+		vector(const float & x, const float & y, const float & z)
 		{
 			m_values = _mm_set_ps(float(0), z, y, x);
 		}
@@ -90,9 +90,9 @@ namespace math
 		//	return m_values.m128_f32[index];
 		//}
 
-		base_vector<float, 2> reduce() const
+		vector<float, 2> reduce() const
 		{
-			base_vector<float, 2> res;
+			vector<float, 2> res;
 			res[0] = x();
 			res[1] = y();
 			return res;

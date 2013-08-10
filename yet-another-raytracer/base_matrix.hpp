@@ -1,7 +1,7 @@
 #pragma once
 
-#include "base_vector.hpp"
-#include "base_vector_operations.hpp"
+#include "vector.hpp"
+#include "vector_operations.hpp"
 #include <crtdefs.h>
 
 namespace math
@@ -10,6 +10,9 @@ namespace math
 	class base_matrix
 	{
 	public:
+
+		enum { columns = COLS, rows = ROWS };
+
 		// Constructs identity matrix
 		base_matrix()
 		{
@@ -34,22 +37,19 @@ namespace math
 			}
 		}
 
-		size_t num_rows() const { return ROWS; }
-		size_t num_cols() const { return COLS; }
-
-		base_vector<T, COLS> & operator[](std::size_t index)
+		vector<T, COLS> & operator[](std::size_t index)
 		{
 			return m_rows[index];
 		}
 
-		const base_vector<T, COLS> & operator[](std::size_t index) const
+		const vector<T, COLS> & operator[](std::size_t index) const
 		{
 			return m_rows[index];
 		}
 
-		base_vector<T, ROWS> get_column(std::size_t index) const
+		vector<T, ROWS> get_column(std::size_t index) const
 		{
-			base_vector<T, ROWS> res;
+			vector<T, ROWS> res;
 			for (size_t i = 0; i < ROWS; i++)
 			{
 				res[i] = m_rows[i][index];
@@ -58,6 +58,6 @@ namespace math
 		}
 
 	private:
-		base_vector<T, COLS> m_rows[ROWS];
+		vector<T, COLS> m_rows[ROWS];
 	};
 }

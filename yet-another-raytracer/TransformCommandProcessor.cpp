@@ -1,7 +1,6 @@
 #include "TransformCommandProcessor.h"
 
 #include "PareserHelper.h"
-#include <glm/gtc/matrix_transform.hpp>
 
 TransformCommandProcessor::TransformCommandProcessor(void)
 {

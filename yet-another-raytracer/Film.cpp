@@ -21,9 +21,9 @@ void Film::SaveAsPng( const char * filename )
 		for (unsigned int x = 0; x < m_width; x++)
 		{
 			auto clamped = math::clamp(*pixel_at(x, y), color_0, color_1);
-			image[y][x].red = (int)(clamped.x() * 255);
-			image[y][x].green = (int)(clamped.y() * 255);
-			image[y][x].blue = (int)(clamped.z() * 255);
+			image[y][x].red = (int)(clamped[0] * 255);
+			image[y][x].green = (int)(clamped[1] * 255);
+			image[y][x].blue = (int)(clamped[2] * 255);
 		}
 	}
 
