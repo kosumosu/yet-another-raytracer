@@ -1,0 +1,429 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{a0353ee5-e715-449b-a62e-cd4567e5b3f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{c789d215-8fe4-4677-8dca-bf76920b2e94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Raytracer">
+      <UniqueIdentifier>{b7e7c851-a11e-4fae-9635-99e430fd591a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Objects">
+      <UniqueIdentifier>{2d3c55fd-2c8f-483f-9000-93cebb15ccd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Lighting">
+      <UniqueIdentifier>{fb4dfe1e-e8f9-4dd4-a32f-86eb7c89e5fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Materials">
+      <UniqueIdentifier>{c5817e61-cdfa-44e4-a23d-82764a20f926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Lighting">
+      <UniqueIdentifier>{0aa8b765-3ee7-431e-ae0c-cbcf1e82a064}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Materials">
+      <UniqueIdentifier>{7c87c896-5cb4-4372-a40c-c735d53eff32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Objects">
+      <UniqueIdentifier>{0ea2301a-98ee-4928-b573-04d165fddfa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Raytracer">
+      <UniqueIdentifier>{7f76c8bb-ec8e-44d9-b636-fe1d9874a825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Raytracer\Accelerators">
+      <UniqueIdentifier>{27d6f3aa-886f-4dfc-b21b-40cb0c6ff477}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Raytracer\Accelerators">
+      <UniqueIdentifier>{41268d28-e133-48ae-a66a-c356874081e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Raytracer\Accelerators\NullAccelerator">
+      <UniqueIdentifier>{ce56f893-5554-46a6-a5a5-e9a14835c580}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Raytracer\Accelerators\NullAccelerator">
+      <UniqueIdentifier>{60ace0c1-6ac1-429c-b130-6054b9cedee3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Scene">
+      <UniqueIdentifier>{cf6c6c45-60b1-4acb-a3a1-fa6cfd0b7ff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Scene">
+      <UniqueIdentifier>{4ab09f64-226b-4c11-9ae9-a0db0ea2018a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Scene\Loading">
+      <UniqueIdentifier>{9b1134e0-6315-483d-8f77-e27d375cf7db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Scene\Loading">
+      <UniqueIdentifier>{30a6e90a-a42c-4ff0-9563-14e530569310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Math">
+      <UniqueIdentifier>{d7290654-dc9f-4632-816a-a2217cc5efb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Raytracer\Accelerators\KDTree">
+      <UniqueIdentifier>{0c1a2529-bfd7-4cec-847d-86696a0dcae3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Raytracer\Accelerators\KDTree">
+      <UniqueIdentifier>{15097169-db03-457f-80b3-7db85e4656f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Math\Vectors">
+      <UniqueIdentifier>{552d1568-0e23-4277-8a1a-5c0f40c9a26a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Math\Matrices">
+      <UniqueIdentifier>{353cbc5a-ca8b-48c0-b635-c5254a9d44f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Math\Random">
+      <UniqueIdentifier>{0bc196d4-9b46-4b97-93ba-cfb5bef58c05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Math">
+      <UniqueIdentifier>{cd471405-c6b4-4c92-8e50-20451b1d18f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine\Math\Random">
+      <UniqueIdentifier>{4128dd85-de2c-46d3-a7ee-a6984e4ec357}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Film.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Engine\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryObject.h">
+      <Filter>Header Files\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="LightingServer.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Flux.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="Raytracer.h">
+      <Filter>Header Files\Engine\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="Hit.h">
+      <Filter>Header Files\Engine\Raytracer</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSource.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="RayEvaluator.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadingContext.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereObject.h">
+      <Filter>Header Files\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Accelerator.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="Marcher.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="NullAccelerator.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators\NullAccelerator</Filter>
+    </ClInclude>
+    <ClInclude Include="NullMarcher.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators\NullAccelerator</Filter>
+    </ClInclude>
+    <ClInclude Include="HRTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Attenuation.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLightSource.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnMaterial.h">
+      <Filter>Header Files\Engine\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformableGeometryObject.h">
+      <Filter>Header Files\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="FlatTriangleObject.h">
+      <Filter>Header Files\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandFactory.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandProcessor.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneLoader.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadingContext.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="Parser.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformCommandProcessor.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsCommandProcessor.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsCommandFactory.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialCommandProcessor.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformCommandFactory.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialCommandFactory.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLightSource.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectCommandProcessor.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectCommandFactory.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="PareserHelper.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSourceCommandProcessor.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSourceCommandFactory.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraCommandProcessor.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraCommandFactory.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBox.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformStack.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBoxHit.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="KDTreeAccelerator.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="KDTreeNode.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="KDTreeMarcher.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyLightSource.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="base_vector3.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="base_vector3_operations.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="sse_float_vector3_operations.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="vector3.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="sse_float_vector3.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="base_vector.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="base_vector_operations.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="base_matrix.hpp">
+      <Filter>Header Files\Engine\Math\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="base_matrix_operations.hpp">
+      <Filter>Header Files\Engine\Math\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="base_vector4.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="base_matrix_functions.hpp">
+      <Filter>Header Files\Engine\Math\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="base_vector_functions.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="base_matrix4x4_transfrom.hpp">
+      <Filter>Header Files\Engine\Math\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="base_matrix4x4.hpp">
+      <Filter>Header Files\Engine\Math\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="sse_float_vector4.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="sse_float_vector4_operations.hpp">
+      <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Types_old.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="new_math.hpp">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="random.hpp">
+      <Filter>Header Files\Engine\Math\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomEngine.h">
+      <Filter>Header Files\Engine\Math\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="allocation.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="KDTraverseFrame.h">
+      <Filter>Header Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Film.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Raytracer.cpp">
+      <Filter>Source Files\Engine\Raytracer</Filter>
+    </ClCompile>
+    <ClCompile Include="LightingServer.cpp">
+      <Filter>Source Files\Engine\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="RayEvaluator.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="SphereObject.cpp">
+      <Filter>Source Files\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="NullAccelerator.cpp">
+      <Filter>Source Files\Engine\Raytracer\Accelerators\NullAccelerator</Filter>
+    </ClCompile>
+    <ClCompile Include="NullMarcher.cpp">
+      <Filter>Source Files\Engine\Raytracer\Accelerators\NullAccelerator</Filter>
+    </ClCompile>
+    <ClCompile Include="HRTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLightSource.cpp">
+      <Filter>Source Files\Engine\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnMaterial.cpp">
+      <Filter>Source Files\Engine\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="FlatTriangleObject.cpp">
+      <Filter>Source Files\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneLoader.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="Parser.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformCommandProcessor.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsCommandProcessor.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialCommandProcessor.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialCommandFactory.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsCommandFactory.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformCommandFactory.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLightSource.cpp">
+      <Filter>Source Files\Engine\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectCommandProcessor.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectCommandFactory.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSourceCommandProcessor.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSourceCommandFactory.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraCommandProcessor.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraCommandFactory.cpp">
+      <Filter>Source Files\Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="KDTreeAccelerator.cpp">
+      <Filter>Source Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="KDTreeNode.cpp">
+      <Filter>Source Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="KDTreeMarcher.cpp">
+      <Filter>Source Files\Engine\Raytracer\Accelerators\KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyLightSource.cpp">
+      <Filter>Source Files\Engine\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="RandomEngine.cpp">
+      <Filter>Source Files\Engine\Math\Random</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>My1841xhw3</RootNamespace>
+    <ProjectGuid>{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>
+    </LinkIncremental>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\Release Library;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\x64\Release Library;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\Release Library;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;D:\_PROGRAMMING\_libraries\glm-0.9.4.0\;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\x64\Release Library;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libpng15.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Accelerator.h" />
+    <ClInclude Include="allocation.h" />
+    <ClInclude Include="Attenuation.h" />
+    <ClInclude Include="base_matrix.hpp" />
+    <ClInclude Include="base_matrix4x4.hpp" />
+    <ClInclude Include="base_matrix_functions.hpp" />
+    <ClInclude Include="base_matrix_operations.hpp" />
+    <ClInclude Include="base_vector.hpp" />
+    <ClInclude Include="base_vector3_operations.hpp" />
+    <ClInclude Include="base_vector4.hpp" />
+    <ClInclude Include="base_vector_functions.hpp" />
+    <ClInclude Include="base_vector_operations.hpp" />
+    <ClInclude Include="BoundingBox.h" />
+    <ClInclude Include="BoundingBoxHit.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraCommandFactory.h" />
+    <ClInclude Include="CameraCommandProcessor.h" />
+    <ClInclude Include="CommandFactory.h" />
+    <ClInclude Include="CommandProcessor.h" />
+    <ClInclude Include="DirectionalLightSource.h" />
+    <ClInclude Include="Film.h" />
+    <ClInclude Include="BlinnMaterial.h" />
+    <ClInclude Include="FlatTriangleObject.h" />
+    <ClInclude Include="Flux.h" />
+    <ClInclude Include="GeometryObject.h" />
+    <ClInclude Include="Hit.h" />
+    <ClInclude Include="HRTimer.h" />
+    <ClInclude Include="KDTraverseFrame.h" />
+    <ClInclude Include="KDTreeAccelerator.h" />
+    <ClInclude Include="KDTreeMarcher.h" />
+    <ClInclude Include="LightingServer.h" />
+    <ClInclude Include="LightSource.h" />
+    <ClInclude Include="LightSourceCommandFactory.h" />
+    <ClInclude Include="LightSourceCommandProcessor.h" />
+    <ClInclude Include="Marcher.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialCommandFactory.h" />
+    <ClInclude Include="MaterialCommandProcessor.h" />
+    <ClInclude Include="base_matrix4x4_transfrom.hpp" />
+    <ClInclude Include="new_math.hpp" />
+    <ClInclude Include="NullAccelerator.h" />
+    <ClInclude Include="NullMarcher.h" />
+    <ClInclude Include="ObjectCommandFactory.h" />
+    <ClInclude Include="ObjectCommandProcessor.h" />
+    <ClInclude Include="PareserHelper.h" />
+    <ClInclude Include="Parser.h" />
+    <ClInclude Include="PointLightSource.h" />
+    <ClInclude Include="random.hpp" />
+    <ClInclude Include="RandomEngine.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="Raytracer.h" />
+    <ClInclude Include="RayEvaluator.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneLoader.h" />
+    <ClInclude Include="SettingsCommandFactory.h" />
+    <ClInclude Include="SettingsCommandProcessor.h" />
+    <ClInclude Include="ShadingContext.h" />
+    <ClInclude Include="LoadingContext.h" />
+    <ClInclude Include="SkyLightSource.h" />
+    <ClInclude Include="sse_float_vector4.hpp" />
+    <ClInclude Include="sse_float_vector3.hpp" />
+    <ClInclude Include="sse_float_vector3_operations.hpp" />
+    <ClInclude Include="sse_float_vector4_operations.hpp" />
+    <ClInclude Include="TransformableGeometryObject.h" />
+    <ClInclude Include="SphereObject.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TransformCommandFactory.h" />
+    <ClInclude Include="TransformCommandProcessor.h" />
+    <ClInclude Include="TransformStack.h" />
+    <ClInclude Include="KDTreeNode.h" />
+    <ClInclude Include="Types.h" />
+    <ClInclude Include="Types_old.h" />
+    <ClInclude Include="base_vector3.hpp" />
+    <ClInclude Include="vector3.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BlinnMaterial.cpp" />
+    <ClCompile Include="CameraCommandFactory.cpp" />
+    <ClCompile Include="CameraCommandProcessor.cpp" />
+    <ClCompile Include="DirectionalLightSource.cpp" />
+    <ClCompile Include="Film.cpp" />
+    <ClCompile Include="FlatTriangleObject.cpp" />
+    <ClCompile Include="HRTimer.cpp" />
+    <ClCompile Include="KDTreeAccelerator.cpp" />
+    <ClCompile Include="KDTreeMarcher.cpp" />
+    <ClCompile Include="LightingServer.cpp" />
+    <ClCompile Include="LightSourceCommandFactory.cpp" />
+    <ClCompile Include="LightSourceCommandProcessor.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MaterialCommandFactory.cpp" />
+    <ClCompile Include="MaterialCommandProcessor.cpp" />
+    <ClCompile Include="NullAccelerator.cpp" />
+    <ClCompile Include="NullMarcher.cpp" />
+    <ClCompile Include="ObjectCommandFactory.cpp" />
+    <ClCompile Include="ObjectCommandProcessor.cpp" />
+    <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="PointLightSource.cpp" />
+    <ClCompile Include="RandomEngine.cpp" />
+    <ClCompile Include="Raytracer.cpp" />
+    <ClCompile Include="RayEvaluator.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="SceneLoader.cpp" />
+    <ClCompile Include="SettingsCommandFactory.cpp" />
+    <ClCompile Include="SettingsCommandProcessor.cpp" />
+    <ClCompile Include="SkyLightSource.cpp" />
+    <ClCompile Include="SphereObject.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TransformCommandFactory.cpp" />
+    <ClCompile Include="TransformCommandProcessor.cpp" />
+    <ClCompile Include="KDTreeNode.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

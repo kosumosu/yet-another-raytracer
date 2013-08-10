@@ -1,0 +1,23 @@
+#pragma once
+
+#include "Types.h"
+
+class ShadingContext;
+
+class Material
+{
+public:
+
+	Material(void)
+	{
+	}
+
+	virtual ~Material(void)
+	{
+	}
+
+	// Returns color as the result of shading
+	virtual color4 Shade(const ShadingContext & context) const = 0;
+
+	virtual Material * Clone() const = 0;
+};
