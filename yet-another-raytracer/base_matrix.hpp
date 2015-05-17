@@ -2,7 +2,7 @@
 
 #include "vector.hpp"
 #include "vector_operations.hpp"
-#include <crtdefs.h>
+#include <cstddef>
 
 namespace math
 {
