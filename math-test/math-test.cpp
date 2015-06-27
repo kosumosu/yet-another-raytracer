@@ -105,7 +105,7 @@ bool CompareWithGLM(const math::base_matrix<float, 4, 4> & one, const glm::mat4 
 	{
 		for (size_t i = 0; i < 4; i++)
 		{
-			if (one[j][i] != another[i][j])
+			if (one[j][i] != another[glm::mat4::length_type(i)][glm::mat4::length_type(j)])
 				return false;
 		}
 	}

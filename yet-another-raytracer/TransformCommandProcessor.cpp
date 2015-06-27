@@ -1,6 +1,6 @@
 #include "TransformCommandProcessor.h"
 
-#include "PareserHelper.h"
+#include "ParserHelper.h"
 
 TransformCommandProcessor::TransformCommandProcessor(void)
 {
@@ -21,18 +21,18 @@ void TransformCommandProcessor::ProcessCommand( LoadingContext & context, const 
 {
 	if (command == "translate")
 	{
-		auto transform = math::translate(PareserHelper::ReadVec3(stream));
+		auto transform = math::translate(ParserHelper::ReadVec3(stream));
 		context.transform(context.transform() * transform);
 	}
 	else if (command == "scale")
 	{
-		auto transform = math::scale(PareserHelper::ReadVec3(stream));
+		auto transform = math::scale(ParserHelper::ReadVec3(stream));
 		context.transform(context.transform() * transform);
 	}
 	else if (command == "rotate")
 	{
-		auto axis = PareserHelper::ReadVec3(stream);
-		space_real angle = PareserHelper::ReadSpaceReal(stream);
+		auto axis = ParserHelper::ReadVec3(stream);
+		space_real angle = ParserHelper::ReadSpaceReal(stream);
 		auto transform = math::rotate_degrees(axis, angle);
 		context.transform(context.transform() * transform);
 	}

@@ -4,7 +4,7 @@
 #include "CommandFactory.h"
 #include <map>
 #include <memory>
-
+#include <string>
 
 class SceneLoader
 {
@@ -15,7 +15,7 @@ public:
 	SceneLoader(const std::vector< std::shared_ptr<CommandFactory> > & factories);
 	~SceneLoader(void);
 
-	void Load(Scene & scene, const char * filename) const;
+	void Load(Scene & scene, const std::string & filename) const;
 
 private:
 	std::vector< std::shared_ptr<CommandFactory> > m_factories;

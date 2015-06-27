@@ -16,7 +16,7 @@ RayEvaluator::~RayEvaluator(void)
 {
 }
 
-color4 RayEvaluator::TraceRay( const Ray & ray, unsigned int depth_left, space_real bias ) const
+color_rgbx RayEvaluator::TraceRay( const Ray & ray, unsigned int depth_left, space_real bias ) const
 {
 	if (depth_left < 1)
 		return m_background_color;

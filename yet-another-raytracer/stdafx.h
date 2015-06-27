@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <tchar.h>
 
-
-
 // TODO: reference additional headers your program requires here
+
+#define NO_MIN_MAX
+#include <Windows.h>
+
+#undef far
+#undef near

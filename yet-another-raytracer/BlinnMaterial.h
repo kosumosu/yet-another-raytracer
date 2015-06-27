@@ -11,14 +11,14 @@ public:
 	
 
 	BlinnMaterial(void)
-		: m_diffuse(color4())
-		, m_specular(color4())
-		, m_emission(color4())
+		: m_diffuse(color_rgbx())
+		, m_specular(color_rgbx())
+		, m_emission(color_rgbx())
 		, m_shininess(1.0f)
 	{
 	}
 
-	BlinnMaterial(const color4 & emission, const color4 & diffuse, const color4 & specular, color_real shininess)
+	BlinnMaterial(const color_rgbx & emission, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess)
 		: m_emission(emission)
 		, m_diffuse(diffuse)
 		, m_specular(specular)
@@ -42,31 +42,31 @@ public:
 
 
 
-	const color4 & emission() const { return m_emission; }
-	void emission(const color4 & value) { m_emission = value; }
+	const color_rgbx & emission() const { return m_emission; }
+	void emission(const color_rgbx & value) { m_emission = value; }
 
-	const color4 & diffuse() const { return m_diffuse; }
-	void diffuse(const color4 & value) { m_diffuse = value; }
+	const color_rgbx & diffuse() const { return m_diffuse; }
+	void diffuse(const color_rgbx & value) { m_diffuse = value; }
 
-	const color4 & specular() const { return m_specular; }
-	void specular(const color4 & value) { m_specular = value; }
+	const color_rgbx & specular() const { return m_specular; }
+	void specular(const color_rgbx & value) { m_specular = value; }
 
 	color_real shininess() const { return m_shininess; }
 	void shininess(color_real value) { m_shininess = value; }
 
 
-	virtual color4 Shade( const ShadingContext & context ) const;
+	virtual color_rgbx Shade( const ShadingContext & context ) const;
 
 	virtual Material * Clone() const;
 
 private:
-	color4 m_emission;
-	color4 m_diffuse;
-	color4 m_specular;
+	color_rgbx m_emission;
+	color_rgbx m_diffuse;
+	color_rgbx m_specular;
 	color_real m_shininess;
 
-	color4 ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux ) const;
-	color4 ComputeSpecularComponent( const ShadingContext & context, const Flux & flux ) const;
+	color_rgbx ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux ) const;
+	color_rgbx ComputeSpecularComponent( const ShadingContext & context, const Flux & flux ) const;
 
 };
 

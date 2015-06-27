@@ -3,7 +3,7 @@
 #include "Types.h"
 #include <istream>
 
-class PareserHelper
+class ParserHelper
 {
 public:
 	static vector3 ReadVec3(std::istream & stream)
@@ -16,6 +16,13 @@ public:
 	static space_real ReadSpaceReal(std::istream & stream)
 	{
 		return Read<space_real>(stream);
+	}
+
+	static color_rgb ReadColorRgb(std::istream & stream)
+	{
+		color_real r, g, b;
+		stream >> r >> g >> b;
+		return color_rgb(r, g, b);
 	}
 
 	static color_real ReadColorReal(std::istream & stream)
@@ -42,11 +49,11 @@ public:
 	}
 
 private:
-	PareserHelper(void)
+	ParserHelper(void)
 	{
 	}
 
-	~PareserHelper(void)
+	~ParserHelper(void)
 	{
 	}
 };

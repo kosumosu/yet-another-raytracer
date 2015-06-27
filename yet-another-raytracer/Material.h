@@ -17,7 +17,7 @@ public:
 	}
 
 	// Returns color as the result of shading
-	virtual color4 Shade(const ShadingContext & context) const = 0;
+	virtual color_rgbx Shade(const ShadingContext & context) const = 0;
 
 	virtual Material * Clone() const = 0;
 };

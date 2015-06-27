@@ -14,6 +14,6 @@ public:
 	virtual void ProcessCommand( LoadingContext & context, const std::string & command, std::istream & stream );
 
 private:
-	color4 m_last_ambient;
+	color_rgbx m_last_ambient;
 };
 

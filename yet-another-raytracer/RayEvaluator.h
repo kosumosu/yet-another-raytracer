@@ -13,17 +13,17 @@ public:
 	~RayEvaluator(void);
 
 	// Returns color of traced ray
-	color4 TraceRay(const Ray & ray, unsigned int depth_left, space_real bias) const;
+	color_rgbx TraceRay(const Ray & ray, unsigned int depth_left, space_real bias) const;
 
-	color4 background_color() const { return m_background_color; }
-	void background_color(const color4 & val) { m_background_color = val; }
+	color_rgbx background_color() const { return m_background_color; }
+	void background_color(const color_rgbx & val) { m_background_color = val; }
 
 	const Raytracer * raytracer() const { return m_raytracer; }
 
 	const LightingServer * lighting_server() const { return m_lighting_server; }
 
 private:
-	color4 m_background_color;
+	color_rgbx m_background_color;
 	const Raytracer * m_raytracer;
 	const LightingServer * m_lighting_server;
 };

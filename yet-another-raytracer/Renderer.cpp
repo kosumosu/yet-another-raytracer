@@ -32,7 +32,7 @@ void Renderer::Render( Film & film, const Scene & scene ) const
 	LightingServer lighting_server(&raytracer);
 	lighting_server.shadows_enabled(true);
 	RayEvaluator ray_evaluator(&raytracer, &lighting_server);
-	//ray_evaluator.background_color(color4(0.5f, 0.64f, 0.82f, 1.0f));
+	//ray_evaluator.background_color(color_rgbx(0.5f, 0.64f, 0.82f, 1.0f));
 
 	lighting_server.lights(scene.lights().get());
 

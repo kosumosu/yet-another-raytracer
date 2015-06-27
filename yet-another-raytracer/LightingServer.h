@@ -18,8 +18,8 @@ public:
 	bool shadows_enabled() const { return m_shadows_enabled; }
 	void shadows_enabled(bool val) { m_shadows_enabled = val; }
 
-	const color4 & ambient_light() const { return m_ambient_light; }
-	void ambient_light(const color4 & val) { m_ambient_light = val; }
+	const color_rgbx & ambient_light() const { return m_ambient_light; }
+	void ambient_light(const color_rgbx & val) { m_ambient_light = val; }
 
 	const LightSourceCollection * lights() const { return m_lights; }
 	void lights(const LightSourceCollection * val) { m_lights = val; }
@@ -34,7 +34,7 @@ public:
 private:
 	bool m_shadows_enabled;
 
-	color4 m_ambient_light;
+	color_rgbx m_ambient_light;
 	const LightSourceCollection * m_lights;
 
 	const Raytracer * m_raytracer;

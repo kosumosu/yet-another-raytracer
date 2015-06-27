@@ -14,7 +14,7 @@ public:
 
 
 	// direction is direction from point to light
-	Flux(const LightSource * source, const vector3 & direction, const color4 & color, space_real distance)
+	Flux(const LightSource * source, const vector3 & direction, const color_rgbx & color, space_real distance)
 		: m_source(source)
 		, m_direction(direction)
 		, m_color(color)
@@ -31,8 +31,8 @@ public:
 	void direction(const vector3 & val) { m_direction = val; }
 
 	// Resulting color of illumination. Already attenuated
-	const color4 & color() const { return m_color; }
-	void color(const color4 & val) { m_color = val; }
+	const color_rgbx & color() const { return m_color; }
+	void color(const color_rgbx & val) { m_color = val; }
 
 	// Gets distance to light source [atom]
 	space_real distance() const { return m_distance; }
@@ -41,7 +41,7 @@ public:
 private:
 	const LightSource * m_source;
 	vector3 m_direction;
-	color4 m_color;
+	color_rgbx m_color;
 	space_real m_distance;
 };
 

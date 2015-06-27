@@ -14,12 +14,12 @@ public:
 	const vector3 & direction() const { return m_direction; }
 	void direction(const vector3 & val) { m_direction = val; }
 
-	const color4 & color() const { return m_color; }
-	void color(const color4 & val) { m_color = val; }
+	const color_rgbx & color() const { return m_color; }
+	void color(const color_rgbx & val) { m_color = val; }
 
 
 private:
 	vector3 m_direction;
-	color4 m_color;
+	color_rgbx m_color;
 };
 

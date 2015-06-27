@@ -2,7 +2,7 @@
 
 #include "DirectionalLightSource.h"
 #include "PointLightSource.h"
-#include "PareserHelper.h"
+#include "ParserHelper.h"
 #include "Types.h"
 
 LightSourceCommandProcessor::LightSourceCommandProcessor(void)
@@ -24,8 +24,8 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 {
 	if (command == "directional")
 	{
-		auto direction = PareserHelper::ReadVec3(stream);
-		auto color = color4(PareserHelper::ReadVec3(stream), color_real(0.0));
+		auto direction = ParserHelper::ReadVec3(stream);
+		auto color = color_rgbx(ParserHelper::ReadColorRgb(stream), color_real(0.0));
 
 		DirectionalLightSource * light = new DirectionalLightSource();
 		light->direction((context.transform() * vector4(direction, space_real(0.0))).reduce());
@@ -35,8 +35,8 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 	}
 	else if (command == "point")
 	{
-		auto position = PareserHelper::ReadVec3(stream);
-		auto color = color4(PareserHelper::ReadVec3(stream), 0.0f);
+		auto position = ParserHelper::ReadVec3(stream);
+		auto color = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
 
 		PointLightSource * light = new PointLightSource();
 		light->position((context.transform() * vector4(position, space_real(1.0))).reduce());

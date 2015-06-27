@@ -2,7 +2,7 @@
 
 #include "FlatTriangleObject.h"
 #include "SphereObject.h"
-#include "PareserHelper.h"
+#include "ParserHelper.h"
 #include <memory>
 
 ObjectCommandProcessor::ObjectCommandProcessor(void)
@@ -23,7 +23,7 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 {
 	if (command == "maxverts")
 	{
-		m_vertices.reserve(PareserHelper::ReadUInt(stream));
+		m_vertices.reserve(ParserHelper::ReadUInt(stream));
 	}
 	else if (command == "maxvertnorms")
 	{
@@ -31,7 +31,7 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 	}
 	else if (command == "vertex")
 	{
-		m_vertices.push_back(PareserHelper::ReadVec3(stream));
+		m_vertices.push_back(ParserHelper::ReadVec3(stream));
 	}
 	else if (command == "vertexnormal")
 	{
@@ -56,8 +56,8 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 	}
 	else if (command == "sphere")
 	{
-		auto center = PareserHelper::ReadVec3(stream);
-		space_real radius = PareserHelper::ReadSpaceReal(stream);
+		auto center = ParserHelper::ReadVec3(stream);
+		space_real radius = ParserHelper::ReadSpaceReal(stream);
 		SphereObject * sphere = new SphereObject();
 		sphere->center(center);
 		sphere->radius(radius);

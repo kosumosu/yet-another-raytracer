@@ -17,8 +17,8 @@ public:
 		m_color_per_sample = m_color / color_real(m_samples);
 	}
 
-	const color4 & color() const { return m_color; }
-	void color(const color4 & val)
+	const color_rgbx & color() const { return m_color; }
+	void color(const color_rgbx & val)
 	{
 		m_color = val;
 		m_color_per_sample = m_color / color_real(m_samples);
@@ -26,7 +26,7 @@ public:
 
 private:
 	unsigned int m_samples;
-	color4 m_color;
-	color4 m_color_per_sample;
+	color_rgbx m_color;
+	color_rgbx m_color_per_sample;
 };
 

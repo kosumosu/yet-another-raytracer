@@ -1,9 +1,9 @@
 #include "BlinnMaterial.h"
 #include "ShadingContext.h"
 
-color4 BlinnMaterial::Shade( const ShadingContext & context ) const
+color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 {
-	color4 m_illumination = m_emission;
+	color_rgbx m_illumination = m_emission;
 
 	FluxCollection * fluxes(context.lighting_server()->GetFluxesAtPoint(context.hit_point(), context.normal(), context.bias()));
 
@@ -16,7 +16,7 @@ color4 BlinnMaterial::Shade( const ShadingContext & context ) const
 
 	auto reflected_direction = context.incident_ray().direction() - context.normal() * (color_real(2.0) * math::dot(context.incident_ray().direction(), context.normal()));
 
-	if (m_specular != color4())
+	if (m_specular != color_rgbx())
 	{
 		auto reflection = context.ray_evaluator()->TraceRay(Ray(context.hit_point(), reflected_direction), context.trace_depth(), context.bias());
 		m_illumination += reflection * m_specular;
@@ -25,13 +25,13 @@ color4 BlinnMaterial::Shade( const ShadingContext & context ) const
 	return m_illumination;
 }
 
-color4 BlinnMaterial::ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux ) const
+color_rgbx BlinnMaterial::ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux ) const
 {
 	auto intensity = (color_real)std::max(space_real(0.0), math::dot(flux.direction(), context.normal()));
 	return m_diffuse * flux.color() * intensity;
 }
 
-color4 BlinnMaterial::ComputeSpecularComponent( const ShadingContext & context, const Flux & flux ) const
+color_rgbx BlinnMaterial::ComputeSpecularComponent( const ShadingContext & context, const Flux & flux ) const
 {
 	auto half_vector = math::normalize(flux.direction() - context.incident_ray().direction());
 	auto intensity = std::powf((color_real)std::max(space_real(0.0), math::dot(half_vector, context.normal())), m_shininess);

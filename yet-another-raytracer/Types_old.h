@@ -16,5 +16,5 @@ typedef glm::mat4 matrix4;
 typedef glm::mediump_float space_real;
 #endif
 
-typedef glm::vec4 color4;
+typedef glm::vec4 color_rgbx;
 typedef glm::mediump_float color_real;

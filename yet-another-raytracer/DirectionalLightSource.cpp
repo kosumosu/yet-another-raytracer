@@ -4,7 +4,7 @@
 
 DirectionalLightSource::DirectionalLightSource(void)
 	: m_direction(vector3())
-	, m_color(color4())
+	, m_color(color_rgbx())
 {
 }
 

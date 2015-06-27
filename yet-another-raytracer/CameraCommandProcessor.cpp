@@ -1,6 +1,6 @@
 #include "CameraCommandProcessor.h"
 
-#include "PareserHelper.h"
+#include "ParserHelper.h"
 #include "Camera.h"
 
 CameraCommandProcessor::CameraCommandProcessor(void)
@@ -21,10 +21,10 @@ void CameraCommandProcessor::ProcessCommand( LoadingContext & context, const std
 {
 	if (command == "camera")
 	{
-		auto position = PareserHelper::ReadVec3(stream);
-		auto target = PareserHelper::ReadVec3(stream);
-		auto up = PareserHelper::ReadVec3(stream);
-		space_real fovy = PareserHelper::ReadSpaceReal(stream);
+		auto position = ParserHelper::ReadVec3(stream);
+		auto target = ParserHelper::ReadVec3(stream);
+		auto up = ParserHelper::ReadVec3(stream);
+		space_real fovy = ParserHelper::ReadSpaceReal(stream);
 
 		auto binormal = math::cross(target - position, up);
 		auto corrected_up = math::normalize(math::cross(binormal, target - position));

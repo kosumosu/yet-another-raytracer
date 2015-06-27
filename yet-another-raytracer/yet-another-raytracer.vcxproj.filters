@@ -213,9 +213,6 @@
     <ClInclude Include="ObjectCommandFactory.h">
       <Filter>Header Files\Engine\Scene\Loading</Filter>
     </ClInclude>
-    <ClInclude Include="PareserHelper.h">
-      <Filter>Header Files\Engine\Scene\Loading</Filter>
-    </ClInclude>
     <ClInclude Include="LightSourceCommandProcessor.h">
       <Filter>Header Files\Engine\Scene\Loading</Filter>
     </ClInclude>
@@ -317,6 +314,9 @@
     </ClInclude>
     <ClInclude Include="vector_operations.hpp">
       <Filter>Header Files\Engine\Math\Vectors</Filter>
+    </ClInclude>
+    <ClInclude Include="ParserHelper.h">
+      <Filter>Header Files\Engine\Scene\Loading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

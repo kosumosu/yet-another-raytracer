@@ -3,7 +3,7 @@
 #include "new_math.hpp"
 #include "allocation.h"
 
-//#define DOUBLE_PRECISION
+#define DOUBLE_PRECISION
 
 #if defined (DOUBLE_PRECISION)
 typedef math::vector3d vector3;
@@ -17,5 +17,6 @@ typedef math::matrix4f matrix4;
 typedef float space_real;
 #endif
 
-typedef math::vector4f color4;
+typedef math::vector3f color_rgb;
+typedef math::vector4f color_rgbx;
 typedef float color_real;

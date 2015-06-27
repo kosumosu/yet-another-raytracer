@@ -1,6 +1,6 @@
 #include "SettingsCommandProcessor.h"
 
-#include "PareserHelper.h"
+#include "ParserHelper.h"
 
 SettingsCommandProcessor::SettingsCommandProcessor(void)
 {
@@ -23,16 +23,16 @@ void SettingsCommandProcessor::ProcessCommand( LoadingContext & context, const s
 {
 	if (command == "size")
 	{
-		context.scene()->viewport_width(PareserHelper::Read<unsigned int>(stream));
-		context.scene()->viewport_height(PareserHelper::Read<unsigned int>(stream));
+		context.scene()->viewport_width(ParserHelper::Read<unsigned int>(stream));
+		context.scene()->viewport_height(ParserHelper::Read<unsigned int>(stream));
 	}
 	else if (command == "maxdepth")
 	{
-		context.scene()->max_trace_depth(PareserHelper::Read<unsigned int>(stream));
+		context.scene()->max_trace_depth(ParserHelper::Read<unsigned int>(stream));
 	}
 	else if (command == "output")
 	{
-		context.scene()->output_filename(PareserHelper::Read<std::string>(stream));
+		context.scene()->output_filename(ParserHelper::Read<std::string>(stream));
 	}
 	else
 	{
