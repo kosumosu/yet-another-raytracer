@@ -14,6 +14,7 @@ public:
 	Scene(void)
 		: m_viewport_width(640)
 		, m_viewport_height(480)
+		, m_max_trace_depth(4)
 		, m_camera(new Camera())
 		, m_objects(new ObjectCollection())
 		, m_lights(new LightSourceCollection())
