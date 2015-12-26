@@ -184,21 +184,24 @@ void InsertDirectionalLight(Scene & scene)
 	scene.lights()->push_back(light_source);
 }
 
-void InsertSkyLight(Scene & scene)
+void InsertSkyLight(Scene & scene, unsigned int samples)
 {
 	std::shared_ptr<SkyLightSource> light_source(new SkyLightSource());
 	light_source->color(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
-	light_source->samples(64);
+	light_source->samples(samples);
 
 	scene.lights()->push_back(light_source);
 }
 
 
-void InsertCamera(Scene &scene)
+void InitCamera(Scene & scene, unsigned int width, unsigned int height)
 {
 	scene.camera()->fovy(90.0);
 	scene.camera()->position(vector3(4.0, 0.0, 0.0));
 	scene.camera()->up(vector3(0.0, 0.0, 1.0));
+
+	scene.viewport_width(width);
+	scene.viewport_height(height);
 }
 
 
@@ -264,22 +267,22 @@ void Render(const std::string & scene_file, const std::string & output_image_fil
 {
 	Scene scene;
 
-#if true
+#if false
 	LoadFromFile(scene, scene_file);
 
 #else
 
-	InsertCamera(scene);
+	InitCamera(scene, 1280, 960);
 
 	InsertDirectionalLight(scene);
 	//InsertSkyLights(scene, 200);
 	//InsertRandomPointLights(scene, 7);
 
-	InsertTwoSpheres(scene);
-	//InsertRandomSpheres(scene, 20);
+	//InsertTwoSpheres(scene);
+	InsertRandomSpheres(scene, 20);
 	//InsertTriangle(scene);
-	//InsertRandomTriangles(scene, 20);
-	//InsertSkyLight(scene);
+	InsertRandomTriangles(scene, 200);
+	InsertSkyLight(scene, 64);
 #endif
 
 	Film film(scene.viewport_width(), scene.viewport_height());
@@ -310,8 +313,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	ShellExecuteA(NULL, "Open", image_file.c_str(), NULL, NULL, SW_SHOWNORMAL);
 
-	std::cin.clear();
-	std::cin.get();
+	//std::cin.clear();
+	//std::cin.get();
 
 	return 0;
 }
