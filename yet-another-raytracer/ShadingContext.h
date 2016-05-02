@@ -2,14 +2,14 @@
 
 #include "GeometryObject.h"
 #include "Ray.h"
-#include "Raytracer.h"
 #include "RayEvaluator.h"
 #include "LightingServer.h"
 #include "Types.h"
 #include <memory>
 
+class RayEvaluator;
 
-class __declspec(align(MM_ALIGNMENT)) ShadingContext
+class ShadingContext
 {
 public:
 	
@@ -21,21 +21,14 @@ public:
 	const GeometryObject * object() const { return m_object; }
 	void object(const GeometryObject * val) { m_object = val; }
 
-	const vector3 & hit_point() const { return m_hit_point; }
-	void hit_point(const vector3 & val) { m_hit_point = val; }
-
-	//const vector3 & biased_hit_point() const { return m_biased_hit_point; }
-	//void biased_hit_point(vector3 val) { m_biased_hit_point = val; }
+	const vector3 & world_space_hit_point() const { return m_hit_point; }
+	void world_space_hit_point(const vector3 & val) { m_hit_point = val; }
 
 	const vector3 & normal() const { return m_normal; }
 	void normal(const vector3 & val) { m_normal = val; }
 
 	const Ray & incident_ray() const { return m_incident_ray; }
 	void incident_ray(const Ray & val) { m_incident_ray = val; }
-
-
-	const Raytracer * raytracer() const { return m_raytracer; }
-	void raytracer(const Raytracer * val) { m_raytracer = val; }
 
 	const RayEvaluator * ray_evaluator() const { return m_ray_evaluator; }
 	void ray_evaluator(const RayEvaluator * val) { m_ray_evaluator = val; }
@@ -49,6 +42,9 @@ public:
 	space_real bias() const { return m_bias; }
 	void bias(space_real val) { m_bias = val; }
 
+	bool allow_subdivision() const { return m_allowSubdivision; }
+	void allow_subdivision(bool value) { m_allowSubdivision = value; }
+
 private:
 	const GeometryObject * m_object;
 	vector3 m_hit_point;
@@ -61,5 +57,6 @@ private:
 	const LightingServer * m_lighting_server;
 
 	unsigned int m_trace_depth;
+	bool m_allowSubdivision;
 };
 

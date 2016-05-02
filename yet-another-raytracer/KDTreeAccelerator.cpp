@@ -2,19 +2,20 @@
 
 #include "KDTreeMarcher.h"
 
-KDTreeAccelerator::KDTreeAccelerator( const ObjectCollection * objects )
+KDTreeAccelerator::KDTreeAccelerator( const ObjectCollection & objects )
 {
 	BoundingBox scene_box;
-	ObjectCollection * objects_copy = new ObjectCollection(objects->begin(), objects->end());
+	std::vector<GeometryObject*> objects_copy(objects.size());
+	std::transform(std::begin(objects), std::end(objects), std::begin(objects_copy), [](auto objectPtr) { return objectPtr.get(); });
 
-	for (auto & object : *objects)
+	for (const auto & object : objects_copy)
 	{
 		scene_box.Include(object->bounding_box());
 	}
 
 	m_scene_box = scene_box;
 
-	m_max_depth = m_root_node.Build(scene_box, objects_copy);
+	m_max_depth = m_root_node.Build(scene_box, std::move(objects_copy));
 }
 
 
@@ -22,7 +23,7 @@ KDTreeAccelerator::~KDTreeAccelerator(void)
 {
 }
 
-Marcher * KDTreeAccelerator::StartMarching( const Ray & ray, space_real near, space_real far ) const
+Marcher * KDTreeAccelerator::CreateMarcher() const
 {
-	return new KDTreeMarcher(ray, m_scene_box, &m_root_node, near, far, m_max_depth);
+	return new KDTreeMarcher(m_scene_box, &m_root_node, m_max_depth);
 }

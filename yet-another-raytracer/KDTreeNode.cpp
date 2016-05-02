@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#define OPTIMAL_PRIMITIVES_PER_LEAF 4
+const unsigned int OPTIMAL_PRIMITIVES_PER_LEAF = 4;
 
 KDTreeNode::KDTreeNode(void)
 {
@@ -15,42 +15,43 @@ KDTreeNode::~KDTreeNode(void)
 		delete m_objects;
 }
 
-unsigned int KDTreeNode::Build(const BoundingBox & box, ObjectCollection * objects)
+unsigned int KDTreeNode::Build(const BoundingBox & box, std::vector<GeometryObject*> && objects)
 {
 	_ASSERT(!box.empty());
 	//_ASSERT(objects->size() != 0);
 
-	if (objects->size() <= OPTIMAL_PRIMITIVES_PER_LEAF)
+	if (objects.size() <= OPTIMAL_PRIMITIVES_PER_LEAF)
 	{
-		return BeacomeALeaf(objects);
+		return BeacomeALeaf(std::move(objects));
 	}
 	else
 	{
-		return BecomeABranch(box, objects);
+		return BecomeABranch(box, std::move(objects));
 	}
 }
 
-unsigned int KDTreeNode::BeacomeALeaf( const ObjectCollection * objects )
+unsigned int KDTreeNode::BeacomeALeaf(std::vector<GeometryObject*> && objects )
 {
 	m_leaf = true;
-	m_objects = objects;
+	m_objects = new std::vector<GeometryObject*>(std::move(objects));
 
 	return 1;
 }
 
-unsigned int KDTreeNode::BecomeABranch( const BoundingBox & box, ObjectCollection * objects )
+unsigned int KDTreeNode::BecomeABranch( const BoundingBox & box, std::vector<GeometryObject*> && objects )
 {
-	m_split_axis = GetSplittingAxis(box);
-	SortObjects(objects);
+	m_split_axis = GetSplittingAxis(box, objects);
+	//SortObjects(objects);
 
-	m_split_coord = FindSplittingPlane(box, objects);
-	unsigned int depth = GenerateSubNodes(box, objects);
+	m_split_coord = FindSplittingPlane(box, m_split_axis, objects);
+	unsigned int depth = GenerateSubNodes(box, std::move(objects));
 
 	return depth;
 }
 
-unsigned int KDTreeNode::GetSplittingAxis( const BoundingBox & box ) const
+unsigned int KDTreeNode::GetSplittingAxis( const BoundingBox & box, const std::vector<GeometryObject*> & objects) const
 {
+#if true
 	auto diff = box.max_corner() - box.min_corner();
 	
 	unsigned int max_axis = 0;
@@ -61,61 +62,97 @@ unsigned int KDTreeNode::GetSplittingAxis( const BoundingBox & box ) const
 	}
 
 	return max_axis;
-}
+#else
 
+	size_t bestAxis = 0;
+	size_t bestSplitCount = objects.size() * 2;
 
-void KDTreeNode::SortObjects( ObjectCollection * objects )
-{
-	std::sort(objects->begin(), objects->end(),
-		[&] (ObjectCollection::const_reference obj0, ObjectCollection::const_reference obj1)
+	for (size_t proposedAxis = 0; proposedAxis < 3; proposedAxis++)
 	{
-		return obj0->bounding_box().min_corner()[m_split_axis] < obj1->bounding_box().min_corner()[m_split_axis];
-	});
+		BoundingBox left_box, right_box;
+		box.Split(proposedAxis, FindSplittingPlane(box, proposedAxis, objects), left_box, right_box);
+
+		size_t left_objects = 0;
+		size_t right_objects = 0;
+
+		for (auto & object : objects)
+		{
+			if (object->bounding_box().Intersects(left_box))
+				left_objects++;
+			if (object->bounding_box().Intersects(right_box))
+				right_objects++;
+		}
+
+		if (left_objects + right_objects < bestSplitCount)
+		{
+			bestAxis = proposedAxis;
+			bestSplitCount = left_objects + right_objects;
+		}
+	}
+	
+	return bestAxis;
+#endif
 }
 
 
-space_real KDTreeNode::FindSplittingPlane( const BoundingBox & box, const ObjectCollection * sorted_objects ) const
+void KDTreeNode::SortObjects(std::vector<GeometryObject*> & objects )
 {
-	return (box.min_corner()[m_split_axis] + box.max_corner()[m_split_axis]) * (space_real)0.5;
+	std::sort(objects.begin(), objects.end(),
+		[&] (const auto & obj0, const auto & obj1)
+		{
+			return obj0->bounding_box().min_corner()[m_split_axis] < obj1->bounding_box().min_corner()[m_split_axis];
+		});
+}
+
+
+space_real KDTreeNode::FindSplittingPlane( const BoundingBox & box, unsigned int axis, const std::vector<GeometryObject*> & objects ) const
+{
+	return (box.min_corner()[axis] + box.max_corner()[axis]) * space_real(0.5);
 
 	//auto split_index = sorted_objects->size() / 2;
 	//return (*sorted_objects)[split_index]->bounding_box().min_corner()[m_split_axis];
+
 }
 
-unsigned int KDTreeNode::GenerateSubNodes( const BoundingBox & box, const ObjectCollection * objects )
+unsigned int KDTreeNode::GenerateSubNodes( const BoundingBox & box, std::vector<GeometryObject*> && objects )
 {
 	BoundingBox left_box, right_box;
 	box.Split(m_split_axis, m_split_coord, left_box, right_box);
 
-	ObjectCollection * left_objects = new ObjectCollection();
-	ObjectCollection * right_objects = new ObjectCollection();
-	left_objects->reserve(objects->size());
-	right_objects->reserve(objects->size());
+	std::vector<GeometryObject*> left_objects;
+	std::vector<GeometryObject*> right_objects;
+	left_objects.reserve(objects.size());
+	right_objects.reserve(objects.size());
 
-	for (auto & object : *objects)
+	for (auto & object : objects)
 	{
-		if (object->bounding_box().Intersects(left_box))
-			left_objects->push_back(object);
-		if (object->bounding_box().Intersects(right_box))
-			right_objects->push_back(object);
+		if (!object->GetBoundsWithinBounds(left_box).empty())
+			left_objects.push_back(object);
+		if (!object->GetBoundsWithinBounds(right_box).empty())
+			right_objects.push_back(object);
 	}
 
-	if ((left_objects->size() + right_objects->size() > objects->size() * 3 / 2) /*|| left_objects->empty() || right_objects->empty()*/) // doesn't worth to split
+	if ((left_objects.size() + right_objects.size() > objects.size() * 2 - 12) /*|| left_objects->empty() || right_objects->empty()*/) // doesn't worth to split
 	{
-		delete left_objects;
-		delete right_objects;
-		return BeacomeALeaf(objects);
+		return BeacomeALeaf(std::move(objects));
 	}
 	else
 	{
-		delete objects;
+		//right_objects.erase(
+		//	std::remove_if(
+		//		std::begin(right_objects),
+		//		std::end(right_objects),
+		//		[&](const auto object) 
+		//			{ return std::none_of(std::begin(left_objects), std::end(left_objects), [&](const auto object2) { return object == object2; }); })
+		//	, std::end(right_objects)
+		//	);
 
 		m_leaf = false;
 		m_subnodes[0] = new KDTreeNode();
 		m_subnodes[1] = new KDTreeNode();
 
-		unsigned int left_depth = m_subnodes[0]->Build(left_box, left_objects);
-		unsigned int right_depth = m_subnodes[1]->Build(right_box, right_objects);
+		unsigned int left_depth = m_subnodes[0]->Build(left_box, std::move(left_objects));
+		unsigned int right_depth = m_subnodes[1]->Build(right_box, std::move(right_objects));
 
 		return std::max(left_depth, right_depth) + 1;
 	}

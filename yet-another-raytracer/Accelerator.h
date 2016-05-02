@@ -15,6 +15,7 @@ public:
 	{
 	}
 
-	virtual Marcher * StartMarching( const Ray & ray, space_real near, space_real far ) const = 0;
+	//virtual Marcher * StartMarching( const Ray & ray, space_real near, space_real far ) const = 0;
+	virtual Marcher * CreateMarcher() const = 0;
 };
 

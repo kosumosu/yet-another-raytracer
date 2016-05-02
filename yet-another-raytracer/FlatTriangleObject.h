@@ -32,6 +32,8 @@ public:
 
 	virtual void PrepareForRendering();
 
+	virtual BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
+
 private:
 	vector3 m_vertex0;
 	vector3 m_vertex1;

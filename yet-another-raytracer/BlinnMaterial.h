@@ -65,7 +65,7 @@ private:
 	color_rgbx m_specular;
 	color_real m_shininess;
 
-	color_rgbx ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux ) const;
+	color_rgbx ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux) const;
 	color_rgbx ComputeSpecularComponent( const ShadingContext & context, const Flux & flux ) const;
 
 };

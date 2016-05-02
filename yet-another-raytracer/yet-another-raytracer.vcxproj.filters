@@ -228,13 +228,7 @@
     <ClInclude Include="Ray.h">
       <Filter>Header Files\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="BoundingBox.h">
-      <Filter>Header Files\Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="TransformStack.h">
-      <Filter>Header Files\Engine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="BoundingBoxHit.h">
       <Filter>Header Files\Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="KDTreeAccelerator.h">
@@ -317,6 +311,18 @@
     </ClInclude>
     <ClInclude Include="ParserHelper.h">
       <Filter>Header Files\Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBox.hpp">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBoxHit.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleGILightSource.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -421,6 +427,9 @@
     </ClCompile>
     <ClCompile Include="RandomEngine.cpp">
       <Filter>Source Files\Engine\Math\Random</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleGILightSource.cpp">
+      <Filter>Source Files\Engine\Lighting</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

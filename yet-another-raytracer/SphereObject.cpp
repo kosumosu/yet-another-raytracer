@@ -52,10 +52,10 @@ Hit SphereObject::FindHit( const Ray & ray ) const
 				x = std::max(x1, x2);
 			}
 
-			auto hit_point = inversed_ray.origin() + inversed_ray.direction() * x;
-			auto normal = hit_point - m_center; // normal is non-normalized
+			auto world_space_hit_point = inversed_ray.origin() + inversed_ray.direction() * x;
+			auto normal = world_space_hit_point - m_center; // normal is non-normalized
 
-			auto transformed_hit_point = (this->transform() * vector4(hit_point, 1.0)).reduce();
+			auto transformed_hit_point = (this->transform() * vector4(world_space_hit_point, 1.0)).reduce();
 			auto transformed_normal = math::normalize((this->normal_transform() * vector4(normal, space_real(0.0))).reduce());
 
 			return Hit(transformed_hit_point, transformed_normal, this, x);
@@ -83,6 +83,13 @@ bool SphereObject::DoesHit( const Ray & ray ) const
 	space_real x2 = (b - d_rooted) / (space_real(-2.0) * a);
 
 	return x1 > space_real(0.0) || x2 > space_real(0.0);
+}
+
+BoundingBox SphereObject::GetBoundsWithinBounds(const BoundingBox & box) const
+{
+	auto ownBox = bounding_box();
+	ownBox.Intersect(box);
+	return ownBox;
 }
 
 void SphereObject::PrepareForRendering()

@@ -4,7 +4,7 @@
 #include "Types.h"
 #include <exception>
 
-class __declspec(align(MM_ALIGNMENT)) TransfromableGeometryObject : public GeometryObject
+class TransfromableGeometryObject : public GeometryObject
 {
 public:
 	

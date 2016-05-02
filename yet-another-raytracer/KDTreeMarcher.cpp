@@ -1,13 +1,23 @@
 #include "KDTreeMarcher.h"
+#include"KDTreeNode.h"
 
 
-
-KDTreeMarcher::KDTreeMarcher(const Ray & ray, const BoundingBox & scene_box, const KDTreeNode * root_node, space_real near, space_real far, unsigned int max_depth)
-	: m_ray(ray)
+KDTreeMarcher::KDTreeMarcher(const BoundingBox & scene_box, const KDTreeNode * root_node, unsigned int max_depth)
+	: m_scene_box(scene_box)
+	, m_root_node(root_node)
 {
 	m_stack.reserve(max_depth);
+}
 
-	auto box_hit = scene_box.IntersectsRay(ray);
+
+KDTreeMarcher::~KDTreeMarcher(void)
+{
+}
+
+void KDTreeMarcher::Restart(const Ray & ray, space_real near, space_real far)
+{
+	m_ray = ray;
+	auto box_hit = m_scene_box.IntersectsRay(m_ray);
 
 	m_failed_in_constructor = !box_hit.occurred();
 	if (m_failed_in_constructor)
@@ -20,15 +30,11 @@ KDTreeMarcher::KDTreeMarcher(const Ray & ray, const BoundingBox & scene_box, con
 	if (m_failed_in_constructor)
 		return;
 
-	m_stack.push_back(KDTraverseFrame(biased_near, biased_far, root_node));
+	m_stack.clear();
+	m_stack.push_back(KDTraverseFrame(biased_near, biased_far, m_root_node));
 }
 
-
-KDTreeMarcher::~KDTreeMarcher(void)
-{
-}
-
-const ObjectCollection * KDTreeMarcher::GetCurrentObjects()
+const std::vector<GeometryObject*> * KDTreeMarcher::GetCurrentObjects()
 {
 	return m_current_leaf->objects();
 }
@@ -68,6 +74,13 @@ bool KDTreeMarcher::MarcheNext()
 		}
 	}
 
+	m_dist_near = dist_near;
+	m_dist_far = dist_far;
 	m_current_leaf = node;
 	return true;
+}
+
+bool KDTreeMarcher::IsDistanceWithinCurrentBounds(space_real dist) const
+{
+	return m_dist_near <= dist && dist <= m_dist_far;
 }

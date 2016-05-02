@@ -35,7 +35,7 @@ namespace math
 
 	// Implements static loop with templates
 	template<int FROM, int TO, typename T>
-	void iterate(T & func)
+	void iterate(const T & func)
 	{
 		details::iterate<FROM, TO, T>(details::bool_tag<FROM <= TO>(), func);
 	}
@@ -49,13 +49,13 @@ namespace math
 		struct bool_tag { enum { value = VALUE }; };
 
 		template<int FROM, int TO, typename T>
-		void iterate(bool_tag<false>, T & func)
+		void iterate(bool_tag<false>, const T & func)
 		{
 			// NOOP
 		}
 
 		template<int FROM, int TO, typename T>
-		void iterate(bool_tag<true>, T & func)
+		void iterate(bool_tag<true>, const T & func)
 		{
 			static_assert(FROM <= TO, "TO cannot be less than FROM!");
 			details::index_iterator<FROM, TO>::iterate(func);
@@ -68,21 +68,21 @@ namespace math
 			enum { from = FROM, to = TO };
 
 			template<typename T>
-			static void iterate(T & func)
+			static void iterate(const T & func)
 			{
 				iterate(tag<from>(), func);
 			}
 
 		private:
 			template<typename T, int INDEX>
-			static void iterate(tag<INDEX>, T & func)
+			static void iterate(tag<INDEX>, const T & func)
 			{
 				func(INDEX);
 				iterate(tag<INDEX + 1>(), func);
 			}
 
 			template<typename T>
-			static void iterate(tag<to>, T & func)
+			static void iterate(tag<to>, const T & func)
 			{
 				func(TO);
 			}

@@ -34,7 +34,7 @@ public:
 	color_rgbx * pixel_at(unsigned int x, unsigned int y) const { return line_at(y) + x; }
 
 
-	void SaveAsPng(const std::string & filename);
+	void SaveAsPng(const std::wstring & filename);
 
 private:
 	unsigned int m_width;

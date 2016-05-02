@@ -107,3 +107,54 @@ void FlatTriangleObject::PrepareForRendering()
 
 	bounding_box(bbox);
 }
+
+space_real find_intersection(space_real normal0, space_real normal1, space_real normal2, space_real coord0, space_real coord1, space_real d)
+{
+	return -(normal0 * coord0 + normal1 * coord1 + d) / normal2;
+}
+
+template <unsigned int axis>
+void include_in_box_if_valid(BoundingBox & refinedBox, const BoundingBox & enclosingBox, const vector3 & point)
+{
+	if (enclosingBox.min_corner()[axis] <= point[axis] && point[axis] <= enclosingBox.max_corner()[axis])
+	{
+		refinedBox.Include(point);
+	}
+}
+
+template <unsigned int axis0, unsigned int axis1, unsigned int axis2>
+void refine_box_for_edge(BoundingBox & refinedBox, const BoundingBox & enclosingBox, const vector3 normal, space_real d, const vector3 & corner0, const vector3 & corner1)
+{
+	vector3 vec;
+	vec[axis0] = corner0[axis0];
+	vec[axis1] = corner1[axis1];
+	vec[axis2] = find_intersection(normal[axis0], normal[axis1], normal[axis2], corner0[axis0], corner1[axis1], d);
+	include_in_box_if_valid<axis2>(refinedBox, enclosingBox, vec);
+}
+
+template <unsigned int axis0, unsigned int axis1, unsigned int axis2>
+void refine_box_for_axis(BoundingBox & refinedBox, const BoundingBox & enclosingBox, const vector3 normal, space_real d)
+{
+	refine_box_for_edge<axis0, axis1, axis2>(refinedBox, enclosingBox, normal, d, enclosingBox.min_corner(), enclosingBox.min_corner());
+	refine_box_for_edge<axis0, axis1, axis2>(refinedBox, enclosingBox, normal, d, enclosingBox.min_corner(), enclosingBox.max_corner());
+	refine_box_for_edge<axis0, axis1, axis2>(refinedBox, enclosingBox, normal, d, enclosingBox.max_corner(), enclosingBox.min_corner());
+	refine_box_for_edge<axis0, axis1, axis2>(refinedBox, enclosingBox, normal, d, enclosingBox.max_corner(), enclosingBox.max_corner());
+}
+
+
+BoundingBox FlatTriangleObject::GetBoundsWithinBounds(const BoundingBox & box) const
+{
+	auto d = -math::dot(m_normal, m_vertex0);
+
+	BoundingBox refinedBox;
+	// Along Z axis
+	refine_box_for_axis<0, 1, 2>(refinedBox, box, m_normal, d);
+	// Along Y axis
+	refine_box_for_axis<0, 2, 1>(refinedBox, box, m_normal, d);
+	// Along X axis
+	refine_box_for_axis<1, 2, 0>(refinedBox, box, m_normal, d);
+
+	refinedBox.Intersect(bounding_box());
+
+	return refinedBox;
+}

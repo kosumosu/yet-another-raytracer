@@ -2,7 +2,7 @@
 
 #include "TransformableGeometryObject.h"
 
-class __declspec(align(MM_ALIGNMENT)) SphereObject : public TransfromableGeometryObject
+class SphereObject : public TransfromableGeometryObject
 {
 public:
 	
@@ -19,6 +19,8 @@ public:
 
 	space_real radius() const { return m_radius; }
 	void radius(space_real val) { m_radius = val; }
+
+	virtual BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
 
 	virtual void PrepareForRendering();
 

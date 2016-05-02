@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Hit.h"
-#include "BoundingBox.h"
+#include "BoundingBox.hpp"
 
 #include <memory>
 #include <vector>
@@ -41,12 +41,17 @@ public:
 	virtual void PrepareForRendering() = 0;
 
 	// Gets transformed bounding box
-	const BoundingBox & bounding_box() const { return m_bounding_box; }
-	void bounding_box(const BoundingBox & val) { m_bounding_box = val; }
+	BoundingBox bounding_box() const { return m_bounding_box; }
+	
+	// Gets bounds of that part of the object that lies within given box.
+	virtual BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const = 0;
 
 
 	const std::shared_ptr<Material> & material() const { return m_material; }
 	void material(const std::shared_ptr<Material> & val) { m_material = val; }
+
+protected:
+	void bounding_box(const BoundingBox & val) { m_bounding_box = val; }
 
 private:
 	std::shared_ptr<Material> m_material;

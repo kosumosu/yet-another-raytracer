@@ -13,7 +13,8 @@ public:
 	~RayEvaluator(void);
 
 	// Returns color of traced ray
-	color_rgbx TraceRay(const Ray & ray, unsigned int depth_left, space_real bias) const;
+	color_rgbx TraceRay(const Ray & ray, unsigned int depth_left, space_real bias, bool allowSubdivision) const;
+	bool DoesIntersect(const Ray & ray, space_real minDistance, space_real maxDistance) const;
 
 	color_rgbx background_color() const { return m_background_color; }
 	void background_color(const color_rgbx & val) { m_background_color = val; }

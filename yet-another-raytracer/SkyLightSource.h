@@ -8,25 +8,22 @@ public:
 	SkyLightSource(void);
 	virtual ~SkyLightSource(void);
 
-	virtual FluxCollection * GetFluxes( const vector3 & point, const vector3 & normal ) const;
+	virtual FluxCollection * GetFluxes( const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned int depthLeft, space_real bias, bool allowSubdivision) const;
 
 	unsigned int samples() const { return m_samples; }
 	void samples(unsigned int val)
 	{
 		m_samples = val;
-		m_color_per_sample = m_color / color_real(m_samples);
 	}
 
 	const color_rgbx & color() const { return m_color; }
 	void color(const color_rgbx & val)
 	{
 		m_color = val;
-		m_color_per_sample = m_color / color_real(m_samples);
 	}
 
 private:
 	unsigned int m_samples;
 	color_rgbx m_color;
-	color_rgbx m_color_per_sample;
 };
 

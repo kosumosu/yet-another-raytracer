@@ -31,7 +31,7 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 		light->direction((context.transform() * vector4(direction, space_real(0.0))).reduce());
 		light->color(color);
 
-		context.scene()->lights()->push_back(std::shared_ptr<LightSource>(light));
+		context.scene()->lights().push_back(std::shared_ptr<LightSource>(light));
 	}
 	else if (command == "point")
 	{
@@ -43,7 +43,7 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 		light->color(color);
 		light->attenuation(m_attenuation);
 
-		context.scene()->lights()->push_back(std::shared_ptr<LightSource>(light));
+		context.scene()->lights().push_back(std::shared_ptr<LightSource>(light));
 	}
 	else if (command == "attenuation")
 	{

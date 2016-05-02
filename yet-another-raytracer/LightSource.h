@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+class RayEvaluator;
+
 class LightSource
 {
 public:
@@ -18,7 +20,7 @@ public:
 	}
 
 	// Gets atoms for the point being lit. Caller must destroy the result.
-	virtual FluxCollection * GetFluxes(const vector3 & point, const vector3 & normal) const = 0;
+	virtual FluxCollection * GetFluxes(const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned int depthLeft, space_real bias, bool allowSubdivision) const = 0;
 
 };
 

@@ -1,16 +1,17 @@
 #pragma once
 
 #include "Accelerator.h"
+#include <vector>
 
 class NullAccelerator : public Accelerator
 {
 public:
-	NullAccelerator(const ObjectCollection * objects);
+	NullAccelerator(const ObjectCollection & objects);
 	~NullAccelerator(void);
 
-	virtual Marcher * StartMarching( const Ray & ray, space_real near, space_real far ) const;
+	virtual Marcher * CreateMarcher() const override;
 
 private:
-	const ObjectCollection * m_objects;
+	std::vector<GeometryObject*> m_objects;
 };
 

@@ -182,4 +182,26 @@ namespace math
 		vector<T, N> res = one * inv_fraction + another * fractions;
 		return res;
 	}
+
+	template <typename T, size_t N>
+	vector<T, N> inline pow(const vector<T, N> & one, const T & power)
+	{
+		vector<T, N> res;
+		iterate<0, N - 1>([&](size_t i)
+		{
+			res[i] = std::pow(one[i], power);
+		});
+		return res;
+	}
+
+	template <typename T, size_t N>
+	vector<T, N> inline pow(const vector<T, N> & one, const vector<T, N> & another)
+	{
+		vector<T, N> res;
+		iterate<0, N - 1>([&](size_t i)
+		{
+			res[i] = std::pow(one[i], another[i]);
+		});
+		return res;
+	}
 }

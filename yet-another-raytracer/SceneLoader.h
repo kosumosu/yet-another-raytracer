@@ -15,7 +15,7 @@ public:
 	SceneLoader(const std::vector< std::shared_ptr<CommandFactory> > & factories);
 	~SceneLoader(void);
 
-	void Load(Scene & scene, const std::string & filename) const;
+	void Load(Scene & scene, const std::wstring & filename) const;
 
 private:
 	std::vector< std::shared_ptr<CommandFactory> > m_factories;

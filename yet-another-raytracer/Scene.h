@@ -16,8 +16,6 @@ public:
 		, m_viewport_height(480)
 		, m_max_trace_depth(4)
 		, m_camera(new Camera())
-		, m_objects(new ObjectCollection())
-		, m_lights(new LightSourceCollection())
 	{
 	}
 
@@ -41,11 +39,16 @@ public:
 	const std::shared_ptr<Camera> & camera() const { return m_camera; }
 	void camera(const std::shared_ptr<Camera> & value) { m_camera = value; }
 
-	std::shared_ptr<ObjectCollection> & objects() { return m_objects; }
-	const std::shared_ptr<ObjectCollection> & objects() const { return m_objects; }
+	ObjectCollection & objects() { return m_objects; }
+	const ObjectCollection & objects() const { return m_objects; }
 
-	const std::shared_ptr<LightSourceCollection> & lights() const { return m_lights; }
-	void lights(std::shared_ptr<LightSourceCollection> val) { m_lights = val; }
+	const LightSourceCollection& lights() const { return m_lights; }
+	LightSourceCollection& lights() { return m_lights; }
+	void lights(const LightSourceCollection & val) { m_lights = val; }
+	void lights(const LightSourceCollection && val) { m_lights = std::move(val); }
+
+	color_rgbx environmentColor() const { return m_environmentColor; }
+	void environmentColor(const color_rgbx & color) { m_environmentColor = color; }
 
 private:
 	unsigned int m_viewport_width;
@@ -56,8 +59,9 @@ private:
 
 	std::shared_ptr<Camera> m_camera;
 
-	std::shared_ptr<ObjectCollection> m_objects;
-	std::shared_ptr<LightSourceCollection> m_lights;
+	ObjectCollection m_objects;
+	LightSourceCollection m_lights;
 	
+	color_rgbx m_environmentColor;
 };
 

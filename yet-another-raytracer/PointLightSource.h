@@ -4,13 +4,13 @@
 #include "Attenuation.h"
 #include "Types.h"
 
-class __declspec(align(MM_ALIGNMENT)) PointLightSource : public LightSource
+class PointLightSource : public LightSource
 {
 public:
 	PointLightSource(void);
 	~PointLightSource(void);
 
-	virtual FluxCollection * GetFluxes( const vector3 & point, const vector3 & normal ) const;
+	virtual FluxCollection * GetFluxes( const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned int depthLeft, space_real bias, bool allowSubdivision) const override;
 
 	const vector3 & position() const { return m_position; }
 	void position(const vector3 & val) { m_position = val; }

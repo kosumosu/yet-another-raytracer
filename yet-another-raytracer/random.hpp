@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Constants.h"
 #include "vector.hpp"
 #include "RandomEngine.h"
 #include <algorithm>
@@ -36,7 +37,7 @@ namespace math
 	vector<T, 3> inline sphericalRand()
 	{
 		T z = linearRand(T(-1), T(1));
-		T a = linearRand(T(0), T(6.283185307179586476925286766559));
+		T a = linearRand(T(0), T(2.0 * pi));
 
 		T r = std::sqrt(T(1) - z * z);
 
@@ -55,5 +56,47 @@ namespace math
 			return initial_vector;
 		else
 			return -initial_vector;
+	}
+
+	template <typename T>
+	inline vector<T, 2> circularRand()
+	{
+		std::uniform_real_distribution<T> distr;
+
+		T radius = std::sqrt(distr(RandomEngine::engine()));
+		T theta = distr(RandomEngine::engine()) * T(2.0 * math::pi);
+
+		return vector<T, 2>(radius * std::cos(theta), radius * std::sin(theta));
+	}
+
+	template <typename T>
+	inline vector<T, 3> cosineWeightedHemiSphericalRand()
+	{
+		auto pointOnCircle = circularRand();
+
+		return vector<T, 3>(pointOnCircle[0], pointOnCircle[1], std::sqrtf(std::max(0.f, 1.f - pointOnCircle[0] * pointOnCircle[0] - pointOnCircle[1] * pointOnCircle[1])));
+	}
+
+	template <typename T>
+	inline vector<T, 3> cosineWeightedHemiSphericalRand(const vector<T, 3> & normal)
+	{
+		// get some arbitrary vector that is not colinear with normal
+		auto someVector = std::abs(normal[0]) < T(oneOverSqrt2)
+			? vector<T, 3>(1, 0, 0)
+			: vector<T, 3>(0, 1, 0);
+
+
+		auto firstBinormal = math::normalize(math::cross(normal, someVector));
+		auto secondBinormal = math::cross(normal, firstBinormal);
+
+		std::uniform_real_distribution<T> distr;
+
+		T randomNumber0 = distr(RandomEngine::engine());
+		T radius = std::sqrt(randomNumber0);
+		T theta = distr(RandomEngine::engine()) * T(2.0 * math::pi);
+
+		auto pointOnCircle = vector<T, 2>(radius * std::cos(theta), radius * std::sin(theta));
+
+		return firstBinormal * pointOnCircle[0] + secondBinormal * pointOnCircle[1] + normal * (std::sqrt(T(1.0) - randomNumber0));
 	}
 }

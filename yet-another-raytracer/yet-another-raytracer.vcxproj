@@ -22,34 +22,35 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>My1841xhw3</RootNamespace>
     <ProjectGuid>{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}</ProjectGuid>
-    <TargetPlatformVersion>10.0.10069.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -177,11 +178,13 @@
     <ClInclude Include="base_matrix4x4.hpp" />
     <ClInclude Include="base_matrix_functions.hpp" />
     <ClInclude Include="base_matrix_operations.hpp" />
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="SimpleGILightSource.h" />
     <ClInclude Include="vector.hpp" />
     <ClInclude Include="vector3_operations.hpp" />
     <ClInclude Include="vector_functions.hpp" />
     <ClInclude Include="vector_operations.hpp" />
-    <ClInclude Include="BoundingBox.h" />
+    <ClInclude Include="BoundingBox.hpp" />
     <ClInclude Include="BoundingBoxHit.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraCommandFactory.h" />
@@ -275,6 +278,7 @@
     <ClCompile Include="SceneLoader.cpp" />
     <ClCompile Include="SettingsCommandFactory.cpp" />
     <ClCompile Include="SettingsCommandProcessor.cpp" />
+    <ClCompile Include="SimpleGILightSource.cpp" />
     <ClCompile Include="SkyLightSource.cpp" />
     <ClCompile Include="SphereObject.cpp" />
     <ClCompile Include="stdafx.cpp">

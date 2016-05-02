@@ -12,6 +12,7 @@
 #include "DirectionalLightSource.h"
 #include "PointLightSource.h"
 #include "SkyLightSource.h"
+#include "SimpleGILightSource.h"
 
 #include "SceneLoader.h"
 
@@ -19,9 +20,9 @@
 #include <iostream>
 #include <memory>
 
+#include "KDTreeNode.h"
 
-
-void callback(unsigned int x, unsigned int y, float progress)
+void reportProgress(unsigned int x, unsigned int y, float progress)
 {
 	char buf[10];
 	sprintf_s(buf, "%.2f", progress * 100.0f);
@@ -50,7 +51,7 @@ void InsertRandomSpheres(Scene & scene, unsigned int count)
 		object->center(math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0)));
 		object->material(material);
 
-		scene.objects()->push_back(object);
+		scene.objects().push_back(object);
 	}
 }
 
@@ -70,7 +71,7 @@ void InsertSkyLights(Scene & scene, unsigned int count)
 		light_source->direction(math::sphericalRand<space_real>());
 		light_source->color(color_rgbx(intensity_per_light));
 
-		scene.lights()->push_back(light_source);
+		scene.lights().push_back(light_source);
 	}
 }
 
@@ -90,7 +91,7 @@ void InsertRandomPointLights(Scene & scene, unsigned int count)
 		light_source->position(math::linearRand(minus_one3 * space_real(3.0), one3 * space_real(3.0)));
 		light_source->color(math::linearRand(zero4, color_rgbx(intensity_per_light)));
 
-		scene.lights()->push_back(light_source);
+		scene.lights().push_back(light_source);
 	}
 }
 
@@ -118,8 +119,30 @@ void InsertTwoSpheres(Scene & scene)
 	object2->center(vector3(0.0f, 0.9f, 0.0f));
 	object2->material(material2);
 
-	scene.objects()->push_back(object1);
-	scene.objects()->push_back(object2);
+	scene.objects().push_back(object1);
+	scene.objects().push_back(object2);
+}
+
+void InsertCalibrationSpheres(Scene & scene)
+{
+	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial());
+	material1->diffuse(color_rgbx(1.0f, 1.0f, 1.0f, 0.0f));
+
+	std::shared_ptr<SphereObject> object1(new SphereObject());
+	object1->radius(1.0f);
+	object1->center(vector3(0.0f, -0.9f, 0.0f));
+	object1->material(material1);
+
+	std::shared_ptr<BlinnMaterial> material2(new BlinnMaterial());
+	material2->diffuse(color_rgbx(0.5f, 0.5f, 0.5f, 0.0f));
+
+	std::shared_ptr<SphereObject> object2(new SphereObject());
+	object2->radius(1.0f);
+	object2->center(vector3(0.0f, 0.9f, 0.0f));
+	object2->material(material2);
+
+	scene.objects().push_back(object1);
+	scene.objects().push_back(object2);
 }
 
 void InsertTriangle(Scene & scene)
@@ -136,10 +159,10 @@ void InsertTriangle(Scene & scene)
 	object1->vertex1(vector3(0.0f, 2.0f, 0.0f));
 	object1->vertex2(vector3(0.0f, 0.0f, 1.0f));
 
-	scene.objects()->push_back(object1);
+	scene.objects().push_back(object1);
 }
 
-void InsertRandomTriangles(Scene & scene, unsigned int count)
+void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real & size)
 {
 	color_rgbx zero4;
 	color_rgbx one4(1.0);
@@ -155,13 +178,18 @@ void InsertRandomTriangles(Scene & scene, unsigned int count)
 		//material->shininess(math::linearRand(10.0, 300.0));
 		//material->emission(math::linearRand(zero4, one4 * 0.2));
 
+		const vector3 min_bound(minus_one3 * size);
+		const vector3 max_bound(one3 * size);
+
+		auto pivot = math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0));
+
 		std::shared_ptr<FlatTriangleObject> object(new FlatTriangleObject());
 		object->material(material);
-		object->vertex0(math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0)));
-		object->vertex1(math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0)));
-		object->vertex2(math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0)));
+		object->vertex0(pivot + math::linearRand(min_bound, max_bound));
+		object->vertex1(pivot + math::linearRand(min_bound, max_bound));
+		object->vertex2(pivot + math::linearRand(min_bound, max_bound));
 
-		scene.objects()->push_back(object);
+		scene.objects().push_back(object);
 	}
 }
 
@@ -172,16 +200,16 @@ void InsertPointLight(Scene & scene)
 	light_source->color(color_rgbx(20.0, 20.0, 30.0, 1.0));
 	light_source->attenuation(Attenuation(1.0, 0.0, 0.0));
 
-	scene.lights()->push_back(light_source);
+	scene.lights().push_back(light_source);
 }
 
 void InsertDirectionalLight(Scene & scene)
 {
 	std::shared_ptr<DirectionalLightSource> light_source(new DirectionalLightSource());
 	light_source->direction(math::normalize(vector3(1.0, 1.0, 1.0)));
-	light_source->color(color_rgbx(0.6f, 0.6f, 0.9f, 1.0f));
+	light_source->color(color_rgbx(0.6f, 0.6f, 0.6f, 1.0f));
 
-	scene.lights()->push_back(light_source);
+	scene.lights().push_back(light_source);
 }
 
 void InsertSkyLight(Scene & scene, unsigned int samples)
@@ -190,7 +218,15 @@ void InsertSkyLight(Scene & scene, unsigned int samples)
 	light_source->color(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
 	light_source->samples(samples);
 
-	scene.lights()->push_back(light_source);
+	scene.lights().push_back(light_source);
+}
+
+void InsertGILight(Scene & scene, unsigned int samples)
+{
+	std::shared_ptr<SimpleGILightSource> light_source(new SimpleGILightSource());
+	light_source->samples(samples);
+
+	scene.lights().push_back(light_source);
 }
 
 
@@ -208,7 +244,7 @@ void InitCamera(Scene & scene, unsigned int width, unsigned int height)
 
 //////////////////////////////////////////////////////////////////////////
 
-void LoadFromFile(Scene & scene, const std::string & filename)
+void LoadFromFile(Scene & scene, const std::wstring & filename)
 {
 	std::unique_ptr<SceneLoader> loader(SceneLoader::CreateDefault());
 
@@ -217,7 +253,7 @@ void LoadFromFile(Scene & scene, const std::string & filename)
 
 //////////////////////////////////////////////////////////////////////////
 
-std::string GetFileName(const std::string & input)
+std::wstring GetFileName(const std::wstring & input)
 {
 	auto index = input.rfind('\\');
 
@@ -231,7 +267,7 @@ std::string GetFileName(const std::string & input)
 	}
 }
 
-std::string GetFileNameWithoutExtension(const std::string & input)
+std::wstring GetFileNameWithoutExtension(const std::wstring & input)
 {
 	auto filename = GetFileName(input);
 
@@ -248,11 +284,11 @@ std::string GetFileNameWithoutExtension(const std::string & input)
 	}
 }
 
-std::string GetPathWithoutExtension(const std::string & input)
+std::wstring GetPathWithoutExtension(const std::wstring & input)
 {
 	auto index = input.rfind('.');
 
-	if (index == std::string::npos)
+	if (index == std::wstring::npos)
 	{
 		return input;
 	}
@@ -263,42 +299,57 @@ std::string GetPathWithoutExtension(const std::string & input)
 	}
 }
 
-void Render(const std::string & scene_file, const std::string & output_image_file)
+void Render(const std::wstring & scene_file, const std::wstring & output_image_file)
 {
 	Scene scene;
 
-#if false
+#if true
 	LoadFromFile(scene, scene_file);
 
+	InsertGILight(scene, 128);
+	//InsertSkyLight(scene, 64);
 #else
-
 	InitCamera(scene, 1280, 960);
+	scene.max_trace_depth(8);
+	scene.environmentColor(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
+	//scene.environmentColor(color_rgbx(1.0));
 
 	InsertDirectionalLight(scene);
 	//InsertSkyLights(scene, 200);
 	//InsertRandomPointLights(scene, 7);
 
 	//InsertTwoSpheres(scene);
+	//InsertCalibrationSpheres(scene);
 	InsertRandomSpheres(scene, 20);
 	//InsertTriangle(scene);
-	InsertRandomTriangles(scene, 200);
-	InsertSkyLight(scene, 64);
+	InsertRandomTriangles(scene, 20, 1.0);
+	//InsertSkyLight(scene, 128);
+	InsertGILight(scene, 512);
 #endif
-
-	Film film(scene.viewport_width(), scene.viewport_height());
-	Renderer renderer;
-	renderer.callback(callback);
 
 	HRTimer timer;
 	timer.Restart();
 
+	Film film(scene.viewport_width(), scene.viewport_height());
+	float initTime;
+	Renderer renderer(
+		[&]() 
+			{
+				initTime = timer.Sample();
+				std::wcout << "Initialization finished : " << initTime << std::endl;
+			},
+		[&]()
+			{
+				auto totalElapsed = timer.Sample();
+				std::wcout << "Rendering finished : " << totalElapsed - initTime << "sec" << std::endl;
+				std::wcout << "Total time : " << totalElapsed << "sec" << std::endl;
+			},
+		reportProgress
+		);
+
 	renderer.Render(film, scene);
 
-	auto elapsed = timer.Sample();
-
-	std::cout << "Elapsed : " << elapsed << "sec" << std::endl;
-
-	film.SaveAsPng(output_image_file.c_str());
+	film.SaveAsPng(output_image_file);
 }
 
 
@@ -307,14 +358,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (argc < 2)
 		return 0;
 
-	std::string image_file = GetPathWithoutExtension(argv[1]) + ".png";
+	std::wstring image_file = GetPathWithoutExtension(argv[1]) + L".png";
 
-	Render(std::string(argv[1]), image_file);
+	Render(std::wstring(argv[1]), image_file);
 
-	ShellExecuteA(NULL, "Open", image_file.c_str(), NULL, NULL, SW_SHOWNORMAL);
-
-	//std::cin.clear();
-	//std::cin.get();
+	ShellExecute(NULL, L"Open", image_file.c_str(), NULL, NULL, SW_SHOWNORMAL);
 
 	return 0;
 }

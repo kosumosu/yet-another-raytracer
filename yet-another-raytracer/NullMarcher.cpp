@@ -2,7 +2,7 @@
 
 #include <limits>
 
-NullMarcher::NullMarcher(const ObjectCollection * objects)
+NullMarcher::NullMarcher(const std::vector<GeometryObject*> * objects)
 	: m_objects(objects)
 	, m_marched(false)
 {
@@ -13,7 +13,12 @@ NullMarcher::~NullMarcher(void)
 {
 }
 
-const ObjectCollection * NullMarcher::GetCurrentObjects()
+void NullMarcher::Restart(const Ray & ray, space_real near, space_real)
+{
+	m_marched = false;
+}
+
+const std::vector<GeometryObject*> * NullMarcher::GetCurrentObjects()
 {
 	return m_objects;
 }
@@ -29,4 +34,9 @@ bool NullMarcher::MarcheNext()
 		m_marched = true;
 		return true;
 	}
+}
+
+bool NullMarcher::IsDistanceWithinCurrentBounds(space_real dist) const
+{
+	return true;
 }

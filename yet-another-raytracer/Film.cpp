@@ -9,7 +9,7 @@ void setToInteger(T & output, const color_real & input)
 	output = static_cast<T>(input * ((1 << bits) - 1));
 }
 
-void Film::SaveAsPng(const std::string & filename)
+void Film::SaveAsPng(const std::wstring & filename)
 {
 	std::ofstream stream(filename, std::ios::binary);
 
@@ -26,7 +26,8 @@ void Film::SaveAsPng(const std::string & filename)
 	{
 		for (unsigned int x = 0; x < m_width; x++)
 		{
-			auto clamped = math::clamp(*pixel_at(x, y), color_0, color_1);
+			auto gammaCorrected = math::pow(*pixel_at(x, y), color_real(1 / 2.2));
+			auto clamped = math::clamp(gammaCorrected, color_0, color_1);
 
 			setToInteger(image[y][x].red, clamped[0]);
 			setToInteger(image[y][x].green, clamped[1]);

@@ -3,13 +3,14 @@
 #include "Accelerator.h"
 #include "KDTreeNode.h"
 
-class __declspec(align(MM_ALIGNMENT)) KDTreeAccelerator : public Accelerator
+class KDTreeAccelerator : public Accelerator
 {
 public:
-	KDTreeAccelerator(const ObjectCollection * objects);
+	KDTreeAccelerator(const ObjectCollection & objects);
+	KDTreeAccelerator(const KDTreeAccelerator & other) = delete;
 	virtual ~KDTreeAccelerator(void);
 
-	virtual Marcher * StartMarching( const Ray & ray, space_real near, space_real far ) const;
+	virtual Marcher * CreateMarcher() const override;
 
 private:
 	KDTreeNode m_root_node;

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Hit.h"
-#include "Accelerator.h"
+#include "Marcher.h"
 #include <memory>
 
 class Raytracer
 {
 public:
-	Raytracer(const Accelerator * accelerator);
+	Raytracer(std::unique_ptr<Marcher> && marcher);
 	~Raytracer(void);
 
 	Hit TraceRay(const Ray & ray, space_real bias) const;
@@ -15,6 +15,6 @@ public:
 	bool DoesIntersect(const Ray & ray, space_real minDistance, space_real maxDistance) const;
 
 private:
-	const Accelerator * m_accelerator;
+	const std::unique_ptr<Marcher> m_marcher;
 };
 

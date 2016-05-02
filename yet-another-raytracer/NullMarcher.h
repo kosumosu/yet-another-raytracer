@@ -7,15 +7,19 @@ class NullMarcher : public Marcher
 {
 public:
 	// for performance issues we are not using smart pointers
-	NullMarcher(const ObjectCollection * objects);
+	NullMarcher(const std::vector<GeometryObject*> * objects);
 	virtual ~NullMarcher(void);
 
-	virtual const ObjectCollection * GetCurrentObjects();
+	virtual void Restart(const Ray & ray, space_real near, space_real far) override;
 
-	virtual bool MarcheNext();
+	virtual const std::vector<GeometryObject*> * GetCurrentObjects() override;
+
+	virtual bool MarcheNext() override;
+
+	virtual bool IsDistanceWithinCurrentBounds(space_real dist) const override;
 
 private:
-	const ObjectCollection * m_objects;
+	const std::vector<GeometryObject*> * m_objects;
 	bool m_marched;
 };
 

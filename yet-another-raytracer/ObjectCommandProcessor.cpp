@@ -48,7 +48,7 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 		FlatTriangleObject * triangle = new FlatTriangleObject(vertex0, vertex1, vertex2);
 		triangle->material(std::shared_ptr<Material>(context.material()->Clone()));
 
-		context.scene()->objects()->push_back(std::shared_ptr<GeometryObject>(triangle));
+		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(triangle));
 	}
 	else if (command == "trinormal")
 	{
@@ -64,7 +64,7 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 		sphere->transform(context.transform());
 		sphere->material(std::shared_ptr<Material>(context.material()->Clone()));
 
-		context.scene()->objects()->push_back(std::shared_ptr<GeometryObject>(sphere));
+		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(sphere));
 	}
 	else
 	{

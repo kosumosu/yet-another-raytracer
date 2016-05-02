@@ -1,4 +1,5 @@
 #include "PointLightSource.h"
+#include "RayEvaluator.h"
 
 
 PointLightSource::PointLightSource(void)
@@ -11,7 +12,7 @@ PointLightSource::~PointLightSource(void)
 {
 }
 
-FluxCollection * PointLightSource::GetFluxes( const vector3 & point, const vector3 & normal ) const
+FluxCollection * PointLightSource::GetFluxes( const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned int depthLeft, space_real bias, bool allowSubdivision) const
 {
 	FluxCollection * collection = new FluxCollection();
 	//collection->reserve(1);
@@ -22,10 +23,13 @@ FluxCollection * PointLightSource::GetFluxes( const vector3 & point, const vecto
 	{
 		auto distance = math::length(point_to_light);
 		auto direction = point_to_light / distance;
-		auto attenuated_color = m_color * m_attenuation.Evaluate(distance);
-		Flux flux(this, direction, attenuated_color, distance);
+		if (!rayEvaluator.DoesIntersect(Ray(point, direction), bias, distance))
+		{
+			auto attenuated_color = m_color * m_attenuation.Evaluate(distance);
+			Flux flux(this, direction, attenuated_color, distance, 1.0);
 
-		collection->push_back(flux);
+			collection->push_back(flux);
+		}
 	}
 
 	return collection;

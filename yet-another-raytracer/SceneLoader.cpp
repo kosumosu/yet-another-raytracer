@@ -76,7 +76,7 @@ void SceneLoader::PrepareContext(LoadingContext & context, const ProcessorCollec
 
 
 
-void SceneLoader::Load(Scene & scene, const std::string & filename) const
+void SceneLoader::Load(Scene & scene, const std::wstring & filename) const
 {
 	std::ifstream stream;
 

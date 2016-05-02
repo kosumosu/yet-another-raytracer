@@ -1,6 +1,7 @@
 #pragma once
 
-#include "RayEvaluator.h"
+#include "GeometryObject.h"
+#include <functional>
 
 class Film;
 class Scene;
@@ -8,18 +9,18 @@ class Scene;
 class Renderer
 {
 public:
-	typedef void (*progress_callback)(unsigned int x, unsigned int y, float progress);
+	typedef std::function<void (unsigned int x, unsigned int y, float progress)> progress_callback;
+	typedef std::function<void()> initialization_finished_callback;
+	typedef std::function<void()> rendering_finished_callback;
 
-	Renderer(void);
-	~Renderer(void);
+	Renderer(const initialization_finished_callback & initializationFinishedCallback, const rendering_finished_callback & renderingFinishedCallback, const progress_callback & progressCallback);
 
 	void Render(Film & film, const Scene & scene) const;
 
-	Renderer::progress_callback callback() const { return m_callback; }
-	void callback(Renderer::progress_callback val) { m_callback = val; }
-
 private:
-	progress_callback m_callback;
+	progress_callback m_progressCallback;
+	initialization_finished_callback m_initializationFinishedCallback;
+	rendering_finished_callback m_renderingFinishedCallback;
 
 	void PrepareObjects(const ObjectCollection & objects) const;
 };
