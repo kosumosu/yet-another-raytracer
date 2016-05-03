@@ -179,6 +179,7 @@
     <ClInclude Include="base_matrix_functions.hpp" />
     <ClInclude Include="base_matrix_operations.hpp" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="DielectricMaterial.h" />
     <ClInclude Include="SimpleGILightSource.h" />
     <ClInclude Include="vector.hpp" />
     <ClInclude Include="vector3_operations.hpp" />
@@ -253,6 +254,7 @@
     <ClCompile Include="BlinnMaterial.cpp" />
     <ClCompile Include="CameraCommandFactory.cpp" />
     <ClCompile Include="CameraCommandProcessor.cpp" />
+    <ClCompile Include="DielectricMaterial.cpp" />
     <ClCompile Include="DirectionalLightSource.cpp" />
     <ClCompile Include="Film.cpp" />
     <ClCompile Include="FlatTriangleObject.cpp" />

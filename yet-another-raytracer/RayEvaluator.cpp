@@ -25,6 +25,7 @@ color_rgbx RayEvaluator::TraceRay( const Ray & ray, unsigned int depth_left, spa
 
 	if (!hit.has_occurred())
 		return m_background_color;
+		//return color_rgbx(ray.direction()[1] * 0.5 + 0.5);
 	
 	ShadingContext context;
 	context.trace_depth(depth_left - 1);

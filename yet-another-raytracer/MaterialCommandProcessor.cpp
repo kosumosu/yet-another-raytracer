@@ -1,6 +1,7 @@
 #include "MaterialCommandProcessor.h"
 
 #include "BlinnMaterial.h"
+#include "DielectricMaterial.h"
 #include "ParserHelper.h"
 #include <typeinfo>
 
@@ -15,57 +16,62 @@ MaterialCommandProcessor::~MaterialCommandProcessor(void)
 
 void MaterialCommandProcessor::PrepareContext(LoadingContext & context)
 {
-	BlinnMaterial * material = new BlinnMaterial();
+	// TODO: fix memory leak
+	m_blinnMaterial = std::make_shared<BlinnMaterial>();
+	m_dielectricMaterial = std::shared_ptr<DielectricMaterial>(new DielectricMaterial(1.5, 1.0));
 
 	m_last_ambient = color_rgbx(0.2f);
-	material->emission(m_last_ambient);
+	m_blinnMaterial->emission(m_last_ambient);
 
-	context.material(std::shared_ptr<Material>(material));
+
+	context.material(m_blinnMaterial);
 }
 
 void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const std::string & command, std::istream & stream)
 {
-	BlinnMaterial * material;
-
-	auto & type1 = typeid(*context.material().get());
-	auto & type2 = typeid(BlinnMaterial);
-
-	if (context.material().get() == nullptr || typeid(*context.material().get()) != typeid(BlinnMaterial))
+	if (command == "blinn")
 	{
-		material = new BlinnMaterial();
-		context.material(std::shared_ptr<Material>(material));
-		m_last_ambient = color_rgbx(0.2f);
-		material->emission(m_last_ambient);
+		context.material(m_blinnMaterial);
 	}
-	else
-	{
-		material = static_cast<BlinnMaterial *>(context.material().get());
-	}
-
-	if (command == "ambient")
+	else if (command == "ambient")
 	{
 		auto new_ambient = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
-		material->emission(material->emission() - m_last_ambient + new_ambient);
+		m_blinnMaterial->emission(m_blinnMaterial->emission() - m_last_ambient + new_ambient);
 		m_last_ambient = new_ambient;
 	}
 	else if (command == "emission")
 	{
 		auto new_emission = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
-		material->emission(new_emission + m_last_ambient);
+		m_blinnMaterial->emission(new_emission + m_last_ambient);
 	}
 	else if (command == "diffuse")
 	{
 		auto new_diffuse = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
-		material->diffuse(new_diffuse);
+		m_blinnMaterial->diffuse(new_diffuse);
 	}
 	else if (command == "specular")
 	{
 		auto new_specular = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
-		material->specular(new_specular);
+		m_blinnMaterial->specular(new_specular);
 	}
 	else if (command == "shininess")
 	{
-		material->shininess(ParserHelper::ReadColorReal(stream));
+		m_blinnMaterial->shininess(ParserHelper::ReadColorReal(stream));
+	}
+	
+	else if (command == "dielectric")
+	{
+		context.material(m_dielectricMaterial);
+	}
+	else if (command == "iorInside")
+	{
+		auto ior = ParserHelper::ReadSpaceReal(stream);
+		m_dielectricMaterial->setIorInside(ior);
+	}
+	else if (command == "iorOutside")
+	{
+		auto ior = ParserHelper::ReadSpaceReal(stream);
+		m_dielectricMaterial->setIorOutside(ior);
 	}
 	else
 	{

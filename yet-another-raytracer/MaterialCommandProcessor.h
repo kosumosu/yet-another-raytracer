@@ -2,8 +2,12 @@
 
 #include "CommandProcessor.h"
 #include "Types.h"
+#include <memory>
 
-class __declspec(align(MM_ALIGNMENT)) MaterialCommandProcessor : public CommandProcessor
+class BlinnMaterial;
+class DielectricMaterial;
+
+class MaterialCommandProcessor : public CommandProcessor
 {
 public:
 	MaterialCommandProcessor(void);
@@ -15,5 +19,7 @@ public:
 
 private:
 	color_rgbx m_last_ambient;
+	std::shared_ptr<BlinnMaterial> m_blinnMaterial;
+	std::shared_ptr<DielectricMaterial> m_dielectricMaterial;
 };
 

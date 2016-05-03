@@ -18,7 +18,8 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real bias) const
 
 Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
-	m_marcher->Restart(ray, minDistance, maxDistance);
+	auto biasedRay = ray.MoveOriginAlongDirection(minDistance);
+	m_marcher->Restart(biasedRay, 0, maxDistance);
 	while (m_marcher->MarcheNext())
 	{
 		auto objects = m_marcher->GetCurrentObjects();
@@ -31,7 +32,7 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxD
 		for (; iterator != objects->end(); iterator++)
 		{
 			auto object = *iterator;
-			auto hit = object->FindHit(ray);
+			auto hit = object->FindHit(biasedRay);
 			if (hit.has_occurred() && hit.distance() >= minDistance && hit.distance() <= maxDistance && m_marcher->IsDistanceWithinCurrentBounds(hit.distance()))
 			{
 				nearest_hit = hit;
@@ -44,7 +45,7 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxD
 		for (; iterator != objects->end(); iterator++)
 		{
 			auto object = *iterator;
-			auto hit = object->FindHit(ray);
+			auto hit = object->FindHit(biasedRay);
 			if (hit.has_occurred() && hit.distance() >= minDistance && hit.distance() <= maxDistance && m_marcher->IsDistanceWithinCurrentBounds(hit.distance()))
 			{
 				if (hit.distance() < nearest_hit.distance())
@@ -65,7 +66,8 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxD
 
 bool Raytracer::DoesIntersect(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
-	m_marcher->Restart(ray, minDistance, maxDistance);
+	auto biasedRay = ray.MoveOriginAlongDirection(minDistance);
+	m_marcher->Restart(biasedRay, 0, maxDistance);
 	while (m_marcher->MarcheNext())
 	{
 		auto objects = m_marcher->GetCurrentObjects();
@@ -73,7 +75,7 @@ bool Raytracer::DoesIntersect(const Ray & ray, space_real minDistance, space_rea
 		for (auto iterator = objects->begin(); iterator != objects->end(); iterator++)
 		{
 			auto object = *iterator;
-			auto hit = object->FindHit(ray);
+			auto hit = object->FindHit(biasedRay);
 			if (hit.has_occurred() && hit.distance() >= minDistance && hit.distance() <= maxDistance)
 			{
 				return true;

@@ -306,7 +306,7 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 #if true
 	LoadFromFile(scene, scene_file);
 
-	InsertGILight(scene, 128);
+	InsertGILight(scene, 1024);
 	//InsertSkyLight(scene, 64);
 #else
 	InitCamera(scene, 1280, 960);

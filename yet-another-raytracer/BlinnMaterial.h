@@ -2,18 +2,17 @@
 
 #include "Material.h"
 #include "Types.h"
-#include <exception>
 #include "Flux.h"
 
-class __declspec(align(MM_ALIGNMENT)) BlinnMaterial : public Material
+class BlinnMaterial : public Material
 {
 public:
 	
 
 	BlinnMaterial(void)
-		: m_diffuse(color_rgbx())
+		: m_emission(color_rgbx())
+		, m_diffuse(color_rgbx())
 		, m_specular(color_rgbx())
-		, m_emission(color_rgbx())
 		, m_shininess(1.0f)
 	{
 	}
@@ -65,8 +64,8 @@ private:
 	color_rgbx m_specular;
 	color_real m_shininess;
 
-	color_rgbx ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux) const;
-	color_rgbx ComputeSpecularComponent( const ShadingContext & context, const Flux & flux ) const;
+	color_rgbx ComputeDiffuseComponent(const ShadingContext & context, const Flux & flux) const;
+	color_rgbx ComputeSpecularComponent(const ShadingContext & context, const Flux & flux) const;
 
 };
 

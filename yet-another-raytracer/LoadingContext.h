@@ -5,7 +5,7 @@
 #include "Types.h"
 #include <memory>
 
-class __declspec(align(MM_ALIGNMENT)) LoadingContext
+class LoadingContext
 {
 public:
 

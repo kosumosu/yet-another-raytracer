@@ -2,7 +2,7 @@
 
 #include "GeometryObject.h"
 
-class __declspec(align(MM_ALIGNMENT)) FlatTriangleObject : public GeometryObject
+class FlatTriangleObject : public GeometryObject
 {
 public:
 	FlatTriangleObject(void);
@@ -16,9 +16,9 @@ public:
 
 	virtual ~FlatTriangleObject(void);
 
-	virtual Hit FindHit( const Ray & ray ) const;
+	virtual Hit FindHit( const Ray & ray ) const override;
 
-	virtual bool DoesHit( const Ray & ray ) const;
+	virtual bool DoesHit( const Ray & ray ) const override;
 
 
 	const vector3 & vertex0() const { return m_vertex0; }
@@ -30,7 +30,7 @@ public:
 	const vector3 & vertex2() const { return m_vertex2; }
 	void vertex2(const vector3 & val) { m_vertex2 = val; }
 
-	virtual void PrepareForRendering();
+	virtual void PrepareForRendering() override;
 
 	virtual BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
 

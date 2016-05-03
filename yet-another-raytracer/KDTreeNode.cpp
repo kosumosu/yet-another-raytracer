@@ -132,7 +132,7 @@ unsigned int KDTreeNode::GenerateSubNodes( const BoundingBox & box, std::vector<
 			right_objects.push_back(object);
 	}
 
-	if ((left_objects.size() + right_objects.size() > objects.size() * 2 - 12) /*|| left_objects->empty() || right_objects->empty()*/) // doesn't worth to split
+	if ((left_objects.size() + right_objects.size() + 12 > objects.size() * 2) /*|| left_objects->empty() || right_objects->empty()*/) // doesn't worth to split
 	{
 		return BeacomeALeaf(std::move(objects));
 	}

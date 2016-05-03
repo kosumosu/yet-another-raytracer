@@ -12,9 +12,9 @@
 
 
 Renderer::Renderer(const initialization_finished_callback & initializationFinishedCallback, const rendering_finished_callback & renderingFinishedCallback, const progress_callback & progressCallback)
-	: m_initializationFinishedCallback(initializationFinishedCallback)
+	: m_progressCallback(progressCallback)
+	, m_initializationFinishedCallback(initializationFinishedCallback)
 	, m_renderingFinishedCallback(renderingFinishedCallback)
-	, m_progressCallback(progressCallback)
 {
 }
 

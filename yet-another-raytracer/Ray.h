@@ -2,11 +2,9 @@
 
 #include "Types.h"
 
-class __declspec(align(MM_ALIGNMENT)) Ray
+class Ray
 {
 public:
-	
-
 	Ray(void)
 	{
 	}
@@ -39,9 +37,22 @@ public:
 		return Ray(origin, direction);
 	}
 
+	Ray MoveOriginAlongDirection(space_real distance) const
+	{
+		return Ray(m_origin + m_direction * distance, m_direction, m_inversed_direction);
+	}
+
 private:
 	vector3 m_origin;
 	vector3 m_direction;
 	vector3 m_inversed_direction;
+
+	Ray(const vector3 & origin, const vector3 & direction, const vector3 & inversedDirection)
+		: m_origin(origin)
+		, m_direction(direction)
+		, m_inversed_direction(inversedDirection)
+	{
+
+	}
 };
 

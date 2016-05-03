@@ -52,7 +52,6 @@ private:
 	vector3 m_normal;
 	Ray m_incident_ray;
 
-	const Raytracer * m_raytracer;
 	const RayEvaluator * m_ray_evaluator;
 	const LightingServer * m_lighting_server;
 

@@ -324,6 +324,9 @@
     <ClInclude Include="SimpleGILightSource.h">
       <Filter>Header Files\Engine\Lighting</Filter>
     </ClInclude>
+    <ClInclude Include="DielectricMaterial.h">
+      <Filter>Header Files\Engine\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -430,6 +433,9 @@
     </ClCompile>
     <ClCompile Include="SimpleGILightSource.cpp">
       <Filter>Source Files\Engine\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="DielectricMaterial.cpp">
+      <Filter>Source Files\Engine\Materials</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
