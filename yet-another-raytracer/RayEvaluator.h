@@ -5,7 +5,7 @@
 #include "Ray.h"
 #include "Types.h"
 
-class __declspec(align(MM_ALIGNMENT)) RayEvaluator
+class RayEvaluator
 {
 public:
 	

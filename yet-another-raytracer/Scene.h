@@ -16,6 +16,7 @@ public:
 		, m_viewport_height(480)
 		, m_max_trace_depth(4)
 		, m_camera(new Camera())
+		, m_samplesPerPixel(1)
 	{
 	}
 
@@ -47,8 +48,11 @@ public:
 	void lights(const LightSourceCollection & val) { m_lights = val; }
 	void lights(const LightSourceCollection && val) { m_lights = std::move(val); }
 
-	color_rgbx environmentColor() const { return m_environmentColor; }
-	void environmentColor(const color_rgbx & color) { m_environmentColor = color; }
+	color_rgbx getEnvironmentColor() const { return m_environmentColor; }
+	void setEnvironmentColor(const color_rgbx & color) { m_environmentColor = color; }
+
+	size_t getSamplesPerPixel() const { return m_samplesPerPixel; }
+	void setSamplesPerPixel(size_t samplesPerPixel) { m_samplesPerPixel = samplesPerPixel; }
 
 private:
 	unsigned int m_viewport_width;
@@ -61,7 +65,8 @@ private:
 
 	ObjectCollection m_objects;
 	LightSourceCollection m_lights;
-	
+
 	color_rgbx m_environmentColor;
+	size_t m_samplesPerPixel;
 };
 

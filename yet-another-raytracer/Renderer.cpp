@@ -18,9 +18,29 @@ Renderer::Renderer(const initialization_finished_callback & initializationFinish
 {
 }
 
+void Renderer::ProcessPixel(Film& film, const Scene& scene, RayEvaluator & rayEvaluator, unsigned int x, unsigned int y) const
+{
+	bool doJitter = scene.getSamplesPerPixel() > 1;
+	color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
+	color_rgbx averageColor;
+	vector2 pixelLeftBottomCoord(x, y);
+	vector2 sizeNormalizationFactor(1.0 / film.width(), 1.0 / film.height());
+
+	for (size_t i = 0; i < scene.getSamplesPerPixel(); i++)
+	{
+		auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0)) : vector2(0.5, 0.5);
+		auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
+
+		auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, space_real(film.width()) / space_real(film.height()));
+		averageColor += rayEvaluator.TraceRay(ray, scene.max_trace_depth(), space_real(0.0), true) * sampleWeight;
+	}
+
+	*film.pixel_at(x, y) = averageColor;
+}
+
 void Renderer::Render(Film & film, const Scene & scene) const
 {
-	float total_pixels = (float)film.width() * (float)film.height(); // for timer
+	float total_pixels = float(film.width()) * float(film.height()); // for timer
 
 	PrepareObjects(scene.objects());
 
@@ -30,7 +50,7 @@ void Renderer::Render(Film & film, const Scene & scene) const
 	LightingServer lightingServer;
 	lightingServer.shadows_enabled(true);
 	RayEvaluator rayEvaluator(&raytracer, &lightingServer);
-	rayEvaluator.background_color(scene.environmentColor());
+	rayEvaluator.background_color(scene.getEnvironmentColor());
 
 	lightingServer.lights(&scene.lights());
 
@@ -43,8 +63,7 @@ void Renderer::Render(Film & film, const Scene & scene) const
 	{
 		for (unsigned int x = 0; x < film.width(); x++)
 		{
-			auto ray = scene.camera()->GetViewRay((x + space_real(0.5)) / film.width(), (y + space_real(0.5)) / film.height(), (space_real)film.width() / (space_real)film.height());
-			*film.pixel_at(x, y) = rayEvaluator.TraceRay(ray, scene.max_trace_depth(), space_real(0.0), true);
+			ProcessPixel(film, scene, rayEvaluator, x, y);
 
 			if (timer.Sample() > 2.0f)
 			{

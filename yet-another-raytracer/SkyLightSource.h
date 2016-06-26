@@ -2,7 +2,7 @@
 
 #include "LightSource.h"
 
-class __declspec(align(MM_ALIGNMENT)) SkyLightSource : public LightSource
+class SkyLightSource : public LightSource
 {
 public:
 	SkyLightSource(void);

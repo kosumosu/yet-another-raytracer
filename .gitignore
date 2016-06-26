@@ -156,3 +156,6 @@ $RECYCLE.BIN/
 .DS_Store
 /berkeley-test-scenes
 yet-another-raytracer.VC.db
+*.db
+yet-another-raytracer.VC.db
+yet-another-raytracer.VC.db

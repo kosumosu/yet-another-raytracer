@@ -3,11 +3,9 @@
 #include "Ray.h"
 
 #include "Types.h"
-#include <exception>
 
-#define M_PI 3.1415926535897932384626433832795
 
-class __declspec(align(MM_ALIGNMENT)) Camera
+class Camera
 {
 public:
 	
@@ -44,10 +42,10 @@ public:
 	void fovy(space_real value)
 	{
 		m_fovy = value;
-		m_tan_half_fov_y = std::tan((space_real)M_PI * m_fovy / (space_real)360.0);
+		m_tan_half_fov_y = std::tan(space_real(math::pi) * m_fovy / space_real(360.0));
 	}
 
-	Ray GetViewRay(space_real x, space_real y, space_real aspect) const
+	Ray GetViewRay(vector2 imageSpaceCoord, space_real aspect) const
 	{
 		auto w = m_direction;
 		auto v = m_up;
@@ -56,7 +54,7 @@ public:
 		auto scale_y = m_tan_half_fov_y;
 		auto scale_x = m_tan_half_fov_y * aspect;
 
-		vector3 ray_direction = w + u * (MapToCamera(x) * scale_x) - v * (MapToCamera(y) * scale_y);  // -v because of inverted y
+		vector3 ray_direction = w + u * (MapToCamera(imageSpaceCoord[0]) * scale_x) - v * (MapToCamera(imageSpaceCoord[1]) * scale_y);  // -v because of inverted y
 
 		return Ray(m_position, math::normalize(ray_direction));
 	}

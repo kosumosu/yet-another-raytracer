@@ -6,7 +6,7 @@
 
 class KDTreeNode;
 
-class __declspec(align(MM_ALIGNMENT)) KDTreeMarcher : public Marcher
+class KDTreeMarcher : public Marcher
 {
 public:
 	KDTreeMarcher(const BoundingBox & scene_box, const KDTreeNode * root_node, unsigned int max_depth);

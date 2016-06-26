@@ -8,7 +8,7 @@
 namespace math
 {
 	template <typename T>
-	class __declspec(align(MM_ALIGNMENT)) base_matrix<T, 4, 4>
+	class base_matrix<T, 4, 4>
 	{
 	public:
 		// Constructs identity matrix

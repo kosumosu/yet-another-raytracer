@@ -12,7 +12,7 @@
 namespace math
 {
 	template<>
-	class __declspec(align(MM_ALIGNMENT)) vector<float, 4>
+	class vector<float, 4>
 	{
 	public:
 		vector()

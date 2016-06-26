@@ -4,7 +4,7 @@
 #include "Ray.h"
 #include <algorithm>
 
-class __declspec(align(MM_ALIGNMENT)) BoundingBox
+class BoundingBox
 {
 public:
 

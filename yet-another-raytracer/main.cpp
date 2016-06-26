@@ -306,13 +306,13 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 #if true
 	LoadFromFile(scene, scene_file);
 
-	InsertGILight(scene, 1024);
+	//InsertGILight(scene, 128);
 	//InsertSkyLight(scene, 64);
 #else
 	InitCamera(scene, 1280, 960);
 	scene.max_trace_depth(8);
-	scene.environmentColor(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
-	//scene.environmentColor(color_rgbx(1.0));
+	scene.getEnvironmentColor(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
+	//scene.getEnvironmentColor(color_rgbx(1.0));
 
 	InsertDirectionalLight(scene);
 	//InsertSkyLights(scene, 200);

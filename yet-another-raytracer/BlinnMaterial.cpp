@@ -11,7 +11,7 @@ color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 
 		for (auto & flux : *fluxes)
 		{
-			auto differentialCoeff = (color_real)std::max(space_real(0.0), math::dot(flux.direction(), context.normal()));
+			auto differentialCoeff = color_real(std::max(space_real(0.0), math::dot(flux.direction(), context.normal())));
 
 			m_illumination += (ComputeDiffuseComponent(context, flux) + ComputeSpecularComponent(context, flux)) * differentialCoeff / flux.probabilityDensity();
 		}
@@ -33,13 +33,13 @@ color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 color_rgbx BlinnMaterial::ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux) const
 {
 	//auto diffuse = math::clamp(color_rgbx(context.normal()[0], context.normal()[1], context.normal()[2], color_real(0.0)), color_rgbx(0.0), color_rgbx(1.0));
-	return m_diffuse * (color_rgbx(1.0) - m_specular) * flux.color();
+	return m_diffuse * (color_rgbx(1.0) - m_specular) * flux.color() * color_real(math::oneOverPi);
 }
 
 color_rgbx BlinnMaterial::ComputeSpecularComponent( const ShadingContext & context, const Flux & flux ) const
 {
 	auto half_vector = math::normalize(flux.direction() - context.incident_ray().direction());
-	auto intensity = std::powf((color_real)std::max(space_real(0.0), math::dot(half_vector, context.normal())), m_shininess);
+	auto intensity = std::pow(color_real(std::max(space_real(0.0), math::dot(half_vector, context.normal()))), m_shininess);
 	return m_specular * flux.color() * intensity;
 }
 

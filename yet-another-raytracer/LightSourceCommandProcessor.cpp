@@ -2,6 +2,7 @@
 
 #include "DirectionalLightSource.h"
 #include "PointLightSource.h"
+#include "SimpleGILightSource.h"
 #include "ParserHelper.h"
 #include "Types.h"
 
@@ -53,6 +54,12 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 		m_attenuation.constant(constant);
 		m_attenuation.linear(linear);
 		m_attenuation.quadratic(quadratic);
+	}
+	else if (command == "gi")
+	{
+		std::shared_ptr<SimpleGILightSource> light(new SimpleGILightSource());
+		light->samples(ParserHelper::ReadUInt(stream));
+		context.scene()->lights().push_back(std::move(light));
 	}
 	else
 	{

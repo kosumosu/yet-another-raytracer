@@ -34,6 +34,14 @@ void SettingsCommandProcessor::ProcessCommand( LoadingContext & context, const s
 	{
 		context.scene()->output_filename(ParserHelper::Read<std::string>(stream));
 	}
+	else if (command == "background")
+	{
+		context.scene()->setEnvironmentColor(color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0));
+	}
+	else if (command == "samples")
+	{
+		context.scene()->setSamplesPerPixel(ParserHelper::ReadUInt(stream));
+	}
 	else
 	{
 		throw std::exception();

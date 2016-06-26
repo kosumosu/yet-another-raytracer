@@ -20,6 +20,8 @@ std::vector<std::string> SettingsCommandFactory::GetSupportedCommands() const
 	commands.push_back("size");
 	commands.push_back("maxdepth");
 	commands.push_back("output");
+	commands.push_back("background");
+	commands.push_back("samples");
 	return commands;
 }
 

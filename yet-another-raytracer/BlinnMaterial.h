@@ -54,9 +54,9 @@ public:
 	void shininess(color_real value) { m_shininess = value; }
 
 
-	virtual color_rgbx Shade( const ShadingContext & context ) const;
+	color_rgbx Shade( const ShadingContext & context ) const override;
 
-	virtual Material * Clone() const;
+	Material * Clone() const override;
 
 private:
 	color_rgbx m_emission;

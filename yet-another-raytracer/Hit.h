@@ -5,7 +5,7 @@
 
 class GeometryObject;
 
-class __declspec(align(MM_ALIGNMENT)) Hit
+class Hit
 {
 public:
 	
