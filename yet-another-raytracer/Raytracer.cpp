@@ -24,42 +24,25 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxD
 	while (m_marcher->MarcheNext())
 	{
 		auto objects = m_marcher->GetCurrentObjects();
-		auto iterator = objects->begin();
 
-		// finding first hit
-		for (; iterator != objects->end(); ++iterator)
+		for (const auto & object : *objects)
 		{
-			auto object = *iterator;
 			auto hit = object->FindHit(ray, minDistance, maxDistance);
 			if (hit.has_occurred())
 			{
-				nearest_hit = hit;
-				++iterator;
-				break;
-			}
-		}
-
-		//finding consecutive hits
-		for (; iterator != objects->end(); ++iterator)
-		{
-			auto object = *iterator;
-			auto hit = object->FindHit(ray, minDistance, maxDistance);
-			if (hit.has_occurred())
-			{
-				if (hit.distance() < nearest_hit.distance())
+				if (!nearest_hit.has_occurred() || hit.distance() < nearest_hit.distance())
 				{
 					nearest_hit = hit;
 				}
 			}
 		}
 
-		// If found
+		// If found and it's guaranteed to be the closest one
 		if (nearest_hit.has_occurred() && m_marcher->IsCorrectIntersectionForCurrentState(nearest_hit.distance()))
 			return nearest_hit;
 	}
 
-	// Nothing found
-	return Hit();
+	return nearest_hit;
 }
 
 bool Raytracer::DoesIntersect(const Ray & ray, space_real minDistance, space_real maxDistance) const
@@ -69,7 +52,7 @@ bool Raytracer::DoesIntersect(const Ray & ray, space_real minDistance, space_rea
 	{
 		auto objects = m_marcher->GetCurrentObjects();
 
-		for (auto object : *objects)
+		for (const auto & object : *objects)
 		{
 			auto hit = object->FindHit(ray, minDistance, maxDistance);
 			if (hit.has_occurred())
