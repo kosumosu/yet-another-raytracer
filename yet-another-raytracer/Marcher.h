@@ -23,6 +23,6 @@ public:
 	// Marches to the next leaf.
 	virtual bool MarcheNext() = 0;
 
-	virtual bool IsDistanceWithinCurrentBounds(space_real dist) const = 0;
+	virtual bool IsCorrectIntersectionForCurrentState(space_real dist) const = 0;
 };
 

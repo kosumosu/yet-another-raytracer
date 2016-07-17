@@ -5,6 +5,10 @@
 KDTreeMarcher::KDTreeMarcher(const BoundingBox & scene_box, const KDTreeNode * root_node, unsigned int max_depth)
 	: m_scene_box(scene_box)
 	, m_root_node(root_node)
+	, m_current_leaf(nullptr)
+	, m_failed_in_constructor(false)
+	, m_dist_near(0)
+	, m_dist_far(0)
 {
 	m_stack.reserve(max_depth);
 }
@@ -80,7 +84,7 @@ bool KDTreeMarcher::MarcheNext()
 	return true;
 }
 
-bool KDTreeMarcher::IsDistanceWithinCurrentBounds(space_real dist) const
+bool KDTreeMarcher::IsCorrectIntersectionForCurrentState(space_real dist) const
 {
-	return m_dist_near <= dist && dist <= m_dist_far;
+	return dist <= m_dist_far; // we don't check m_dist_near because all closer intersections were found previously
 }

@@ -1,9 +1,6 @@
 #pragma once
 
-#include "allocation.h"
 #include "vector.hpp"
-#include "vector_operations.hpp"
-#include <crtdefs.h>
 
 namespace math
 {
@@ -11,6 +8,9 @@ namespace math
 	class base_matrix<T, 4, 4>
 	{
 	public:
+		constexpr static size_t columns() { return 4; }
+		constexpr static size_t rows() { return 4; }
+
 		// Constructs identity matrix
 		base_matrix()
 		{
@@ -73,9 +73,6 @@ namespace math
 				}
 			}
 		}
-
-		size_t num_rows() const { return 4; }
-		size_t num_cols() const { return 4; }
 
 		vector<T, 4> & operator[](std::size_t index)
 		{

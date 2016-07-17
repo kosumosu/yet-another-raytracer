@@ -3,10 +3,7 @@
 //#include "base_vector3.hpp"
 #include "base_matrix4x4.hpp"
 #include "base_matrix_operations.hpp"
-
-#include <algorithm>
-
-#define M_PI 3.1415926535897932384626433832795
+#include "Constants.h"
 
 namespace math
 {
@@ -62,7 +59,7 @@ namespace math
 	template <typename T>
 	base_matrix<T, 4, 4> inline rotate_degrees(const vector<T, 3> & axis, T degrees)
 	{
-		T radians = T(M_PI) / T(180) * degrees;
+		T radians = T(math::pi) / T(180) * degrees;
 		return rotate(axis, radians);
 	}
 }

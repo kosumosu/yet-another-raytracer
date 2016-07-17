@@ -5,6 +5,8 @@
 const unsigned int OPTIMAL_PRIMITIVES_PER_LEAF = 4;
 
 KDTreeNode::KDTreeNode(void)
+	: m_leaf(false)
+	, m_split_axis(0)
 {
 }
 
@@ -55,7 +57,7 @@ unsigned int KDTreeNode::GetSplittingAxis( const BoundingBox & box, const std::v
 	auto diff = box.max_corner() - box.min_corner();
 	
 	unsigned int max_axis = 0;
-	for (unsigned int i = 1; i < diff.dimensions; i++)
+	for (unsigned int i = 1; i < diff.dimensions(); i++)
 	{
 		if (diff[i] > diff[max_axis])
 			max_axis = i;

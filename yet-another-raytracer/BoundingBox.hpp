@@ -9,8 +9,8 @@ class BoundingBox
 public:
 
 	BoundingBox(void)
-		: m_min_corner(vector3())
-		, m_max_corner(vector3(space_real(-1.0)))
+		: m_min_corner()
+		, m_max_corner(space_real(-1.0))
 	{
 	}
 

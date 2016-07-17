@@ -5,6 +5,7 @@
 
 LightingServer::LightingServer()
 	: m_shadows_enabled(false)
+	, m_lights(nullptr)
 {
 
 }
@@ -14,7 +15,7 @@ LightingServer::~LightingServer(void)
 {
 }
 
-FluxCollection * LightingServer::GetFluxesAtPoint( const vector3 & point, const vector3 & normal, space_real bias, unsigned int depthLeft, const RayEvaluator& rayEvaluator, bool allowSubdivision) const
+FluxCollection * LightingServer::GetFluxesAtPoint(const vector3 & point, const vector3 & normal, space_real bias, unsigned int depthLeft, const RayEvaluator& rayEvaluator, bool allowSubdivision) const
 {
 	FluxCollection * filtered_fluxes = new FluxCollection(); // to reduce allocations
 

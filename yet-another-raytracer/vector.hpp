@@ -12,29 +12,29 @@ namespace math
 	{
 	public:
 
-		enum { dimensions = DIMENSIONS };
+		constexpr static size_t dimensions() { return DIMENSIONS; }
 
 		vector()
 		{
-			iterate<0, dimensions - 1>([&] (size_t i) { m_elements[i] = TSpace(0); });
+			iterate<0, dimensions() - 1>([&] (size_t i) { m_elements[i] = TSpace(0); });
 		}
 
 		template <typename TOther>
 		vector(const vector<TOther, DIMENSIONS> & other )
 		{
-			iterate<0, dimensions - 1>([&] (size_t i) { m_elements[i] = TSpace(other[i]); });
+			iterate<0, dimensions() - 1>([&] (size_t i) { m_elements[i] = TSpace(other[i]); });
 		}
 
 		template <typename TOther>
 		explicit vector(const TOther other[])
 		{
-			iterate<0, dimensions - 1>([&] (size_t i) { m_elements[i] = TSpace(other[i]); });
+			iterate<0, dimensions() - 1>([&] (size_t i) { m_elements[i] = TSpace(other[i]); });
 		}
 
 		template <typename TValue>
 		explicit vector(const TValue & value)
 		{
-			iterate<0, dimensions - 1>([&] (size_t i) { m_elements[i] = TSpace(value); });
+			iterate<0, dimensions() - 1>([&] (size_t i) { m_elements[i] = TSpace(value); });
 		}
 
 		template <typename TFirstValue, typename ... TValues>

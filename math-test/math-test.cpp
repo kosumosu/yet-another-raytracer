@@ -135,7 +135,7 @@ bool TestMatScale()
 __declspec(noinline)
 bool TestMatRotate()
 {
-	auto rotate = math::rotate(math::vector<float, 3>(1.0f, 0.0f, 0.0f), float(M_PI / 2.0));
+	auto rotate = math::rotate(math::vector<float, 3>(1.0f, 0.0f, 0.0f), float(math::pi / 2.0));
 
 	auto glm_rotate = glm::rotate(glm::mat4(), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 

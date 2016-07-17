@@ -36,7 +36,7 @@ bool NullMarcher::MarcheNext()
 	}
 }
 
-bool NullMarcher::IsDistanceWithinCurrentBounds(space_real dist) const
+bool NullMarcher::IsCorrectIntersectionForCurrentState(space_real dist) const
 {
 	return true;
 }

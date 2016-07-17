@@ -18,15 +18,14 @@
 
 #include "Types.h"
 #include <iostream>
+#include <iomanip>
 #include <memory>
 
 #include "KDTreeNode.h"
 
 void reportProgress(unsigned int x, unsigned int y, float progress)
 {
-	char buf[10];
-	sprintf_s(buf, "%.2f", progress * 100.0f);
-	std::cout << "Done " << buf << "%" << std::endl;
+	std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
 }
 
 

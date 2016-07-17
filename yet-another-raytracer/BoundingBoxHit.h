@@ -7,7 +7,9 @@ class BoundingBoxHit
 public:
 
 	BoundingBoxHit()
-		: m_occurred(false)
+		: m_near(0)
+		, m_far(0)
+		, m_occurred(false)
 	{
 
 	}

@@ -31,10 +31,10 @@ public:
 
 
 	// Finds point of intersection with given ray
-	virtual Hit FindHit(const Ray & ray) const = 0;
+	virtual Hit FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const = 0;
 
 	// Determines if ray intersects the object
-	virtual bool DoesHit(const Ray & ray) const = 0;
+	virtual bool DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const = 0;
 
 
 	// Perform some precalculations (normals, bboxes etc)

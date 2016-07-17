@@ -7,6 +7,7 @@ class Attenuation
 public:
 
 	Attenuation()
+		: m_quadratic(0), m_linear(0), m_constant(0)
 	{
 
 	}
@@ -33,7 +34,7 @@ public:
 
 	color_real Evaluate(space_real distance) const
 	{
-		return (color_real)(space_real(1.0) / ( m_quadratic * distance * distance + m_linear * distance + m_constant ));
+		return color_real(space_real(1.0) / ( m_quadratic * distance * distance + m_linear * distance + m_constant ));
 	}
 
 private:

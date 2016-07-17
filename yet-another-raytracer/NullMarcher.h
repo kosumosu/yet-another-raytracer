@@ -10,13 +10,13 @@ public:
 	NullMarcher(const std::vector<GeometryObject*> * objects);
 	virtual ~NullMarcher(void);
 
-	virtual void Restart(const Ray & ray, space_real near, space_real far) override;
+	void Restart(const Ray & ray, space_real near, space_real far) override;
 
-	virtual const std::vector<GeometryObject*> * GetCurrentObjects() override;
+	const std::vector<GeometryObject*> * GetCurrentObjects() override;
 
-	virtual bool MarcheNext() override;
+	bool MarcheNext() override;
 
-	virtual bool IsDistanceWithinCurrentBounds(space_real dist) const override;
+	bool IsCorrectIntersectionForCurrentState(space_real dist) const override;
 
 private:
 	const std::vector<GeometryObject*> * m_objects;

@@ -1,5 +1,4 @@
 #include "Raytracer.h"
-#include <exception>
 
 
 Raytracer::Raytracer(std::unique_ptr<Marcher> && marcher)
@@ -18,35 +17,34 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real bias) const
 
 Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
-	auto biasedRay = ray.MoveOriginAlongDirection(minDistance);
-	m_marcher->Restart(biasedRay, 0, maxDistance);
+	m_marcher->Restart(ray, minDistance, maxDistance);
+
+	Hit nearest_hit;
+
 	while (m_marcher->MarcheNext())
 	{
 		auto objects = m_marcher->GetCurrentObjects();
-
-		Hit nearest_hit;
-
 		auto iterator = objects->begin();
 
 		// finding first hit
-		for (; iterator != objects->end(); iterator++)
+		for (; iterator != objects->end(); ++iterator)
 		{
 			auto object = *iterator;
-			auto hit = object->FindHit(biasedRay);
-			if (hit.has_occurred() && hit.distance() >= minDistance && hit.distance() <= maxDistance && m_marcher->IsDistanceWithinCurrentBounds(hit.distance()))
+			auto hit = object->FindHit(ray, minDistance, maxDistance);
+			if (hit.has_occurred())
 			{
 				nearest_hit = hit;
-				iterator++;
+				++iterator;
 				break;
 			}
 		}
 
 		//finding consecutive hits
-		for (; iterator != objects->end(); iterator++)
+		for (; iterator != objects->end(); ++iterator)
 		{
 			auto object = *iterator;
-			auto hit = object->FindHit(biasedRay);
-			if (hit.has_occurred() && hit.distance() >= minDistance && hit.distance() <= maxDistance && m_marcher->IsDistanceWithinCurrentBounds(hit.distance()))
+			auto hit = object->FindHit(ray, minDistance, maxDistance);
+			if (hit.has_occurred())
 			{
 				if (hit.distance() < nearest_hit.distance())
 				{
@@ -56,7 +54,7 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxD
 		}
 
 		// If found
-		if (nearest_hit.has_occurred())
+		if (nearest_hit.has_occurred() && m_marcher->IsCorrectIntersectionForCurrentState(nearest_hit.distance()))
 			return nearest_hit;
 	}
 
@@ -66,17 +64,15 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxD
 
 bool Raytracer::DoesIntersect(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
-	auto biasedRay = ray.MoveOriginAlongDirection(minDistance);
-	m_marcher->Restart(biasedRay, 0, maxDistance);
+	m_marcher->Restart(ray, minDistance, maxDistance);
 	while (m_marcher->MarcheNext())
 	{
 		auto objects = m_marcher->GetCurrentObjects();
 
-		for (auto iterator = objects->begin(); iterator != objects->end(); iterator++)
+		for (auto object : *objects)
 		{
-			auto object = *iterator;
-			auto hit = object->FindHit(biasedRay);
-			if (hit.has_occurred() && hit.distance() >= minDistance && hit.distance() <= maxDistance)
+			auto hit = object->FindHit(ray, minDistance, maxDistance);
+			if (hit.has_occurred())
 			{
 				return true;
 			}

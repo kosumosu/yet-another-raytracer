@@ -27,10 +27,10 @@ namespace math
 	base_matrix<T, COLS, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const T & scalar)
 	{
 		base_matrix<T, COLS, ROWS> res;
-		for (size_t i = 0; i < ROWS; i++)
+		iterate<0, ROWS - 1>([&](size_t i)
 		{
 			res[i] = one[i] * scalar;
-		}
+		});
 		return res;
 	}
 
@@ -53,10 +53,10 @@ namespace math
 		base_matrix<T, COLS_ANOTHER, ROWS_ONE> res;
 		for (size_t j = 0; j < ROWS_ONE; j++)
 		{
-			for (size_t i = 0; i < COLS_ANOTHER; i++)
+			iterate<0, COLS_ANOTHER - 1>([&](size_t i)
 			{
 				res[j][i] = math::dot( one[j] , another.get_column(i) );
-			}
+			});
 		}
 		return res;
 	}
@@ -65,10 +65,10 @@ namespace math
 	base_matrix<T, COLS, ROWS> inline operator +(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
 		base_matrix<T, COLS, ROWS> res;
-		for (size_t i = 0; i < ROWS; i++)
+		iterate<0, ROWS - 1>([&](size_t i)
 		{
 			res[i] = one[i] + another[i];
-		}
+		});
 		return res;
 	}
 
@@ -76,10 +76,10 @@ namespace math
 	base_matrix<T, COLS, ROWS> inline operator -(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
 		base_matrix<T, COLS, ROWS> res;
-		for (size_t i = 0; i < ROWS; i++)
+		iterate<0, ROWS - 1>([&](size_t i)
 		{
 			res[i] = one[i] - another[i];
-		}
+		});
 		return res;
 	}
 
@@ -88,10 +88,10 @@ namespace math
 	vector<T, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const vector<T, COLS> & another)
 	{
 		vector<T, ROWS> res;
-		for (size_t i = 0; i < ROWS; i++)
+		iterate<0, ROWS - 1>([&](size_t i)
 		{
 			res[i] = math::dot( one[i] , another );
-		}
+		});
 		return res;
 	}
 }

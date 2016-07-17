@@ -16,9 +16,9 @@ public:
 
 	virtual ~FlatTriangleObject(void);
 
-	virtual Hit FindHit( const Ray & ray ) const override;
+	Hit FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const override;
 
-	virtual bool DoesHit( const Ray & ray ) const override;
+	bool DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const override;
 
 
 	const vector3 & vertex0() const { return m_vertex0; }
@@ -30,9 +30,9 @@ public:
 	const vector3 & vertex2() const { return m_vertex2; }
 	void vertex2(const vector3 & val) { m_vertex2 = val; }
 
-	virtual void PrepareForRendering() override;
+	void PrepareForRendering() override;
 
-	virtual BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
+	BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
 
 private:
 	vector3 m_vertex0;

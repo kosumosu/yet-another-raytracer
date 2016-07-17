@@ -12,13 +12,13 @@ public:
 	KDTreeMarcher(const BoundingBox & scene_box, const KDTreeNode * root_node, unsigned int max_depth);
 	~KDTreeMarcher(void);
 
-	virtual void Restart(const Ray & ray, space_real near, space_real far) override;
+	void Restart(const Ray & ray, space_real near, space_real far) override;
 
-	virtual const std::vector<GeometryObject*> * GetCurrentObjects() override;
+	const std::vector<GeometryObject*> * GetCurrentObjects() override;
 
-	virtual bool MarcheNext() override;
+	bool MarcheNext() override;
 
-	virtual bool IsDistanceWithinCurrentBounds(space_real dist) const override;
+	bool IsCorrectIntersectionForCurrentState(space_real dist) const override;
 
 private:
 	const BoundingBox m_scene_box;

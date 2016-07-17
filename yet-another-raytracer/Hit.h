@@ -21,8 +21,9 @@ public:
 
 	// Initializes unsuccessful hit
 	Hit()
-		: m_has_occurred(false)
-	{
+		: m_object(nullptr)
+		, m_has_occurred(false)
+		, m_distance(0) {
 
 	}
 

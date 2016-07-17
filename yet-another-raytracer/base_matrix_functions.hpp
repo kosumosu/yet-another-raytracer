@@ -4,6 +4,64 @@
 
 namespace math
 {
+	template <typename T, size_t SIDE, size_t COLUMN, size_t COLUMNS_LEFT>
+	class determinant_iter
+	{
+	public:
+		enum
+		{
+			columns_left = COLUMNS_LEFT,
+			column = COLUMN,
+			side = SIDE
+		};
+
+		static T determinant(const base_matrix<T, SIDE, SIDE> & mat)
+		{
+			return mat[0][COLUMN] * minor<T, SIDE, COLUMN, 0>(mat) - determinant_iter<T, SIDE, COLUMN + 1, COLUMNS_LEFT - 1>::determinant(mat);
+		}
+	};
+
+	template <typename T, size_t SIDE, size_t COLUMN>
+	class determinant_iter<T, SIDE, COLUMN, 0>
+	{
+	public:
+		enum
+		{
+			column = COLUMN,
+			side = SIDE
+		};
+
+		static T determinant(const base_matrix<T, SIDE, SIDE> & mat)
+		{
+			return mat[0][COLUMN] * minor<T, SIDE, COLUMN, 0>(mat);
+		}
+	};
+
+	template <typename T>
+	T inline determinant(const base_matrix<T, 1, 1> & mat)
+	{
+		return mat[0][0];
+	}
+
+	template <typename T>
+	T determinant(const base_matrix<T, 2, 2> & mat)
+	{
+		return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+	}
+
+	template <typename T>
+	T determinant(const base_matrix<T, 3, 3> & mat)
+	{
+		return mat[0][0] * mat[1][1] * mat[2][2] + mat[0][1] * mat[1][2] * mat[2][0] + mat[0][2] * mat[1][0] * mat[2][1]
+			- mat[0][2] * mat[1][1] * mat[2][0] - mat[0][1] * mat[1][0] * mat[2][2] - mat[0][0] * mat[1][2] * mat[2][1];
+	}
+
+	template <typename T, size_t SIDE>
+	T inline determinant(const base_matrix<T, SIDE, SIDE> & mat)
+	{
+		return determinant_iter<T, SIDE, 0, SIDE - 1>::determinant(mat);
+	}
+
 	template <typename T, size_t COLS, size_t ROWS>
 	base_matrix<T, COLS - 1, ROWS - 1> inline submatrix(const base_matrix<T, COLS, ROWS> & mat, size_t column, size_t row)
 	{
@@ -59,65 +117,6 @@ namespace math
 
 		return math::determinant(submatrix<T, SIDE, SIDE, EXCLUDE_COL, EXCLUDE_ROW>(mat));
 	}
-
-	template <typename T>
-	T inline determinant(const base_matrix<T, 1, 1> & mat)
-	{
-		return mat[0][0];
-	}
-
-	template <typename T>
-	T determinant(const base_matrix<T, 2, 2> & mat)
-	{
-		return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
-	}
-
-	template <typename T>
-	T determinant(const base_matrix<T, 3, 3> & mat)
-	{
-		return mat[0][0] * mat[1][1] * mat[2][2] + mat[0][1] * mat[1][2] * mat[2][0] + mat[0][2] * mat[1][0] * mat[2][1]
-		- mat[0][2] * mat[1][1] * mat[2][0] - mat[0][1] * mat[1][0] * mat[2][2] - mat[0][0] * mat[1][2] * mat[2][1];
-	}
-
-	template <typename T, size_t SIDE>
-	T inline determinant(const base_matrix<T, SIDE, SIDE> & mat)
-	{
-		return determinant_iter<T, SIDE, 0, SIDE - 1>::determinant(mat);
-	}
-
-	template <typename T, size_t SIDE, size_t COLUMN, size_t COLUMNS_LEFT>
-	class determinant_iter
-	{
-	public:
-		enum
-		{
-			columns_left = COLUMNS_LEFT,
-			column = COLUMN,
-			side = SIDE
-		};
-
-		static T determinant(const base_matrix<T, SIDE, SIDE> & mat)
-		{
-			return mat[0][COLUMN] * minor<T, SIDE, COLUMN, 0>(mat) - determinant_iter<T, SIDE, COLUMN + 1, COLUMNS_LEFT - 1>::determinant(mat);
-		}
-	};
-
-	template <typename T, size_t SIDE, size_t COLUMN>
-	class determinant_iter<T, SIDE, COLUMN, 0>
-	{
-	public:
-		enum
-		{
-			column = COLUMN,
-			side = SIDE
-		};
-
-		static T determinant(const base_matrix<T, SIDE, SIDE> & mat)
-		{
-			return mat[0][COLUMN] * minor<T, SIDE, COLUMN, 0>(mat);
-		}
-	};
-
 
 	template <typename T, size_t SIDE>
 	base_matrix<T, SIDE, SIDE> inline inverse(const base_matrix<T, SIDE, SIDE> & mat)

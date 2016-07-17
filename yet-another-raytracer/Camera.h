@@ -9,14 +9,16 @@ class Camera
 {
 public:
 	
-	Camera(void)
-	: m_position(vector3(1.0, 0.0, 0.0))
-	, m_target(vector3(0.0, 0.0, 0.0))
+	Camera()
+		: m_position(vector3(1.0, 0.0, 0.0))
+		, m_target(vector3(0.0, 0.0, 0.0))
+		, m_fovy(60.0)
+		, m_tan_half_fov_y(std::tan(space_real(math::pi) * m_fovy / space_real(360.0)))
 	{
 		UpdateDirection();
 	}
 
-	~Camera(void)
+	~Camera()
 	{
 	}
 

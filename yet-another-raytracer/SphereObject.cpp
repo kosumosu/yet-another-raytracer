@@ -13,7 +13,7 @@ SphereObject::~SphereObject(void)
 {
 }
 
-Hit SphereObject::FindHit( const Ray & ray ) const
+Hit SphereObject::FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
 	auto inversed_ray = ray.Transform(this->inverse_transform());
 
@@ -33,24 +33,24 @@ Hit SphereObject::FindHit( const Ray & ray ) const
 	else // treat d == 0 as d > 0 i.e. think that we have two roots
 	{
 		space_real d_rooted = std::sqrt(d);
-		space_real x1 = (b + d_rooted) / (space_real(-2.0) * a);
-		space_real x2 = (b - d_rooted) / (space_real(-2.0) * a);
+		space_real biasedX1 = (b + d_rooted) / (space_real(-2.0) * a) - minDistance; // subtract it now to simplify calculation. Later it will be compensated.
+		space_real biasedX2 = (b - d_rooted) / (space_real(-2.0) * a) - minDistance;
 
-		if ( x1 <= space_real(0.0) && x2 <= space_real(0.0))
+		if (biasedX1 < space_real(0.0) && biasedX2 < space_real(0.0))
 		{
 			return Hit();
 		}
 		else
 		{
-			space_real x;
-			if (x1 * x2 > space_real(0.0)) // if outside of the sphere (signs are the same)
-			{
-				x = std::min(x1, x2);
-			}
-			else
-			{
-				x = std::max(x1, x2);
-			}
+			const space_real biased_x =
+				math::is_same_sign(biasedX1, biasedX2)
+				? std::min(biasedX1, biasedX2)
+				: std::max(biasedX1, biasedX2);
+
+			const space_real x = biased_x + minDistance;
+
+			if (x > maxDistance)
+				return Hit();
 
 			auto world_space_hit_point = inversed_ray.origin() + inversed_ray.direction() * x;
 			auto normal = world_space_hit_point - m_center; // normal is non-normalized
@@ -63,7 +63,7 @@ Hit SphereObject::FindHit( const Ray & ray ) const
 	}
 }
 
-bool SphereObject::DoesHit( const Ray & ray ) const
+bool SphereObject::DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
 	auto inversed_ray = ray.Transform(this->inverse_transform());
 
@@ -82,7 +82,7 @@ bool SphereObject::DoesHit( const Ray & ray ) const
 	space_real x1 = (b + d_rooted) / (space_real(-2.0) * a);
 	space_real x2 = (b - d_rooted) / (space_real(-2.0) * a);
 
-	return x1 > space_real(0.0) || x2 > space_real(0.0);
+	return (x1 >= minDistance && x1 <= maxDistance) || (x2 > minDistance && x2 <= maxDistance);
 }
 
 BoundingBox SphereObject::GetBoundsWithinBounds(const BoundingBox & box) const

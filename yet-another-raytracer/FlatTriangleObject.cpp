@@ -2,7 +2,7 @@
 
 #include <limits>
 
-#define EPSILON std::numeric_limits<space_real>::min() * space_real(16.0)
+constexpr space_real EPSILON = std::numeric_limits<space_real>::min() * space_real(16.0);
 
 FlatTriangleObject::FlatTriangleObject(void)
 {
@@ -14,7 +14,7 @@ FlatTriangleObject::~FlatTriangleObject(void)
 }
 
 // Implementation of "Fast, minimum storage ray/triangle intersection" by Tomas Moller & Ben Trumbore (MT97)
-Hit FlatTriangleObject::FindHit( const Ray & ray ) const
+Hit FlatTriangleObject::FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
 	auto edge1 = m_vertex1 - m_vertex0;
 	auto edge2 = m_vertex2 - m_vertex0;
@@ -39,12 +39,12 @@ Hit FlatTriangleObject::FindHit( const Ray & ray ) const
 
 	space_real v = math::dot(q, ray.direction()) * inv_det;
 
-	if(v < space_real(0.0) || u + v > space_real(1.0))
+	if (v < space_real(0.0) || u + v > space_real(1.0))
 		return Hit();
 
 	space_real dist = math::dot(q, edge2) * inv_det;
 
-	if (dist <= space_real(0.0))
+	if (dist < minDistance || dist > maxDistance)
 		return Hit();
 
 	space_real w = space_real(1) - u - v;
@@ -54,7 +54,7 @@ Hit FlatTriangleObject::FindHit( const Ray & ray ) const
 	return Hit(hit_point, m_normal * -math::sign(math::dot(m_normal, ray.direction())), this, dist);
 }
 
-bool FlatTriangleObject::DoesHit( const Ray & ray ) const
+bool FlatTriangleObject::DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
 {
 	auto edge1 = m_vertex1 - m_vertex0;
 	auto edge2 = m_vertex2 - m_vertex0;
@@ -79,12 +79,12 @@ bool FlatTriangleObject::DoesHit( const Ray & ray ) const
 
 	space_real v = math::dot(q, ray.direction()) * inv_det;
 
-	if(v < space_real(0.0) || u + v > space_real(1.0))
+	if (v < space_real(0.0) || u + v > space_real(1.0))
 		return false;
 
 	space_real dist = math::dot(q, edge2) * inv_det;
 
-	return dist > space_real(0.0);
+	return dist >= minDistance && dist <= maxDistance;
 }
 
 void FlatTriangleObject::calculate_normal()

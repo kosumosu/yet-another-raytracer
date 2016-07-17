@@ -11,17 +11,19 @@ namespace math
 	{
 	public:
 
-		enum { columns = COLS, rows = ROWS };
+		constexpr static size_t columns() { return COLS; }
+		constexpr static size_t rows() { return ROWS; }
+
 
 		// Constructs identity matrix
 		base_matrix()
 		{
 			for (size_t j = 0; j < ROWS; j++)
 			{
-				for (size_t i = 0; i < COLS; i++)
+				iterate<0, COLS - 1>([&](size_t i)
 				{
 					m_rows[j][i] = i == j ? T(1) : T(0);
-				}
+				});
 			}
 		}
 
@@ -30,10 +32,10 @@ namespace math
 		{
 			for (size_t j = 0; j < ROWS; j++)
 			{
-				for (size_t i = 0; i < COLS; i++)
+				iterate<0, COLS - 1>([&](size_t i)
 				{
 					m_rows[j][i] = other[j][i];
-				}
+				});
 			}
 		}
 
@@ -50,10 +52,10 @@ namespace math
 		vector<T, ROWS> get_column(std::size_t index) const
 		{
 			vector<T, ROWS> res;
-			for (size_t i = 0; i < ROWS; i++)
+			iterate<0, ROWS - 1>([&](size_t i)
 			{
 				res[i] = m_rows[i][index];
-			}
+			});
 			return res;
 		}
 

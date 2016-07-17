@@ -33,14 +33,4 @@ namespace math
 	typedef base_matrix<float, 4, 4> matrix4f;
 	typedef base_matrix<double, 3, 3> matrix3d;
 	typedef base_matrix<double, 4, 4> matrix4d;
-
-
-	//////////////////////////////////////////////////////////////////////////
-	// scalar stuff
-	//////////////////////////////////////////////////////////////////////////
-	template <typename T>
-	T sign(T val)
-	{
-		return val >= 0 ? T(1) : T(-1);
-	}
 }
