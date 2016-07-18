@@ -1,5 +1,6 @@
 #include "BlinnMaterial.h"
 #include "ShadingContext.h"
+#include "LightingContext.h"
 
 color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 {
@@ -7,7 +8,7 @@ color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 
 	if (m_diffuse != color_rgbx() || (m_specular != color_rgbx() && m_shininess > color_real(0.0)))
 	{
-		context.lighting_server()->IterateOverFluxes(context.world_space_hit_point(), context.normal(), context.bias(), context.trace_depth(), *context.ray_evaluator(), context.allow_subdivision(),
+		context.lighting_server()->IterateOverFluxes(LightingContext(context.world_space_hit_point(), context.normal(), context.bias(), context.trace_depth(), context.allow_subdivision()), *context.ray_evaluator(),
 			[&](const Flux & flux)
 		{
 			auto differentialCoeff = color_real(std::max(space_real(0.0), math::dot(flux.direction(), context.normal())));

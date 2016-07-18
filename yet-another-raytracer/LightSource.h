@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 
+class LightingContext;
 class RayEvaluator;
 
 class LightSource
@@ -19,7 +20,7 @@ public:
 	{
 	}
 
-	virtual void IterateOverFluxes(const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned int depthLeft, space_real bias, bool allowSubdivision, const flux_func & job) const = 0;
+	virtual void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, const flux_func & job) const = 0;
 };
 
 typedef std::vector< std::shared_ptr<LightSource> > LightSourceCollection;

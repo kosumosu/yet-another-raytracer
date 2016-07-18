@@ -2,8 +2,6 @@
 
 #include "helper.hpp"
 
-#include <cstddef>
-
 namespace math
 {
 	// Represents vector in space of TSpace^DIMENSIONS.

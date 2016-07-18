@@ -4,6 +4,7 @@
 #include "LightingCommon.h"
 #include "Types.h"
 
+class LightingContext;
 class Raytracer;
 class RayEvaluator;
 
@@ -24,7 +25,7 @@ public:
 	const LightSourceCollection * lights() const { return m_lights; }
 	void lights(const LightSourceCollection * val) { m_lights = val; }
 
-	void IterateOverFluxes(const vector3 & point, const vector3 & normal, space_real bias, unsigned int depthLeft, const RayEvaluator& rayEvaluator, bool allowSubdivision, const flux_func & job) const;
+	void IterateOverFluxes(const LightingContext & context, const RayEvaluator& rayEvaluator, const flux_func & job) const;
 
 private:
 	bool m_shadows_enabled;

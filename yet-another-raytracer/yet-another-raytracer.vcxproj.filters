@@ -330,6 +330,9 @@
     <ClInclude Include="LightingCommon.h">
       <Filter>Header Files\Engine\Lighting</Filter>
     </ClInclude>
+    <ClInclude Include="LightingContext.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

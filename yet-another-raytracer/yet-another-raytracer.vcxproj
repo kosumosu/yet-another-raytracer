@@ -181,6 +181,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DielectricMaterial.h" />
     <ClInclude Include="LightingCommon.h" />
+    <ClInclude Include="LightingContext.h" />
     <ClInclude Include="SimpleGILightSource.h" />
     <ClInclude Include="vector.hpp" />
     <ClInclude Include="vector3_operations.hpp" />
