@@ -1,6 +1,5 @@
 #include "LightingServer.h"
 #include "RayEvaluator.h"
-#include "Raytracer.h"
 
 
 LightingServer::LightingServer()
@@ -15,19 +14,10 @@ LightingServer::~LightingServer(void)
 {
 }
 
-FluxCollection * LightingServer::GetFluxesAtPoint(const vector3 & point, const vector3 & normal, space_real bias, unsigned int depthLeft, const RayEvaluator& rayEvaluator, bool allowSubdivision) const
+void LightingServer::IterateOverFluxes(const vector3 & point, const vector3 & normal, space_real bias, unsigned depthLeft, const RayEvaluator & rayEvaluator, bool allowSubdivision, const flux_func & job) const
 {
-	FluxCollection * filtered_fluxes = new FluxCollection(); // to reduce allocations
-
-	for (auto & light : *m_lights)
+	for (const auto & light : *m_lights)
 	{
-		FluxCollection * fluxes(light->GetFluxes(point, normal, rayEvaluator, depthLeft, bias, allowSubdivision));
-
-
-		filtered_fluxes->insert(filtered_fluxes->end(), fluxes->begin(), fluxes->end());
-
-		delete fluxes;
+		light->IterateOverFluxes(point, normal, rayEvaluator, depthLeft, bias, allowSubdivision, job);
 	}
-
-	return filtered_fluxes;
 }

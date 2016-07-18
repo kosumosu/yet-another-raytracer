@@ -1,0 +1,92 @@
+#Open corridor
+#size 701 1000
+size 1402 2000
+camera 0 -0.1 -3 0 0.8 -10 0 1 0 45
+
+maxdepth 8
+background 0.122 0.259 0.514
+
+
+maxverts 12
+#planar face
+vertex -1 +1 0
+vertex -1 -1 0
+vertex +1 -1 0
+vertex +1 +1 0
+
+#cube
+vertex -1 +1 +1
+vertex +1 +1 +1
+vertex -1 -1 +1
+vertex +1 -1 +1
+
+vertex -1 +1 -1
+vertex +1 +1 -1
+vertex -1 -1 -1
+vertex +1 -1 -1
+
+
+ambient 0 0 0
+specular 0 0 0
+shininess 0
+emission 0 0 0
+diffuse 0 0 0
+
+attenuation 1 0.1 0.05
+
+#point 0 0.44 -1.5 0.8 0.8 0.8
+directional 1 1.6 -5 1.6 1.5 1.3
+gi 2048
+
+pushTransform
+
+#left wall
+pushTransform
+translate -0.2 0 0
+rotate 0 1 0 90
+scale 10 1 1
+diffuse 0.9 0.9 0.9
+tri 0 1 2
+tri 0 2 3
+popTransform
+
+#right wall
+pushTransform
+translate 0.2 0 0
+rotate 0 1 0 -90
+scale 10 1 1
+diffuse 0.9 0.9 0.9
+tri 0 1 2
+tri 0 2 3
+popTransform
+
+#upper back
+pushTransform
+translate 0 0.6 -10
+scale 0.2 0.4 1
+diffuse 0.9 0.9 0.9
+tri 0 1 2
+tri 0 2 3
+popTransform
+
+#door
+pushTransform
+translate 0 -0.4 -10
+scale 0.2 0.6 1
+diffuse 0.508 0.169 0.085
+tri 0 1 2
+tri 0 2 3
+popTransform
+
+#floor
+pushTransform
+
+translate 0 -1 0
+rotate 1 0 0 -90
+scale 0.2 10 1
+diffuse 0.486 0.448 0.376
+tri 0 1 2
+tri 0 2 3
+popTransform
+
+popTransform

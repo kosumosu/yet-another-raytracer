@@ -1,5 +1,6 @@
 #include "DirectionalLightSource.h"
 #include "RayEvaluator.h"
+#include "Flux.h"
 
 #include <limits>
 
@@ -14,16 +15,11 @@ DirectionalLightSource::~DirectionalLightSource(void)
 {
 }
 
-
-FluxCollection * DirectionalLightSource::GetFluxes( const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned int depthLeft, space_real bias, bool allowSubdivision) const
+void DirectionalLightSource::IterateOverFluxes(const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned depthLeft, space_real bias, bool allowSubdivision, const flux_func & job) const
 {
-	FluxCollection * collection = new FluxCollection();
-
 	if (math::dot(m_direction, normal) >= 0.0f && !rayEvaluator.DoesIntersect(Ray(point, m_direction), bias, std::numeric_limits<space_real>::max()))
 	{
 		Flux flux(this, m_direction, m_color, std::numeric_limits<space_real>::max(), 1.0);
-		collection->push_back(flux);
+		job(flux);
 	}
-
-	return collection;
 }

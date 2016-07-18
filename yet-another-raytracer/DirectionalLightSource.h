@@ -9,8 +9,6 @@ public:
 	DirectionalLightSource(void);
 	~DirectionalLightSource(void);
 
-	virtual FluxCollection * GetFluxes( const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned int depthLeft, space_real bias, bool allowSubdivision) const override;
-
 	const vector3 & direction() const { return m_direction; }
 	void direction(const vector3 & val) { m_direction = val; }
 
@@ -18,6 +16,7 @@ public:
 	void color(const color_rgbx & val) { m_color = val; }
 
 
+	void IterateOverFluxes(const vector3 & point, const vector3 & normal, const RayEvaluator & rayEvaluator, unsigned depthLeft, space_real bias, bool allowSubdivision, const flux_func & job) const override;
 private:
 	vector3 m_direction;
 	color_rgbx m_color;

@@ -1,0 +1,19 @@
+GLM
+
+scene			time
+-------------------------------
+scene4-diffuse		0.131
+scene4-specular		0.197
+scene5			0.234
+scene6			0.510
+scene7			0.954
+
+My math without SSE
+
+scene			time
+-------------------------------
+scene4-diffuse		0.135
+scene4-specular		0.205
+scene5			0.253
+scene6			0.535
+scene7			0.946

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Flux.h"
 #include "LightSource.h"
+#include "LightingCommon.h"
 #include "Types.h"
-#include <vector>
-#include <memory>
 
 class Raytracer;
 class RayEvaluator;
@@ -26,9 +24,7 @@ public:
 	const LightSourceCollection * lights() const { return m_lights; }
 	void lights(const LightSourceCollection * val) { m_lights = val; }
 
-	// Get all incident illumination fluxes that affect given point. Shadowed fluxes are filtered out. Either culled are.
-	// Caller must destroy the result.
-	FluxCollection * GetFluxesAtPoint( const vector3 & point, const vector3 & normal, space_real bias, unsigned int depthLeft, const RayEvaluator& rayEvaluator, bool allowSubdivision) const;
+	void IterateOverFluxes(const vector3 & point, const vector3 & normal, space_real bias, unsigned int depthLeft, const RayEvaluator& rayEvaluator, bool allowSubdivision, const flux_func & job) const;
 
 private:
 	bool m_shadows_enabled;

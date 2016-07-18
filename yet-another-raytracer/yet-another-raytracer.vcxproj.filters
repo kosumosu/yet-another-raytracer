@@ -327,6 +327,9 @@
     <ClInclude Include="DielectricMaterial.h">
       <Filter>Header Files\Engine\Materials</Filter>
     </ClInclude>
+    <ClInclude Include="LightingCommon.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

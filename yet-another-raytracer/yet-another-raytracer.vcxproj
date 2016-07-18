@@ -160,7 +160,6 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <OpenMPSupport>true</OpenMPSupport>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -181,6 +180,7 @@
     <ClInclude Include="base_matrix_operations.hpp" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DielectricMaterial.h" />
+    <ClInclude Include="LightingCommon.h" />
     <ClInclude Include="SimpleGILightSource.h" />
     <ClInclude Include="vector.hpp" />
     <ClInclude Include="vector3_operations.hpp" />
