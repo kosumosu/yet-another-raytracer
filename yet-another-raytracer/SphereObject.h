@@ -24,6 +24,8 @@ public:
 
 	void PrepareForRendering() override;
 
+	space_real GetOneSidedSurfaceArea() const override;
+	math::random_sample<vector3, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const override;
 private:
 	vector3 m_center;
 	space_real m_radius;

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "GeometryObject.h"
-#include <functional>
 #include "CameraCommandFactory.h"
+#include "UniformRandomBitGenerator.h"
+#include <functional>
 
 class Film;
 class Scene;
@@ -22,7 +23,7 @@ private:
 	initialization_finished_callback m_initializationFinishedCallback;
 	rendering_finished_callback m_renderingFinishedCallback;
 
-	void ProcessPixel(Film& film, const Scene& scene, RayEvaluator & rayEvaluator, unsigned int x, unsigned int y) const;
+	void ProcessPixel(Film& film, const Scene& scene, RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, unsigned int x, unsigned int y) const;
 	void PrepareObjects(const ObjectCollection & objects) const;
 };
 

@@ -2,7 +2,6 @@
 
 #include "Material.h"
 #include "Types.h"
-#include "Flux.h"
 
 class DielectricMaterial : public Material
 {
@@ -29,9 +28,10 @@ public:
 	void setIorInside(space_real ior) { m_iorInside = ior; }
 	void setIorOutside(space_real ior) { m_iorOutside = ior; }
 
-	virtual color_rgbx Shade(const ShadingContext & context) const;
+	color_rgbx Shade(const ShadingContext & context) const override;
+	color_real GetAverageEmission() const override;
 
-	virtual Material * Clone() const;
+	Material * Clone() const override;
 
 private:
 	space_real m_iorInside;

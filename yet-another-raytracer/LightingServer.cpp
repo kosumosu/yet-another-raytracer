@@ -14,10 +14,10 @@ LightingServer::~LightingServer(void)
 {
 }
 
-void LightingServer::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, const flux_func & job) const
+void LightingServer::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned> & randomEngine, const flux_func & job) const
 {
 	for (const auto & light : *m_lights)
 	{
-		light->IterateOverFluxes(context, rayEvaluator, job);
+		light->IterateOverFluxes(context, rayEvaluator, randomEngine, job);
 	}
 }

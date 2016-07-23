@@ -28,8 +28,8 @@ void reportProgress(unsigned int x, unsigned int y, float progress)
 	std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
 }
 
-
-void InsertRandomSpheres(Scene & scene, unsigned int count)
+template <typename TRandomEngine>
+void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
 	color_rgbx zero4;
 	color_rgbx one4(1.0f);
@@ -40,21 +40,22 @@ void InsertRandomSpheres(Scene & scene, unsigned int count)
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<BlinnMaterial> material(new BlinnMaterial());
-		material->diffuse(math::linearRand(zero4, one4));
+		material->diffuse(math::linearRand(zero4, one4, engine));
 		//material->specular(math::linearRand(zero4, one4));
 		//material->shininess(math::linearRand(10.0f, 300.0f));
 		//material->emission(math::linearRand(zero4, one4 * 0.2f));
 
 		std::shared_ptr<SphereObject> object(new SphereObject());
-		object->radius(math::linearRand(space_real(0.1), space_real(1.0)));
-		object->center(math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0)));
+		object->radius(math::linearRand(space_real(0.1), space_real(1.0), engine));
+		object->center(math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0), engine));
 		object->material(material);
 
 		scene.objects().push_back(object);
 	}
 }
 
-void InsertSkyLights(Scene & scene, unsigned int count)
+template <typename TRandomEngine>
+void InsertSkyLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
 	color_rgbx zero4;
 	color_rgbx one4(1.0f);
@@ -67,14 +68,15 @@ void InsertSkyLights(Scene & scene, unsigned int count)
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<DirectionalLightSource> light_source(new DirectionalLightSource());
-		light_source->direction(math::sphericalRand<space_real>());
+		light_source->direction(math::sphericalRand<space_real>(engine));
 		light_source->color(color_rgbx(intensity_per_light));
 
 		scene.lights().push_back(light_source);
 	}
 }
 
-void InsertRandomPointLights(Scene & scene, unsigned int count)
+template <typename TRandomEngine>
+void InsertRandomPointLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
 	color_rgbx zero4;
 	color_rgbx one4(1.0f);
@@ -87,8 +89,8 @@ void InsertRandomPointLights(Scene & scene, unsigned int count)
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<PointLightSource> light_source(new PointLightSource());
-		light_source->position(math::linearRand(minus_one3 * space_real(3.0), one3 * space_real(3.0)));
-		light_source->color(math::linearRand(zero4, color_rgbx(intensity_per_light)));
+		light_source->position(math::linearRand(minus_one3 * space_real(3.0), one3 * space_real(3.0), engine));
+		light_source->color(math::linearRand(zero4, color_rgbx(intensity_per_light), engine));
 
 		scene.lights().push_back(light_source);
 	}
@@ -161,7 +163,8 @@ void InsertTriangle(Scene & scene)
 	scene.objects().push_back(object1);
 }
 
-void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real & size)
+template <typename TRandomEngine>
+void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real & size, TRandomEngine & engine)
 {
 	color_rgbx zero4;
 	color_rgbx one4(1.0);
@@ -172,7 +175,7 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<BlinnMaterial> material(new BlinnMaterial());
-		material->diffuse(math::linearRand(zero4, one4));
+		material->diffuse(math::linearRand(zero4, one4, engine));
 		//material->specular(math::linearRand(zero4, one4));
 		//material->shininess(math::linearRand(10.0, 300.0));
 		//material->emission(math::linearRand(zero4, one4 * 0.2));
@@ -180,13 +183,13 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 		const vector3 min_bound(minus_one3 * size);
 		const vector3 max_bound(one3 * size);
 
-		auto pivot = math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0));
+		auto pivot = math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0), engine);
 
 		std::shared_ptr<FlatTriangleObject> object(new FlatTriangleObject());
 		object->material(material);
-		object->vertex0(pivot + math::linearRand(min_bound, max_bound));
-		object->vertex1(pivot + math::linearRand(min_bound, max_bound));
-		object->vertex2(pivot + math::linearRand(min_bound, max_bound));
+		object->vertex0(pivot + math::linearRand(min_bound, max_bound, engine));
+		object->vertex1(pivot + math::linearRand(min_bound, max_bound, engine));
+		object->vertex2(pivot + math::linearRand(min_bound, max_bound, engine));
 
 		scene.objects().push_back(object);
 	}
@@ -308,20 +311,22 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 	//InsertGILight(scene, 128);
 	//InsertSkyLight(scene, 64);
 #else
+
+	std::mt19937 engine;
 	InitCamera(scene, 1280, 960);
 	scene.max_trace_depth(8);
-	scene.getEnvironmentColor(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
-	//scene.getEnvironmentColor(color_rgbx(1.0));
+	//scene.setEnvironmentColor(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
+	//scene.setEnvironmentColor(color_rgbx(1.0));
 
 	InsertDirectionalLight(scene);
-	//InsertSkyLights(scene, 200);
-	//InsertRandomPointLights(scene, 7);
+	//InsertSkyLights(scene, 200, engine);
+	//InsertRandomPointLights(scene, 7, engine);
 
 	//InsertTwoSpheres(scene);
 	//InsertCalibrationSpheres(scene);
-	InsertRandomSpheres(scene, 20);
+	InsertRandomSpheres(scene, 20, engine);
 	//InsertTriangle(scene);
-	InsertRandomTriangles(scene, 20, 1.0);
+	InsertRandomTriangles(scene, 20, 1.0, engine);
 	//InsertSkyLight(scene, 128);
 	InsertGILight(scene, 512);
 #endif

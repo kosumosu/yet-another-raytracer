@@ -8,7 +8,7 @@ color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 
 	if (m_diffuse != color_rgbx() || (m_specular != color_rgbx() && m_shininess > color_real(0.0)))
 	{
-		context.lighting_server()->IterateOverFluxes(LightingContext(context.world_space_hit_point(), context.normal(), context.bias(), context.trace_depth(), context.allow_subdivision()), *context.ray_evaluator(),
+		context.lighting_server()->IterateOverFluxes(LightingContext(context.world_space_hit_point(), context.normal(), context.bias(), context.trace_depth(), context.allow_subdivision()), *context.ray_evaluator(), *context.getRandomEngine(),
 			[&](const Flux & flux)
 		{
 			auto differentialCoeff = color_real(std::max(space_real(0.0), math::dot(flux.direction(), context.normal())));
@@ -26,6 +26,11 @@ color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 	}
 
 	return m_illumination;
+}
+
+color_real BlinnMaterial::GetAverageEmission() const
+{
+	return (m_emission[0] + m_emission[1] + m_emission[2]) / color_real(3.0);
 }
 
 color_rgbx BlinnMaterial::ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux) const

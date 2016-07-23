@@ -157,7 +157,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\yet-another-raytracer\RandomEngine.cpp" />
     <ClCompile Include="math-test.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>

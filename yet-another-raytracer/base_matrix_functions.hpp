@@ -169,6 +169,7 @@ namespace math
 		return res / determinant(mat);
 	}
 
+	// works with positive scaling only
 	// last column is treated as translation and ignored
 	template <typename T, size_t COLS, size_t ROWS>
 	inline vector<T, ROWS> extractBoundsScale(const base_matrix<T, COLS, ROWS> & matrix)

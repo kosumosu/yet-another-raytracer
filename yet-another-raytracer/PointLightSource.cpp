@@ -13,7 +13,7 @@ PointLightSource::~PointLightSource(void)
 {
 }
 
-void PointLightSource::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, const flux_func & job) const
+void PointLightSource::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const
 {
 	auto point_to_light = m_position - context.getPoint();
 

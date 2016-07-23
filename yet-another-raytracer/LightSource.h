@@ -2,6 +2,7 @@
 
 #include "LightingCommon.h"
 #include "Types.h"
+#include "UniformRandomBitGenerator.h"
 #include <vector>
 #include <memory>
 
@@ -20,7 +21,7 @@ public:
 	{
 	}
 
-	virtual void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, const flux_func & job) const = 0;
+	virtual void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const = 0;
 };
 
 typedef std::vector< std::shared_ptr<LightSource> > LightSourceCollection;

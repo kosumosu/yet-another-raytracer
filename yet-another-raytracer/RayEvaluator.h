@@ -9,7 +9,7 @@ class RayEvaluator
 {
 public:
 	
-	RayEvaluator(const Raytracer * raytracer, const LightingServer * lighting_server);
+	RayEvaluator(const Raytracer * raytracer, const LightingServer * lighting_server, math::UniformRandomBitGenerator<unsigned> * randomEngine);
 	~RayEvaluator(void);
 
 	// Returns color of traced ray
@@ -27,5 +27,6 @@ private:
 	color_rgbx m_background_color;
 	const Raytracer * m_raytracer;
 	const LightingServer * m_lighting_server;
+	math::UniformRandomBitGenerator<unsigned> * m_randomEngine;
 };
 

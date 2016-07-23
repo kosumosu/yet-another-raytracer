@@ -55,6 +55,7 @@ public:
 
 
 	color_rgbx Shade( const ShadingContext & context ) const override;
+	color_real GetAverageEmission() const override;
 
 	Material * Clone() const override;
 

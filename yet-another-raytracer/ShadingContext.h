@@ -36,6 +36,10 @@ public:
 	const LightingServer * lighting_server() const { return m_lighting_server; }
 	void lighting_server(const LightingServer * val) { m_lighting_server = val; }
 
+
+	math::UniformRandomBitGenerator<unsigned> * getRandomEngine() const { return m_randomEngine; }
+	void setRandomEngine(math::UniformRandomBitGenerator<unsigned> * const randomEngine) { m_randomEngine = randomEngine; }
+
 	unsigned int trace_depth() const { return m_trace_depth; }
 	void trace_depth(unsigned int val) { m_trace_depth = val; }
 
@@ -54,6 +58,7 @@ private:
 
 	const RayEvaluator * m_ray_evaluator;
 	const LightingServer * m_lighting_server;
+	math::UniformRandomBitGenerator<unsigned> * m_randomEngine;
 
 	unsigned int m_trace_depth;
 	bool m_allowSubdivision;

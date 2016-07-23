@@ -85,12 +85,6 @@
     <Filter Include="Header Files\Engine\Math\Random">
       <UniqueIdentifier>{0bc196d4-9b46-4b97-93ba-cfb5bef58c05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine\Math">
-      <UniqueIdentifier>{cd471405-c6b4-4c92-8e50-20451b1d18f9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Engine\Math\Random">
-      <UniqueIdentifier>{4128dd85-de2c-46d3-a7ee-a6984e4ec357}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -285,9 +279,6 @@
     <ClInclude Include="random.hpp">
       <Filter>Header Files\Engine\Math\Random</Filter>
     </ClInclude>
-    <ClInclude Include="RandomEngine.h">
-      <Filter>Header Files\Engine\Math\Random</Filter>
-    </ClInclude>
     <ClInclude Include="allocation.h">
       <Filter>Header Files\Engine\Math</Filter>
     </ClInclude>
@@ -318,9 +309,6 @@
     <ClInclude Include="BoundingBoxHit.h">
       <Filter>Header Files\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Constants.h">
-      <Filter>Header Files\Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="SimpleGILightSource.h">
       <Filter>Header Files\Engine\Lighting</Filter>
     </ClInclude>
@@ -332,6 +320,21 @@
     </ClInclude>
     <ClInclude Include="LightingContext.h">
       <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryLightSource.h">
+      <Filter>Header Files\Engine\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="random_sample.hpp">
+      <Filter>Header Files\Engine\Math\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="discrete_distribution.hpp">
+      <Filter>Header Files\Engine\Math\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.hpp">
+      <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="UniformRandomBitGenerator.h">
+      <Filter>Header Files\Engine\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -434,14 +437,14 @@
     <ClCompile Include="SkyLightSource.cpp">
       <Filter>Source Files\Engine\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="RandomEngine.cpp">
-      <Filter>Source Files\Engine\Math\Random</Filter>
-    </ClCompile>
     <ClCompile Include="SimpleGILightSource.cpp">
       <Filter>Source Files\Engine\Lighting</Filter>
     </ClCompile>
     <ClCompile Include="DielectricMaterial.cpp">
       <Filter>Source Files\Engine\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryLightSource.cpp">
+      <Filter>Source Files\Engine\Lighting</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

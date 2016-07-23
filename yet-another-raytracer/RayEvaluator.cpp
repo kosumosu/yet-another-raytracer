@@ -3,14 +3,14 @@
 #include "ShadingContext.h"
 #include <limits>
 
-const space_real BIAS = std::numeric_limits<space_real>::epsilon() * (space_real)32768.0;
+constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 
-RayEvaluator::RayEvaluator(const Raytracer * raytracer, const LightingServer * lighting_server)
+RayEvaluator::RayEvaluator(const Raytracer * raytracer, const LightingServer * lighting_server, math::UniformRandomBitGenerator<unsigned>* randomEngine)
 	: m_raytracer(raytracer)
 	, m_lighting_server(lighting_server)
+	, m_randomEngine(randomEngine)
 {
 }
-
 
 RayEvaluator::~RayEvaluator(void)
 {
@@ -35,6 +35,7 @@ color_rgbx RayEvaluator::TraceRay( const Ray & ray, unsigned int depth_left, spa
 	context.incident_ray(ray);
 	context.object(hit.object());
 	context.ray_evaluator(this);
+	context.setRandomEngine(m_randomEngine);
 	context.lighting_server(m_lighting_server);
 	context.bias(BIAS);
 	context.allow_subdivision(allowSubdivision);

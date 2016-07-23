@@ -16,7 +16,7 @@ public:
 	void color(const color_rgbx & val) { m_color = val; }
 
 
-	void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, const flux_func & job) const override;
+	void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const override;
 private:
 	vector3 m_direction;
 	color_rgbx m_color;

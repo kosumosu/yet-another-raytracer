@@ -33,6 +33,8 @@ public:
 	void PrepareForRendering() override;
 
 	BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
+	space_real GetOneSidedSurfaceArea() const override;
+	math::random_sample<vector3, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const override;
 
 private:
 	vector3 m_vertex0;
@@ -41,5 +43,6 @@ private:
 	vector3 m_normal;
 
 	void calculate_normal();
+	space_real GetPreciseOneSidedSurfaceArea() const;
 };
 

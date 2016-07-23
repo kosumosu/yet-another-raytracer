@@ -1,19 +1,22 @@
 #include "stdafx.h"
 
 #include "Types.h"
+#include "discrete_distribution.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
+#include <map>
 
 //////////////////////////////////////////////////////////////////////////
 
 __declspec(noinline)
 bool TestFloatVectorLinearRand()
 {
-	auto vec1 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22));
-	auto vec2 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22));
+	std::mt19937_64 engine;
+	auto vec1 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22), engine);
+	auto vec2 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22), engine);
 
 	bool success = vec1[0] >= 1 && vec1[0] <= 2 && vec1[1] >= 11 && vec1[1] <= 12 && vec1[2] >= 21 && vec1[2] <= 22;
 	success &= vec2[0] >= 1 && vec2[0] <= 2 && vec2[1] >= 11 && vec2[1] <= 12 && vec2[2] >= 21 && vec2[2] <= 22;
@@ -135,11 +138,51 @@ bool TestMatScale()
 __declspec(noinline)
 bool TestMatRotate()
 {
-	auto rotate = math::rotate(math::vector<float, 3>(1.0f, 0.0f, 0.0f), float(math::pi / 2.0));
+	constexpr auto angle = float(math::pi / 2.0);
+	auto rotate = math::rotate(math::vector<float, 3>(1.0f, 0.0f, 0.0f), angle);
 
-	auto glm_rotate = glm::rotate(glm::mat4(), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	auto glm_rotate = glm::rotate(glm::mat4(), angle, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	return CompareWithGLM(rotate, glm_rotate);
+}
+
+__declspec(noinline)
+bool TestDiscreteDistribution()
+{
+	bool allOk = true;
+
+	constexpr int iterationCount = 1000;
+	constexpr float allowedPdfError = std::numeric_limits<float>::epsilon() * 16.0f;
+
+	std::map<int, float> items = { {10, 0.1f}, {20, 0.2f}, {30, 0.3f}, {40, 0.4f} };
+	math::discrete_distribution<int, float> distribution(std::begin(items), std::end(items));
+
+	std::mt19937_64 engine;
+	std::uniform_real_distribution<float> distr;
+	std::map<int, int> bins;
+
+	for (size_t i = 0; i < iterationCount; i++)
+	{
+		auto sample = distribution.GetRandomElement([&]() { return distr(engine); });
+		bool isOkItem = std::abs(sample.getPdf() - items.at(sample.getValue())) < items.at(sample.getValue()) * allowedPdfError;
+		allOk = allOk && isOkItem;
+		if (!isOkItem)
+		{
+			int asdf = 666; // put breakpoint here
+		}
+
+		bins[sample.getValue()]++;
+	}
+
+	for (const auto & bin : bins)
+	{
+		float ratio = (bin.second / (float)iterationCount) / items.at(bin.first);
+
+		bool isOk = ratio > 0.9f && ratio < 1.1f;
+		allOk = allOk && isOk;
+	}
+
+	return allOk;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -156,6 +199,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::cout << "mat translate\t\t" << (TestMatTranslate() ? "ok" : "failed") << std::endl;
 	std::cout << "mat scale\t\t" << (TestMatScale() ? "ok" : "failed") << std::endl;
 	std::cout << "mat rotate\t\t" << (TestMatRotate() ? "ok" : "failed") << std::endl;
+	std::cout << "discrete_distribution \t" << (TestDiscreteDistribution() ? "ok" : "failed") << std::endl;
 
 	std::cin.clear();
 	std::cin.get();

@@ -178,11 +178,15 @@
     <ClInclude Include="base_matrix4x4.hpp" />
     <ClInclude Include="base_matrix_functions.hpp" />
     <ClInclude Include="base_matrix_operations.hpp" />
-    <ClInclude Include="Constants.h" />
+    <ClInclude Include="constants.hpp" />
     <ClInclude Include="DielectricMaterial.h" />
+    <ClInclude Include="discrete_distribution.hpp" />
+    <ClInclude Include="GeometryLightSource.h" />
     <ClInclude Include="LightingCommon.h" />
     <ClInclude Include="LightingContext.h" />
+    <ClInclude Include="random_sample.hpp" />
     <ClInclude Include="SimpleGILightSource.h" />
+    <ClInclude Include="UniformRandomBitGenerator.h" />
     <ClInclude Include="vector.hpp" />
     <ClInclude Include="vector3_operations.hpp" />
     <ClInclude Include="vector_functions.hpp" />
@@ -224,7 +228,6 @@
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PointLightSource.h" />
     <ClInclude Include="random.hpp" />
-    <ClInclude Include="RandomEngine.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Raytracer.h" />
     <ClInclude Include="RayEvaluator.h" />
@@ -260,6 +263,7 @@
     <ClCompile Include="DirectionalLightSource.cpp" />
     <ClCompile Include="Film.cpp" />
     <ClCompile Include="FlatTriangleObject.cpp" />
+    <ClCompile Include="GeometryLightSource.cpp" />
     <ClCompile Include="HRTimer.cpp" />
     <ClCompile Include="KDTreeAccelerator.cpp" />
     <ClCompile Include="KDTreeMarcher.cpp" />
@@ -275,7 +279,6 @@
     <ClCompile Include="ObjectCommandProcessor.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PointLightSource.cpp" />
-    <ClCompile Include="RandomEngine.cpp" />
     <ClCompile Include="Raytracer.cpp" />
     <ClCompile Include="RayEvaluator.cpp" />
     <ClCompile Include="Renderer.cpp" />

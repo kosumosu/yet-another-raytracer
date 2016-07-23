@@ -2,10 +2,13 @@
 
 #include "Hit.h"
 #include "BoundingBox.hpp"
+#include "Types.h"
+#include "random_sample.hpp"
+#include "UniformRandomBitGenerator.h"
 
 #include <memory>
 #include <vector>
-#include "Types.h"
+#include <functional>
 
 
 class Material;
@@ -13,7 +16,7 @@ class Material;
 class GeometryObject
 {
 public:
-	
+
 
 	GeometryObject(void)
 	{
@@ -42,10 +45,13 @@ public:
 
 	// Gets transformed bounding box
 	BoundingBox bounding_box() const { return m_bounding_box; }
-	
+
 	// Gets bounds of that part of the object that lies within given box.
 	virtual BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const = 0;
 
+	virtual space_real GetOneSidedSurfaceArea() const = 0;
+
+	virtual math::random_sample<vector3, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const = 0;
 
 	const std::shared_ptr<Material> & material() const { return m_material; }
 	void material(const std::shared_ptr<Material> & val) { m_material = val; }

@@ -16,7 +16,7 @@ public:
 	}
 
 
-	void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, const flux_func & job) const override;
+	void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const override;
 private:
 	unsigned int m_samples;
 };

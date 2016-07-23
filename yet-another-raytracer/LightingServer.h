@@ -25,7 +25,7 @@ public:
 	const LightSourceCollection * lights() const { return m_lights; }
 	void lights(const LightSourceCollection * val) { m_lights = val; }
 
-	void IterateOverFluxes(const LightingContext & context, const RayEvaluator& rayEvaluator, const flux_func & job) const;
+	void IterateOverFluxes(const LightingContext & context, const RayEvaluator& rayEvaluator, math::UniformRandomBitGenerator<unsigned> & randomEngine, const flux_func & job) const;
 
 private:
 	bool m_shadows_enabled;

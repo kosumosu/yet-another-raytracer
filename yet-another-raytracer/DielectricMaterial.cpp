@@ -89,6 +89,11 @@ color_rgbx DielectricMaterial::Shade(const ShadingContext & context) const
 	return totalColor;
 }
 
+color_real DielectricMaterial::GetAverageEmission() const
+{
+	return color_real(0.0);
+}
+
 Material * DielectricMaterial::Clone() const
 {
 	return new DielectricMaterial(m_iorInside, m_iorOutside);

@@ -158,3 +158,28 @@ BoundingBox FlatTriangleObject::GetBoundsWithinBounds(const BoundingBox & box) c
 
 	return refinedBox;
 }
+
+space_real FlatTriangleObject::GetPreciseOneSidedSurfaceArea() const
+{
+	return math::length(math::cross(m_vertex1 - m_vertex0, m_vertex2 - m_vertex0)) * space_real(0.5);
+}
+
+space_real FlatTriangleObject::GetOneSidedSurfaceArea() const
+{
+	return GetPreciseOneSidedSurfaceArea();
+}
+
+math::random_sample<vector3, space_real> FlatTriangleObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
+{
+	std::uniform_real_distribution<space_real> distr;
+	const auto rawU = distr(engine);
+	const auto rawV = distr(engine);
+
+	const bool isOnTheOtherHalfOfTheParallelogram = rawV + rawU > space_real(1);
+
+	const auto finalU = isOnTheOtherHalfOfTheParallelogram ? space_real(1) - rawU : rawU;
+	const auto finalV = isOnTheOtherHalfOfTheParallelogram ? space_real(1) - rawV : rawV;
+
+	const auto finalPoint = m_vertex0 + (m_vertex1 - m_vertex0) * finalU + (m_vertex2 - m_vertex0) * finalV;
+	return math::random_sample<vector3, space_real>(finalPoint, GetPreciseOneSidedSurfaceArea());
+}

@@ -13,7 +13,7 @@ SimpleGILightSource::~SimpleGILightSource(void)
 {
 }
 
-void SimpleGILightSource::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, const flux_func & job) const
+void SimpleGILightSource::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const
 {
 	if (context.getDepthLeft() >= 1)
 	{
@@ -24,7 +24,7 @@ void SimpleGILightSource::IterateOverFluxes(const LightingContext & context, con
 		for (unsigned int i = 0; i < actualSamples; i++)
 		{
 #if true
-			auto direction = math::cosineWeightedHemiSphericalRand(context.getNormal());
+			auto direction = math::cosineWeightedHemiSphericalRand(context.getNormal(), randomEngine);
 			const color_real pdf = color_real(math::dot(direction, context.getNormal()) * space_real(math::oneOverPi));
 #else
 			auto direction = math::hemiSphericalRand(normal);

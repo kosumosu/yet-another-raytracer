@@ -105,3 +105,15 @@ void SphereObject::PrepareForRendering()
 
 	bounding_box(bbox);
 }
+
+space_real SphereObject::GetOneSidedSurfaceArea() const
+{
+	return space_real(4.0 * math::pi) * m_radius * m_radius;
+}
+
+math::random_sample<vector3, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
+{
+	// scale is not supported
+	auto worldPoint = transform() * vector4(m_center + math::sphericalRand<space_real>(engine) * m_radius, space_real(1.0));
+	return math::random_sample<vector3, space_real>(worldPoint.reduce(), space_real(1.0) / GetOneSidedSurfaceArea());
+}
