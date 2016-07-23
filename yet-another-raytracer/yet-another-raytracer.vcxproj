@@ -184,8 +184,10 @@
     <ClInclude Include="GeometryLightSource.h" />
     <ClInclude Include="LightingCommon.h" />
     <ClInclude Include="LightingContext.h" />
+    <ClInclude Include="ProcessTimeStopwatch.h" />
     <ClInclude Include="random_sample.hpp" />
     <ClInclude Include="SimpleGILightSource.h" />
+    <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="UniformRandomBitGenerator.h" />
     <ClInclude Include="vector.hpp" />
     <ClInclude Include="vector3_operations.hpp" />
@@ -206,7 +208,7 @@
     <ClInclude Include="GeometryObject.h" />
     <ClInclude Include="helper.hpp" />
     <ClInclude Include="Hit.h" />
-    <ClInclude Include="HRTimer.h" />
+    <ClInclude Include="StdHigheResolutionClockStopwatch.h" />
     <ClInclude Include="KDTraverseFrame.h" />
     <ClInclude Include="KDTreeAccelerator.h" />
     <ClInclude Include="KDTreeMarcher.h" />
@@ -264,7 +266,8 @@
     <ClCompile Include="Film.cpp" />
     <ClCompile Include="FlatTriangleObject.cpp" />
     <ClCompile Include="GeometryLightSource.cpp" />
-    <ClCompile Include="HRTimer.cpp" />
+    <ClCompile Include="ProcessTimeStopwatch.cpp" />
+    <ClCompile Include="StdHigheResolutionClockStopwatch.cpp" />
     <ClCompile Include="KDTreeAccelerator.cpp" />
     <ClCompile Include="KDTreeMarcher.cpp" />
     <ClCompile Include="LightingServer.cpp" />

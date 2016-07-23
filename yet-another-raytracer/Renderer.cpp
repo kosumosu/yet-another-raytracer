@@ -7,7 +7,7 @@
 #include "Raytracer.h"
 #include "LightingServer.h"
 #include "RayEvaluator.h"
-#include "HRTimer.h"
+#include "StdHigheResolutionClockStopwatch.h"
 #include "Types.h"
 
 
@@ -58,7 +58,7 @@ void Renderer::Render(Film & film, const Scene & scene) const
 
 	m_initializationFinishedCallback();
 
-	HRTimer timer;
+	StdHigheResolutionClockStopwatch timer;
 
 
 	timer.Restart();

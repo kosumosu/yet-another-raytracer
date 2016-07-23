@@ -144,9 +144,6 @@
     <ClInclude Include="NullMarcher.h">
       <Filter>Header Files\Engine\Raytracer\Accelerators\NullAccelerator</Filter>
     </ClInclude>
-    <ClInclude Include="HRTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Attenuation.h">
       <Filter>Header Files\Engine\Lighting</Filter>
     </ClInclude>
@@ -336,6 +333,15 @@
     <ClInclude Include="UniformRandomBitGenerator.h">
       <Filter>Header Files\Engine\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Stopwatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdHigheResolutionClockStopwatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessTimeStopwatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -367,9 +373,6 @@
     </ClCompile>
     <ClCompile Include="NullMarcher.cpp">
       <Filter>Source Files\Engine\Raytracer\Accelerators\NullAccelerator</Filter>
-    </ClCompile>
-    <ClCompile Include="HRTimer.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PointLightSource.cpp">
       <Filter>Source Files\Engine\Lighting</Filter>
@@ -445,6 +448,12 @@
     </ClCompile>
     <ClCompile Include="GeometryLightSource.cpp">
       <Filter>Source Files\Engine\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="StdHigheResolutionClockStopwatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessTimeStopwatch.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

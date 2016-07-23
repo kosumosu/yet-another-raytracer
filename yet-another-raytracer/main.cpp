@@ -8,7 +8,7 @@
 #include "FlatTriangleObject.h"
 #include "BlinnMaterial.h"
 #include "Renderer.h"
-#include "HRTimer.h"
+#include "StdHigheResolutionClockStopwatch.h"
 #include "DirectionalLightSource.h"
 #include "PointLightSource.h"
 #include "SkyLightSource.h"
@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "KDTreeNode.h"
+#include "ProcessTimeStopwatch.h"
 
 void reportProgress(unsigned int x, unsigned int y, float progress)
 {
@@ -331,20 +332,20 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 	InsertGILight(scene, 512);
 #endif
 
-	HRTimer timer;
-	timer.Restart();
+	std::unique_ptr<Stopwatch> timer(new StdHigheResolutionClockStopwatch());
+	timer->Restart();
 
 	Film film(scene.viewport_width(), scene.viewport_height());
 	float initTime;
 	Renderer renderer(
 		[&]() 
 			{
-				initTime = timer.Sample();
+				initTime = timer->Sample();
 				std::wcout << "Initialization finished : " << initTime << std::endl;
 			},
 		[&]()
 			{
-				auto totalElapsed = timer.Sample();
+				auto totalElapsed = timer->Sample();
 				std::wcout << "Rendering finished : " << totalElapsed - initTime << "sec" << std::endl;
 				std::wcout << "Total time : " << totalElapsed << "sec" << std::endl;
 			},
