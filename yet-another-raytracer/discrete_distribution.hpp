@@ -3,6 +3,7 @@
 #include "random_sample.hpp"
 #include <vector>
 #include <algorithm>
+#include <random>
 
 namespace math
 {

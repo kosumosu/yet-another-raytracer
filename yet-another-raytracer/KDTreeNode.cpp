@@ -17,7 +17,7 @@ KDTreeNode::~KDTreeNode(void)
 		delete m_objects;
 }
 
-unsigned int KDTreeNode::Build(const BoundingBox & box, std::vector<GeometryObject*> && objects)
+unsigned int KDTreeNode::Build(const bounding_box3 & box, std::vector<GeometryObject*> && objects)
 {
 	_ASSERT(!box.empty());
 	//_ASSERT(objects->size() != 0);
@@ -40,7 +40,7 @@ unsigned int KDTreeNode::BeacomeALeaf(std::vector<GeometryObject*> && objects )
 	return 1;
 }
 
-unsigned int KDTreeNode::BecomeABranch( const BoundingBox & box, std::vector<GeometryObject*> && objects )
+unsigned int KDTreeNode::BecomeABranch( const bounding_box3 & box, std::vector<GeometryObject*> && objects )
 {
 	m_split_axis = GetSplittingAxis(box, objects);
 	//SortObjects(objects);
@@ -51,7 +51,7 @@ unsigned int KDTreeNode::BecomeABranch( const BoundingBox & box, std::vector<Geo
 	return depth;
 }
 
-unsigned int KDTreeNode::GetSplittingAxis( const BoundingBox & box, const std::vector<GeometryObject*> & objects) const
+unsigned int KDTreeNode::GetSplittingAxis( const bounding_box3 & box, const std::vector<GeometryObject*> & objects) const
 {
 #if true
 	auto diff = box.max_corner() - box.min_corner();
@@ -71,7 +71,7 @@ unsigned int KDTreeNode::GetSplittingAxis( const BoundingBox & box, const std::v
 
 	for (size_t proposedAxis = 0; proposedAxis < 3; proposedAxis++)
 	{
-		BoundingBox left_box, right_box;
+		bounding_box left_box, right_box;
 		box.Split(proposedAxis, FindSplittingPlane(box, proposedAxis, objects), left_box, right_box);
 
 		size_t left_objects = 0;
@@ -107,7 +107,7 @@ void KDTreeNode::SortObjects(std::vector<GeometryObject*> & objects )
 }
 
 
-space_real KDTreeNode::FindSplittingPlane( const BoundingBox & box, unsigned int axis, const std::vector<GeometryObject*> & objects ) const
+space_real KDTreeNode::FindSplittingPlane( const bounding_box3 & box, unsigned int axis, const std::vector<GeometryObject*> & objects ) const
 {
 	return (box.min_corner()[axis] + box.max_corner()[axis]) * space_real(0.5);
 
@@ -116,9 +116,9 @@ space_real KDTreeNode::FindSplittingPlane( const BoundingBox & box, unsigned int
 
 }
 
-unsigned int KDTreeNode::GenerateSubNodes( const BoundingBox & box, std::vector<GeometryObject*> && objects )
+unsigned int KDTreeNode::GenerateSubNodes( const bounding_box3 & box, std::vector<GeometryObject*> && objects )
 {
-	BoundingBox left_box, right_box;
+	bounding_box3 left_box, right_box;
 	box.Split(m_split_axis, m_split_coord, left_box, right_box);
 
 	std::vector<GeometryObject*> left_objects;

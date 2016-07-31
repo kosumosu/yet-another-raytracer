@@ -10,12 +10,12 @@ Raytracer::~Raytracer(void)
 {
 }
 
-Hit Raytracer::TraceRay(const Ray & ray, space_real bias) const
+Hit Raytracer::TraceRay(const ray3 & ray, space_real bias) const
 {
 	return TraceRay(ray, bias, std::numeric_limits<space_real>::max());
 }
 
-Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxDistance) const
+Hit Raytracer::TraceRay(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
 	m_marcher->Restart(ray, minDistance, maxDistance);
 
@@ -45,7 +45,7 @@ Hit Raytracer::TraceRay(const Ray & ray, space_real minDistance, space_real maxD
 	return nearest_hit;
 }
 
-bool Raytracer::DoesIntersect(const Ray & ray, space_real minDistance, space_real maxDistance) const
+bool Raytracer::DoesIntersect(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
 	m_marcher->Restart(ray, minDistance, maxDistance);
 	while (m_marcher->MarcheNext())

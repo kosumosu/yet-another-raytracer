@@ -2,11 +2,11 @@
 size 512 512
 camera 278 273 -800 278 273 -799 0 1 0 39.3
 
-maxdepth 8
+maxdepth 16
 background 0 0 0
 
-samples 4
-gi 16 true
+samples 8
+gi 32 false
 #point 275 275 275 1 1 1
 
 ambient 0 0 0
@@ -139,6 +139,9 @@ maxverts 100
     vertex 423.0 330.0 247.0
     vertex 423.0   0.0 247.0
 	
+	#specular 1 1 1
+	shininess 0
+	#diffuse 0 0 0
 	diffuse 0.879 0.693 0.659
 	
 	#top
@@ -177,3 +180,5 @@ maxverts 100
 	tri 48 49 50
 	tri 48 50 51
 	popTransform
+	
+geometryLight 32

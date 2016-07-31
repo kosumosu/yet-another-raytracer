@@ -1,7 +1,6 @@
 #pragma once
 
 #include "LightingCommon.h"
-#include "Types.h"
 #include "UniformRandomBitGenerator.h"
 #include <vector>
 #include <memory>

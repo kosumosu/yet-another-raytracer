@@ -6,18 +6,12 @@
 class SimpleGILightSource : public LightSource
 {
 public:
-	SimpleGILightSource(void);
+	SimpleGILightSource(bool includeEmission, size_t samples);
 	virtual ~SimpleGILightSource(void);
-
-	unsigned int samples() const { return m_samples; }
-	void samples(unsigned int val)
-	{
-		m_samples = val;
-	}
-
 
 	void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const override;
 private:
-	unsigned int m_samples;
+	size_t _samples;
+	bool _includeEmission;
 };
 

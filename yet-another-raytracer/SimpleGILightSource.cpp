@@ -3,11 +3,12 @@
 #include "Flux.h"
 #include "LightingContext.h"
 
-SimpleGILightSource::SimpleGILightSource(void)
-	: m_samples(20)
+SimpleGILightSource::SimpleGILightSource(bool includeEmission, size_t sampleCount)
+	: _samples(sampleCount)
+	, _includeEmission(includeEmission)
 {
+	
 }
-
 
 SimpleGILightSource::~SimpleGILightSource(void)
 {
@@ -17,11 +18,11 @@ void SimpleGILightSource::IterateOverFluxes(const LightingContext & context, con
 {
 	if (context.getDepthLeft() >= 1)
 	{
-		unsigned int actualSamples = context.getAllowSubdivision() ? m_samples : 1;
+		size_t actualSamples = context.getAllowSubdivision() ? _samples : 1;
 		color_real sampleWeight = color_real(1.0 / actualSamples);
 
 
-		for (unsigned int i = 0; i < actualSamples; i++)
+		for (size_t i = 0; i < actualSamples; i++)
 		{
 #if true
 			auto direction = math::cosineWeightedHemiSphericalRand(context.getNormal(), randomEngine);
@@ -31,7 +32,7 @@ void SimpleGILightSource::IterateOverFluxes(const LightingContext & context, con
 			const color_real pdf = color_real(0.5 * math::oneOverPi);
 #endif
 
-			auto color = rayEvaluator.TraceRay(Ray(context.getPoint(), direction), context.getDepthLeft(), context.getBias(), false);
+			auto color = rayEvaluator.TraceRay(ray3(context.getPoint(), direction), context.getDepthLeft(), context.getBias(), false, _includeEmission);
 			if (color != color_rgbx())
 			{
 				Flux flux(this, direction, color * sampleWeight, std::numeric_limits<space_real>::max(), pdf);

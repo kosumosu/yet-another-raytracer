@@ -2,7 +2,7 @@
 #include"KDTreeNode.h"
 
 
-KDTreeMarcher::KDTreeMarcher(const BoundingBox & scene_box, const KDTreeNode * root_node, unsigned int max_depth)
+KDTreeMarcher::KDTreeMarcher(const bounding_box3 & scene_box, const KDTreeNode * root_node, unsigned int max_depth)
 	: m_scene_box(scene_box)
 	, m_root_node(root_node)
 	, m_current_leaf(nullptr)
@@ -18,7 +18,7 @@ KDTreeMarcher::~KDTreeMarcher(void)
 {
 }
 
-void KDTreeMarcher::Restart(const Ray & ray, space_real near, space_real far)
+void KDTreeMarcher::Restart(const ray3 & ray, space_real near, space_real far)
 {
 	m_ray = ray;
 	auto box_hit = m_scene_box.IntersectsRay(m_ray);

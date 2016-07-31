@@ -109,6 +109,28 @@ namespace math
 	}
 
 	template <typename T, size_t N>
+	T inline max_element(const vector<T, N> & one)
+	{
+		T res = one[0];
+		iterate<1, N - 1>([&](size_t i)
+		{
+			res = std::max(res, one[i]);
+		});
+		return res;
+	}
+
+	template <typename T, size_t N>
+	T inline min_element(const vector<T, N> & one)
+	{
+		T res = one[0];
+		iterate<1, N - 1>([&](size_t i)
+		{
+			res = std::min(res, one[i]);
+		});
+		return res;
+	}
+
+	template <typename T, size_t N>
 	vector<T, N> inline clamp( const vector<T, N> & vec, const vector<T, N> & low, const vector<T, N> & high)
 	{
 		return min(high, max(low, vec));

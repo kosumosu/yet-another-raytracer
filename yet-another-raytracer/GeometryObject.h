@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Hit.h"
-#include "BoundingBox.hpp"
 #include "Types.h"
 #include "random_sample.hpp"
 #include "UniformRandomBitGenerator.h"
@@ -34,20 +33,20 @@ public:
 
 
 	// Finds point of intersection with given ray
-	virtual Hit FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const = 0;
+	virtual Hit FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const = 0;
 
 	// Determines if ray intersects the object
-	virtual bool DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const = 0;
+	virtual bool DoesHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const = 0;
 
 
 	// Perform some precalculations (normals, bboxes etc)
 	virtual void PrepareForRendering() = 0;
 
 	// Gets transformed bounding box
-	BoundingBox bounding_box() const { return m_bounding_box; }
+	bounding_box3 bounding_box() const { return m_bounding_box; }
 
 	// Gets bounds of that part of the object that lies within given box.
-	virtual BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const = 0;
+	virtual bounding_box3 GetBoundsWithinBounds(const bounding_box3 & box) const = 0;
 
 	virtual space_real GetOneSidedSurfaceArea() const = 0;
 
@@ -57,11 +56,11 @@ public:
 	void material(const std::shared_ptr<Material> & val) { m_material = val; }
 
 protected:
-	void bounding_box(const BoundingBox & val) { m_bounding_box = val; }
+	void bounding_box(const bounding_box3 & val) { m_bounding_box = val; }
 
 private:
 	std::shared_ptr<Material> m_material;
-	BoundingBox m_bounding_box;
+	bounding_box3 m_bounding_box;
 };
 
 typedef std::vector< std::shared_ptr<GeometryObject> > ObjectCollection;

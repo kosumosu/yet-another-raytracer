@@ -18,19 +18,3 @@
 #include "base_matrix_functions.hpp"
 #include "base_matrix4x4_transfrom.hpp"
 #include "random.hpp"
-
-
-namespace math
-{
-	typedef vector<float, 2> vector2f;
-	typedef vector<float, 3> vector3f;
-	typedef vector<float, 4> vector4f;
-	typedef vector<double, 2> vector2d;
-	typedef vector<double, 3> vector3d;
-	typedef vector<double, 4> vector4d;
-
-	typedef base_matrix<float, 3, 3> matrix3f;
-	typedef base_matrix<float, 4, 4> matrix4f;
-	typedef base_matrix<double, 3, 3> matrix3d;
-	typedef base_matrix<double, 4, 4> matrix4d;
-}

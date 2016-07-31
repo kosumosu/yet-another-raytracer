@@ -16,9 +16,9 @@ public:
 
 	virtual ~FlatTriangleObject(void);
 
-	Hit FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const override;
+	Hit FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const override;
 
-	bool DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const override;
+	bool DoesHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const override;
 
 
 	const vector3 & vertex0() const { return m_vertex0; }
@@ -32,7 +32,7 @@ public:
 
 	void PrepareForRendering() override;
 
-	BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
+	bounding_box3 GetBoundsWithinBounds(const bounding_box3 & box) const override;
 	space_real GetOneSidedSurfaceArea() const override;
 	math::random_sample<vector3, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const override;
 

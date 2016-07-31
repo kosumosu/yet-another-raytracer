@@ -14,7 +14,7 @@ public:
 
 private:
 	KDTreeNode m_root_node;
-	BoundingBox m_scene_box;
+	bounding_box3 m_scene_box;
 	unsigned int m_max_depth;
 };
 

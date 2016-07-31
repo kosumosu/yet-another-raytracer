@@ -13,7 +13,7 @@ NullMarcher::~NullMarcher(void)
 {
 }
 
-void NullMarcher::Restart(const Ray & ray, space_real near, space_real)
+void NullMarcher::Restart(const ray3 & ray, space_real near, space_real)
 {
 	m_marched = false;
 }

@@ -10,9 +10,9 @@ public:
 	SphereObject(void);
 	virtual ~SphereObject(void);
 
-	Hit FindHit( const Ray & ray, space_real minDistance, space_real maxDistance) const override;
+	Hit FindHit( const ray3 & ray, space_real minDistance, space_real maxDistance) const override;
 
-	bool DoesHit( const Ray & ray, space_real minDistance, space_real maxDistance) const override;
+	bool DoesHit( const ray3 & ray, space_real minDistance, space_real maxDistance) const override;
 
 	vector3 center() const { return m_center; }
 	void center(const vector3 & val) { m_center = val; }
@@ -20,7 +20,7 @@ public:
 	space_real radius() const { return m_radius; }
 	void radius(space_real val) { m_radius = val; }
 
-	BoundingBox GetBoundsWithinBounds(const BoundingBox & box) const override;
+	bounding_box3 GetBoundsWithinBounds(const bounding_box3 & box) const override;
 
 	void PrepareForRendering() override;
 

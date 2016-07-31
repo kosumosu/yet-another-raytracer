@@ -22,7 +22,7 @@ void SkyLightSource::IterateOverFluxes(const LightingContext & context, const Ra
 	for (unsigned int i = 0; i < actualSamples; i++)
 	{
 		auto direction = math::hemiSphericalRand(context.getNormal(), randomEngine);
-		if (!rayEvaluator.DoesIntersect(Ray(context.getPoint(), direction), context.getBias(), std::numeric_limits<space_real>::max()))
+		if (!rayEvaluator.DoesIntersect(ray3(context.getPoint(), direction), context.getBias(), std::numeric_limits<space_real>::max()))
 		{
 			Flux flux(this, direction, m_color * sampleWeight, std::numeric_limits<space_real>::max(), 0.5);
 			job(flux);

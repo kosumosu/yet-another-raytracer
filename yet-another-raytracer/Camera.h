@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Ray.h"
+#include "ray.hpp"
 
 #include "Types.h"
 
@@ -47,7 +47,7 @@ public:
 		m_tan_half_fov_y = std::tan(space_real(math::pi) * m_fovy / space_real(360.0));
 	}
 
-	Ray GetViewRay(vector2 imageSpaceCoord, space_real aspect) const
+	ray3 GetViewRay(vector2 imageSpaceCoord, space_real aspect) const
 	{
 		auto w = m_direction;
 		auto v = m_up;
@@ -58,7 +58,7 @@ public:
 
 		vector3 ray_direction = w + u * (MapToCamera(imageSpaceCoord[0]) * scale_x) - v * (MapToCamera(imageSpaceCoord[1]) * scale_y);  // -v because of inverted y
 
-		return Ray(m_position, math::normalize(ray_direction));
+		return ray3(m_position, math::normalize(ray_direction));
 	}
 
 private:

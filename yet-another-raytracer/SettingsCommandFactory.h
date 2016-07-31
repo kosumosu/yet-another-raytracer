@@ -8,8 +8,8 @@ public:
 	SettingsCommandFactory(void);
 	~SettingsCommandFactory(void);
 
-	virtual std::vector<std::string> GetSupportedCommands() const;
+	std::vector<std::string> GetSupportedCommands() const override;
 
-	virtual CommandProcessor * CreateCommandProcessor() const;
+	CommandProcessor * CreateCommandProcessor() const override;
 };
 

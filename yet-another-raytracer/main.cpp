@@ -9,6 +9,7 @@
 #include "BlinnMaterial.h"
 #include "Renderer.h"
 #include "StdHigheResolutionClockStopwatch.h"
+#include "ProcessTimeStopwatch.h"
 #include "DirectionalLightSource.h"
 #include "PointLightSource.h"
 #include "SkyLightSource.h"
@@ -21,10 +22,8 @@
 #include <iomanip>
 #include <memory>
 
-#include "KDTreeNode.h"
-#include "ProcessTimeStopwatch.h"
 
-void reportProgress(unsigned int x, unsigned int y, float progress)
+void reportProgress(float progress)
 {
 	std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
 }
@@ -224,10 +223,9 @@ void InsertSkyLight(Scene & scene, unsigned int samples)
 	scene.lights().push_back(light_source);
 }
 
-void InsertGILight(Scene & scene, unsigned int samples)
+void InsertGILight(Scene & scene, unsigned int samples, bool includeEmission)
 {
-	std::shared_ptr<SimpleGILightSource> light_source(new SimpleGILightSource());
-	light_source->samples(samples);
+	std::shared_ptr<SimpleGILightSource> light_source(new SimpleGILightSource(includeEmission, samples));
 
 	scene.lights().push_back(light_source);
 }

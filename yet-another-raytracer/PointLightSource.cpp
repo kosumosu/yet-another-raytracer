@@ -21,7 +21,7 @@ void PointLightSource::IterateOverFluxes(const LightingContext & context, const 
 	{
 		auto distance = math::length(point_to_light);
 		auto direction = point_to_light / distance;
-		if (!rayEvaluator.DoesIntersect(Ray(context.getPoint(), direction), context.getBias(), distance))
+		if (!rayEvaluator.DoesIntersect(ray3(context.getPoint(), direction), context.getBias(), distance))
 		{
 			auto attenuated_color = m_color * m_attenuation.Evaluate(distance);
 			Flux flux(this, direction, attenuated_color, distance, 1.0);

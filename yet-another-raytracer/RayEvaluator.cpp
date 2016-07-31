@@ -16,7 +16,7 @@ RayEvaluator::~RayEvaluator(void)
 {
 }
 
-color_rgbx RayEvaluator::TraceRay( const Ray & ray, unsigned int depth_left, space_real bias, bool allowSubdivision) const
+color_rgbx RayEvaluator::TraceRay( const ray3 & ray, unsigned int depth_left, space_real bias, bool allowSubdivision, bool includeEmission) const
 {
 	if (depth_left < 1)
 		return m_background_color;
@@ -44,11 +44,11 @@ color_rgbx RayEvaluator::TraceRay( const Ray & ray, unsigned int depth_left, spa
 	auto material = object->material();
 
 	//auto color = hit.object()->material()->Shade(context);
-	auto color = material->Shade(context);
+	auto color = includeEmission ? material->Shade(context) : material->GetScattering(context);
 	return color;
 }
 
-bool RayEvaluator::DoesIntersect(const Ray & ray, space_real minDistance, space_real maxDistance) const
+bool RayEvaluator::DoesIntersect(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
 	return m_raytracer->DoesIntersect(ray, minDistance, maxDistance);
 }

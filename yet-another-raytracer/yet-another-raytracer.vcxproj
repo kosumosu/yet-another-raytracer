@@ -172,12 +172,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Accelerator.h" />
-    <ClInclude Include="allocation.h" />
     <ClInclude Include="Attenuation.h" />
     <ClInclude Include="base_matrix.hpp" />
     <ClInclude Include="base_matrix4x4.hpp" />
     <ClInclude Include="base_matrix_functions.hpp" />
     <ClInclude Include="base_matrix_operations.hpp" />
+    <ClInclude Include="bounding_box_functions.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="DielectricMaterial.h" />
     <ClInclude Include="discrete_distribution.hpp" />
@@ -186,6 +186,7 @@
     <ClInclude Include="LightingContext.h" />
     <ClInclude Include="ProcessTimeStopwatch.h" />
     <ClInclude Include="random_sample.hpp" />
+    <ClInclude Include="ray_functions.hpp" />
     <ClInclude Include="SimpleGILightSource.h" />
     <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="UniformRandomBitGenerator.h" />
@@ -193,8 +194,8 @@
     <ClInclude Include="vector3_operations.hpp" />
     <ClInclude Include="vector_functions.hpp" />
     <ClInclude Include="vector_operations.hpp" />
-    <ClInclude Include="BoundingBox.hpp" />
-    <ClInclude Include="BoundingBoxHit.h" />
+    <ClInclude Include="bounding_box.hpp" />
+    <ClInclude Include="bounding_box_hit.hpp" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraCommandFactory.h" />
     <ClInclude Include="CameraCommandProcessor.h" />
@@ -230,7 +231,7 @@
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PointLightSource.h" />
     <ClInclude Include="random.hpp" />
-    <ClInclude Include="Ray.h" />
+    <ClInclude Include="ray.hpp" />
     <ClInclude Include="Raytracer.h" />
     <ClInclude Include="RayEvaluator.h" />
     <ClInclude Include="Renderer.h" />
@@ -254,7 +255,6 @@
     <ClInclude Include="TransformStack.h" />
     <ClInclude Include="KDTreeNode.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="Types_old.h" />
     <ClInclude Include="vector3.hpp" />
   </ItemGroup>
   <ItemGroup>

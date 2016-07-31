@@ -32,7 +32,7 @@ void Renderer::ProcessPixel(Film& film, const Scene& scene, RayEvaluator & rayEv
 		auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
 
 		auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, space_real(film.width()) / space_real(film.height()));
-		averageColor += rayEvaluator.TraceRay(ray, scene.max_trace_depth(), space_real(0.0), true) * sampleWeight;
+		averageColor += rayEvaluator.TraceRay(ray, scene.max_trace_depth(), space_real(0.0), true, true) * sampleWeight;
 	}
 
 	*film.pixel_at(x, y) = averageColor;
@@ -71,7 +71,7 @@ void Renderer::Render(Film & film, const Scene & scene) const
 			if (timer.Sample() > 2.0f)
 			{
 				timer.Restart();
-				m_progressCallback(x, y, (y * film.width() + x) / total_pixels);
+				m_progressCallback((y * film.width() + x) / total_pixels);
 			}
 		}
 	}

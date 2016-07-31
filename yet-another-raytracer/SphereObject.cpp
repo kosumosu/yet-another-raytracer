@@ -1,6 +1,6 @@
 #include "SphereObject.h"
 
-#include <exception>
+#include "ray_functions.hpp"
 
 SphereObject::SphereObject(void)
 	: m_center(vector3(0.0, 0.0, 0.0))
@@ -13,9 +13,9 @@ SphereObject::~SphereObject(void)
 {
 }
 
-Hit SphereObject::FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
+Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
-	auto inversed_ray = ray.Transform(this->inverse_transform());
+	auto inversed_ray = math::transform3by4x4(ray, this->inverse_transform());
 
 	// from center of sphere to ray origin
 	auto center_to_origin = inversed_ray.origin() - m_center;
@@ -63,9 +63,9 @@ Hit SphereObject::FindHit(const Ray & ray, space_real minDistance, space_real ma
 	}
 }
 
-bool SphereObject::DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
+bool SphereObject::DoesHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
-	auto inversed_ray = ray.Transform(this->inverse_transform());
+	auto inversed_ray = math::transform3by4x4(ray, this->inverse_transform());
 
 	auto center_to_origin = inversed_ray.origin() - m_center;
 
@@ -85,7 +85,7 @@ bool SphereObject::DoesHit(const Ray & ray, space_real minDistance, space_real m
 	return (x1 >= minDistance && x1 <= maxDistance) || (x2 > minDistance && x2 <= maxDistance);
 }
 
-BoundingBox SphereObject::GetBoundsWithinBounds(const BoundingBox & box) const
+bounding_box3 SphereObject::GetBoundsWithinBounds(const bounding_box3 & box) const
 {
 	auto ownBox = bounding_box();
 	ownBox.Intersect(box);
@@ -97,7 +97,7 @@ void SphereObject::PrepareForRendering()
 	auto scale = extractBoundsScale(transform()).reduce();
 	auto translate = extractTranslate(transform());
 
-	BoundingBox bbox;
+	bounding_box3 bbox;
 	bbox.min_corner((m_center + vector3(-m_radius)) * scale + translate);
 	bbox.max_corner((m_center + vector3(m_radius)) * scale + translate);
 

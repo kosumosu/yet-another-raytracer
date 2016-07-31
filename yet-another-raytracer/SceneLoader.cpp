@@ -85,6 +85,8 @@ void SceneLoader::Load(Scene & scene, const std::wstring & filename) const
 	if (!stream.is_open())
 		throw std::exception();
 
+	stream >> std::boolalpha;
+
 	ProcessorMap command_map;
 	ProcessorCollection processors;
 	CreateProcessors(command_map, processors);

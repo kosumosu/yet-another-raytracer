@@ -13,9 +13,9 @@ public:
 	MaterialCommandProcessor(void);
 	virtual ~MaterialCommandProcessor(void);
 
-	virtual void PrepareContext( LoadingContext & context );
+	void PrepareContext(LoadingContext & context) override;
 
-	virtual void ProcessCommand( LoadingContext & context, const std::string & command, std::istream & stream );
+	void ProcessCommand(LoadingContext & context, const std::string & command, std::istream & stream) override;
 
 private:
 	color_rgbx m_last_ambient;

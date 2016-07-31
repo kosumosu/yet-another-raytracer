@@ -11,7 +11,7 @@ class Scene;
 class Renderer
 {
 public:
-	typedef std::function<void (unsigned int x, unsigned int y, float progress)> progress_callback;
+	typedef std::function<void (float progress)> progress_callback;
 	typedef std::function<void()> initialization_finished_callback;
 	typedef std::function<void()> rendering_finished_callback;
 

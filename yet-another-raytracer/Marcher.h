@@ -15,7 +15,7 @@ public:
 	}
 
 
-	virtual void Restart(const Ray & ray, space_real near, space_real far) = 0;
+	virtual void Restart(const math::ray<space_real, 3> & ray, space_real near, space_real far) = 0;
 
 	// Gets objects in current leaf.
 	virtual const std::vector<GeometryObject*> * GetCurrentObjects() = 0;

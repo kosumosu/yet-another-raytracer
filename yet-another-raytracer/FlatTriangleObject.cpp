@@ -14,7 +14,7 @@ FlatTriangleObject::~FlatTriangleObject(void)
 }
 
 // Implementation of "Fast, minimum storage ray/triangle intersection" by Tomas Moller & Ben Trumbore (MT97)
-Hit FlatTriangleObject::FindHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
+Hit FlatTriangleObject::FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
 	auto edge1 = m_vertex1 - m_vertex0;
 	auto edge2 = m_vertex2 - m_vertex0;
@@ -54,7 +54,7 @@ Hit FlatTriangleObject::FindHit(const Ray & ray, space_real minDistance, space_r
 	return Hit(hit_point, m_normal * -math::sign(math::dot(m_normal, ray.direction())), this, dist);
 }
 
-bool FlatTriangleObject::DoesHit(const Ray & ray, space_real minDistance, space_real maxDistance) const
+bool FlatTriangleObject::DoesHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
 	auto edge1 = m_vertex1 - m_vertex0;
 	auto edge2 = m_vertex2 - m_vertex0;
@@ -97,7 +97,7 @@ void FlatTriangleObject::PrepareForRendering()
 {
 	calculate_normal();
 
-	BoundingBox bbox;
+	bounding_box3 bbox;
 
 	bbox.Include(m_vertex0);
 	bbox.Include(m_vertex1);
@@ -114,7 +114,7 @@ space_real find_intersection(space_real normal0, space_real normal1, space_real 
 }
 
 template <unsigned int axis>
-void include_in_box_if_valid(BoundingBox & refinedBox, const BoundingBox & enclosingBox, const vector3 & point)
+void include_in_box_if_valid(bounding_box3 & refinedBox, const bounding_box3 & enclosingBox, const vector3 & point)
 {
 	if (enclosingBox.min_corner()[axis] <= point[axis] && point[axis] <= enclosingBox.max_corner()[axis])
 	{
@@ -123,7 +123,7 @@ void include_in_box_if_valid(BoundingBox & refinedBox, const BoundingBox & enclo
 }
 
 template <unsigned int axis0, unsigned int axis1, unsigned int axis2>
-void refine_box_for_edge(BoundingBox & refinedBox, const BoundingBox & enclosingBox, const vector3 normal, space_real d, const vector3 & corner0, const vector3 & corner1)
+void refine_box_for_edge(bounding_box3 & refinedBox, const bounding_box3 & enclosingBox, const vector3 normal, space_real d, const vector3 & corner0, const vector3 & corner1)
 {
 	vector3 vec;
 	vec[axis0] = corner0[axis0];
@@ -133,7 +133,7 @@ void refine_box_for_edge(BoundingBox & refinedBox, const BoundingBox & enclosing
 }
 
 template <unsigned int axis0, unsigned int axis1, unsigned int axis2>
-void refine_box_for_axis(BoundingBox & refinedBox, const BoundingBox & enclosingBox, const vector3 normal, space_real d)
+void refine_box_for_axis(bounding_box3 & refinedBox, const bounding_box3 & enclosingBox, const vector3 normal, space_real d)
 {
 	refine_box_for_edge<axis0, axis1, axis2>(refinedBox, enclosingBox, normal, d, enclosingBox.min_corner(), enclosingBox.min_corner());
 	refine_box_for_edge<axis0, axis1, axis2>(refinedBox, enclosingBox, normal, d, enclosingBox.min_corner(), enclosingBox.max_corner());
@@ -142,11 +142,11 @@ void refine_box_for_axis(BoundingBox & refinedBox, const BoundingBox & enclosing
 }
 
 
-BoundingBox FlatTriangleObject::GetBoundsWithinBounds(const BoundingBox & box) const
+bounding_box3 FlatTriangleObject::GetBoundsWithinBounds(const bounding_box3 & box) const
 {
 	auto d = -math::dot(m_normal, m_vertex0);
 
-	BoundingBox refinedBox;
+	bounding_box3 refinedBox;
 	// Along Z axis
 	refine_box_for_axis<0, 1, 2>(refinedBox, box, m_normal, d);
 	// Along Y axis
@@ -181,5 +181,5 @@ math::random_sample<vector3, space_real> FlatTriangleObject::PickRandomPointOnSu
 	const auto finalV = isOnTheOtherHalfOfTheParallelogram ? space_real(1) - rawV : rawV;
 
 	const auto finalPoint = m_vertex0 + (m_vertex1 - m_vertex0) * finalU + (m_vertex2 - m_vertex0) * finalV;
-	return math::random_sample<vector3, space_real>(finalPoint, GetPreciseOneSidedSurfaceArea());
+	return math::random_sample<vector3, space_real>(finalPoint, space_real(1.0) / GetPreciseOneSidedSurfaceArea());
 }

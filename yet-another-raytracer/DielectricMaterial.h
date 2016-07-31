@@ -29,6 +29,8 @@ public:
 	void setIorOutside(space_real ior) { m_iorOutside = ior; }
 
 	color_rgbx Shade(const ShadingContext & context) const override;
+	color_rgbx GetEmission(const ShadingContext & context) const override;
+	color_rgbx GetScattering(const ShadingContext & context) const override;
 	color_real GetAverageEmission() const override;
 
 	Material * Clone() const override;

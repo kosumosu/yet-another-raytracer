@@ -4,7 +4,7 @@
 
 KDTreeAccelerator::KDTreeAccelerator( const ObjectCollection & objects )
 {
-	BoundingBox scene_box;
+	bounding_box3 scene_box;
 	std::vector<GeometryObject*> objects_copy(objects.size());
 	std::transform(std::begin(objects), std::end(objects), std::begin(objects_copy), [](auto objectPtr) { return objectPtr.get(); });
 

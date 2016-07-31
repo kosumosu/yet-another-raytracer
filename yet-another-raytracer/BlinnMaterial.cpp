@@ -4,7 +4,17 @@
 
 color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 {
-	color_rgbx m_illumination = m_emission;
+	return m_emission + BlinnMaterial::GetScattering(context);
+}
+
+color_rgbx BlinnMaterial::GetEmission(const ShadingContext & context) const
+{
+	return m_emission;
+}
+
+color_rgbx BlinnMaterial::GetScattering(const ShadingContext & context) const
+{
+	color_rgbx radiance;
 
 	if (m_diffuse != color_rgbx() || (m_specular != color_rgbx() && m_shininess > color_real(0.0)))
 	{
@@ -13,7 +23,7 @@ color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 		{
 			auto differentialCoeff = color_real(std::max(space_real(0.0), math::dot(flux.direction(), context.normal())));
 
-			m_illumination += (ComputeDiffuseComponent(context, flux) + ComputeSpecularComponent(context, flux)) * differentialCoeff / flux.probabilityDensity();
+			radiance += (ComputeDiffuseComponent(context, flux) + ComputeSpecularComponent(context, flux)) * differentialCoeff / flux.probabilityDensity();
 		});
 	}
 
@@ -21,16 +31,16 @@ color_rgbx BlinnMaterial::Shade( const ShadingContext & context ) const
 	if (m_specular != color_rgbx())
 	{
 		auto reflected_direction = context.incident_ray().direction() - context.normal() * (space_real(2.0) * math::dot(context.incident_ray().direction(), context.normal()));
-		auto reflection = context.ray_evaluator()->TraceRay(Ray(context.world_space_hit_point(), reflected_direction), context.trace_depth(), context.bias(), context.allow_subdivision());
-		m_illumination += reflection * m_specular;
+		auto reflection = context.ray_evaluator()->TraceRay(ray3(context.world_space_hit_point(), reflected_direction), context.trace_depth(), context.bias(), context.allow_subdivision(), true);
+		radiance += reflection * m_specular;
 	}
 
-	return m_illumination;
+	return radiance;
 }
 
 color_real BlinnMaterial::GetAverageEmission() const
 {
-	return (m_emission[0] + m_emission[1] + m_emission[2]) / color_real(3.0);
+	return color_real(math::pi) * (m_emission[0] + m_emission[1] + m_emission[2]) / color_real(3.0);
 }
 
 color_rgbx BlinnMaterial::ComputeDiffuseComponent( const ShadingContext & context, const Flux & flux) const

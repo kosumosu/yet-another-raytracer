@@ -59,6 +59,16 @@ color_real FrDielectric(space_real cosThetaI, space_real etaI, space_real etaT)
 
 color_rgbx DielectricMaterial::Shade(const ShadingContext & context) const
 {
+	return DielectricMaterial::GetScattering(context);
+}
+
+color_rgbx DielectricMaterial::GetEmission(const ShadingContext & context) const
+{
+	return color_rgbx();
+}
+
+color_rgbx DielectricMaterial::GetScattering(const ShadingContext & context) const
+{
 	auto cosTheta = -math::dot(context.incident_ray().direction(), context.normal());
 	bool entering = cosTheta > space_real(0.0);
 
@@ -66,11 +76,11 @@ color_rgbx DielectricMaterial::Shade(const ShadingContext & context) const
 	space_real iorOut = entering ? m_iorInside : m_iorOutside;
 
 	auto reflectedDirection = context.incident_ray().direction() - context.normal() * (space_real(2.0) * math::dot(context.incident_ray().direction(), context.normal()));
-	
-	auto reflectance =  FrDielectric(cosTheta, iorIn, iorOut);
-	
+
+	auto reflectance = FrDielectric(cosTheta, iorIn, iorOut);
+
 	color_rgbx totalColor;
-	totalColor += reflectance * context.ray_evaluator()->TraceRay(Ray(context.world_space_hit_point(), reflectedDirection), context.trace_depth(), context.bias(), context.allow_subdivision());
+	totalColor += reflectance * context.ray_evaluator()->TraceRay(ray3(context.world_space_hit_point(), reflectedDirection), context.trace_depth(), context.bias(), context.allow_subdivision(), true);
 
 	auto transmission = color_real(1.0) - reflectance;
 
@@ -82,7 +92,7 @@ color_rgbx DielectricMaterial::Shade(const ShadingContext & context) const
 			totalColor +=
 				transmission
 				* color_real((iorIn * iorIn) / (iorOut * iorOut))
-				* context.ray_evaluator()->TraceRay(Ray(context.world_space_hit_point(), refractedDirection), context.trace_depth(), context.bias(), context.allow_subdivision());
+				* context.ray_evaluator()->TraceRay(ray3(context.world_space_hit_point(), refractedDirection), context.trace_depth(), context.bias(), context.allow_subdivision(), true);
 		}
 	}
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GeometryObject.h"
-#include "BoundingBox.hpp"
+#include "bounding_box.hpp"
 
 enum class NodeKind
 {
@@ -52,7 +52,7 @@ public:
 	}
 
 	// Returns maximum levels of subtree. Node becomes objects owner!
-	unsigned int Build(const BoundingBox & box, std::vector<GeometryObject*> && objects);
+	unsigned int Build(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
 
 private:
 	bool m_leaf;
@@ -75,9 +75,9 @@ private:
 
 
 	unsigned int BeacomeALeaf(std::vector<GeometryObject*> && objects);
-	unsigned int BecomeABranch(const BoundingBox & box, std::vector<GeometryObject*> && objects);
-	unsigned int GetSplittingAxis(const BoundingBox & box, const std::vector<GeometryObject*> & objects) const;
+	unsigned int BecomeABranch(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
+	unsigned int GetSplittingAxis(const bounding_box3 & box, const std::vector<GeometryObject*> & objects) const;
 	void SortObjects(std::vector<GeometryObject*> & objects);
-	space_real FindSplittingPlane(const BoundingBox & box, unsigned int axis, const std::vector<GeometryObject*> & sorted_objects) const;
-	unsigned int GenerateSubNodes(const BoundingBox & box, std::vector<GeometryObject*> && objects);
+	space_real FindSplittingPlane(const bounding_box3 & box, unsigned int axis, const std::vector<GeometryObject*> & sorted_objects) const;
+	unsigned int GenerateSubNodes(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
 };
