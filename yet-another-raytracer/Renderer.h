@@ -5,6 +5,7 @@
 #include "UniformRandomBitGenerator.h"
 #include <functional>
 
+class RayIntegrator;
 class Film;
 class Scene;
 
@@ -17,6 +18,7 @@ public:
 
 	Renderer(const initialization_finished_callback & initializationFinishedCallback, const rendering_finished_callback & renderingFinishedCallback, const progress_callback & progressCallback);
 	void Render(Film & film, const Scene & scene) const;
+	void RenderOld(Film & film, const Scene & scene) const;
 
 private:
 	progress_callback m_progressCallback;
@@ -24,6 +26,7 @@ private:
 	rendering_finished_callback m_renderingFinishedCallback;
 
 	void ProcessPixel(Film& film, const Scene& scene, RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, unsigned int x, unsigned int y) const;
+	void ProcessPixel(Film& film, const Scene& scene, const RayIntegrator & rayIntegrator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, unsigned int x, unsigned int y) const;
 	void PrepareObjects(const ObjectCollection & objects) const;
 };
 

@@ -53,7 +53,7 @@ namespace math
 				? *weightIterator - *std::prev(weightIterator)
 				: *weightIterator;
 
-			return random_sample<TElement, TPdf>(*std::next(std::begin(_elements), iteratorDistance), weight / _weightSum);
+			return random_sample<TElement, TPdf>(*std::next(std::begin(_elements), iteratorDistance), weight / _weightSum, false);
 		}
 
 	private:

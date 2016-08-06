@@ -35,7 +35,7 @@ namespace math
 			iterate<0, dimensions() - 1>([&] (size_t i) { m_elements[i] = TSpace(value); });
 		}
 
-		template <typename TFirstValue, typename ... TValues>
+		template <typename TFirstValue, typename ... TValues, class = std::enable_if_t<sizeof...(TValues) == DIMENSIONS - 1>>
 		explicit vector(const TFirstValue & first_value, const TValues & ... values)
 		{
 			static_assert(sizeof ... (values) == DIMENSIONS - 1, "Number of arguments does not match dimensionality of the vector!");
@@ -43,11 +43,9 @@ namespace math
 			setValues(m_elements, first_value, values ...);
 		}
 
-		template <typename ... TValues>
+		template <typename ... TValues, class = std::enable_if_t<(sizeof ... (TValues) < DIMENSIONS)>>
 		explicit vector(const vector<TSpace, DIMENSIONS - sizeof ... (TValues)> & vec, const TValues & ... values)
 		{
-			static_assert(sizeof ... (values) < DIMENSIONS, "Too many arguments!");
-
 			iterate<0, DIMENSIONS - sizeof ... (values) - 1>([&] (size_t i) { m_elements[i] = vec[i]; });
 
 			setValues(m_elements + DIMENSIONS - sizeof ... (values), values ...);

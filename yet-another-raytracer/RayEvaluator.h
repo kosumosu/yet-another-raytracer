@@ -2,7 +2,6 @@
 
 #include "Raytracer.h"
 #include "LightingServer.h"
-#include "ray.hpp"
 #include "Types.h"
 
 class RayEvaluator

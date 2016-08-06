@@ -176,7 +176,7 @@ bool TestDiscreteDistribution()
 
 	for (const auto & bin : bins)
 	{
-		float ratio = (bin.second / (float)iterationCount) / items.at(bin.first);
+		float ratio = (bin.second / float(iterationCount)) / items.at(bin.first);
 
 		bool isOk = ratio > 0.9f && ratio < 1.1f;
 		allOk = allOk && isOk;

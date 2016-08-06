@@ -33,7 +33,6 @@ void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engi
 {
 	color_rgbx zero4;
 	color_rgbx one4(1.0f);
-	vector3 zero3;
 	vector3 one3(1.0f);
 	vector3 minus_one3(-1.0f);
 
@@ -57,12 +56,6 @@ void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engi
 template <typename TRandomEngine>
 void InsertSkyLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
-	color_rgbx zero4;
-	color_rgbx one4(1.0f);
-	vector3 zero3;
-	vector3 one3(1.0f);
-	vector3 minus_one3(-1.0f);
-
 	color_real intensity_per_light = color_real(5.0) / count;
 
 	for (unsigned int i = 0; i < count; i++)
@@ -79,8 +72,6 @@ template <typename TRandomEngine>
 void InsertRandomPointLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
 	color_rgbx zero4;
-	color_rgbx one4(1.0f);
-	vector3 zero3;
 	vector3 one3(1.0f);
 	vector3 minus_one3(-1.0f);
 
@@ -168,7 +159,6 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 {
 	color_rgbx zero4;
 	color_rgbx one4(1.0);
-	vector3 zero3;
 	vector3 one3(1.0);
 	vector3 minus_one3(-1.0);
 
@@ -350,7 +340,7 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 		reportProgress
 		);
 
-	renderer.Render(film, scene);
+	renderer.RenderOld(film, scene);
 
 	film.SaveAsPng(output_image_file);
 }

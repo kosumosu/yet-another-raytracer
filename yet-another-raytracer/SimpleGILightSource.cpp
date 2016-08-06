@@ -3,6 +3,10 @@
 #include "Flux.h"
 #include "LightingContext.h"
 
+#define ENABLE_IMPORTANCE_SAMPLING true
+
+using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
+
 SimpleGILightSource::SimpleGILightSource(bool includeEmission, size_t sampleCount)
 	: _samples(sampleCount)
 	, _includeEmission(includeEmission)
@@ -24,11 +28,11 @@ void SimpleGILightSource::IterateOverFluxes(const LightingContext & context, con
 
 		for (size_t i = 0; i < actualSamples; i++)
 		{
-#if true
+#if ENABLE_IMPORTANCE_SAMPLING
 			auto direction = math::cosineWeightedHemiSphericalRand(context.getNormal(), randomEngine);
 			const color_real pdf = color_real(math::dot(direction, context.getNormal()) * space_real(math::oneOverPi));
 #else
-			auto direction = math::hemiSphericalRand(normal);
+			auto direction = math::hemiSphericalRand(normal, randomEngine);
 			const color_real pdf = color_real(0.5 * math::oneOverPi);
 #endif
 
@@ -40,4 +44,10 @@ void SimpleGILightSource::IterateOverFluxes(const LightingContext & context, con
 			}
 		}
 	}
+}
+
+void SimpleGILightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
+{
+	// not supported
+	job(lighting_functional_distribution());
 }

@@ -4,14 +4,10 @@
 
 SphereObject::SphereObject(void)
 	: m_center(vector3(0.0, 0.0, 0.0))
-	, m_radius(1.0)
-{
-}
+	  , m_radius(1.0) {}
 
 
-SphereObject::~SphereObject(void)
-{
-}
+SphereObject::~SphereObject(void) {}
 
 Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
@@ -44,8 +40,8 @@ Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real m
 		{
 			const space_real biased_x =
 				math::is_same_sign(biasedX1, biasedX2)
-				? std::min(biasedX1, biasedX2)
-				: std::max(biasedX1, biasedX2);
+					? std::min(biasedX1, biasedX2)
+					: std::max(biasedX1, biasedX2);
 
 			const space_real x = biased_x + minDistance;
 
@@ -111,9 +107,14 @@ space_real SphereObject::GetOneSidedSurfaceArea() const
 	return space_real(4.0 * math::pi) * m_radius * m_radius;
 }
 
-math::random_sample<vector3, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
+math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
 {
+	const auto directionFromCenter = math::sphericalRand<space_real>(engine);
 	// scale is not supported
-	auto worldPoint = transform() * vector4(m_center + math::sphericalRand<space_real>(engine) * m_radius, space_real(1.0));
-	return math::random_sample<vector3, space_real>(worldPoint.reduce(), space_real(1.0) / GetOneSidedSurfaceArea());
+	const auto worldPoint = transform() * vector4(m_center + directionFromCenter * m_radius, space_real(1.0));
+	const auto worldNormal = normal_transform() * vector4(directionFromCenter, space_real(0.0));
+	return math::random_sample<surface_point, space_real>(
+		surface_point(worldPoint.reduce(), worldNormal.reduce()),
+		space_real(1.0) / GetOneSidedSurfaceArea(),
+		false);
 }

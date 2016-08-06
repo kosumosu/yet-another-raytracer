@@ -4,14 +4,10 @@
 
 constexpr space_real EPSILON = std::numeric_limits<space_real>::min() * space_real(16.0);
 
-FlatTriangleObject::FlatTriangleObject(void)
-{
-}
+FlatTriangleObject::FlatTriangleObject(void) {}
 
 
-FlatTriangleObject::~FlatTriangleObject(void)
-{
-}
+FlatTriangleObject::~FlatTriangleObject(void) {}
 
 // Implementation of "Fast, minimum storage ray/triangle intersection" by Tomas Moller & Ben Trumbore (MT97)
 Hit FlatTriangleObject::FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
@@ -169,7 +165,7 @@ space_real FlatTriangleObject::GetOneSidedSurfaceArea() const
 	return GetPreciseOneSidedSurfaceArea();
 }
 
-math::random_sample<vector3, space_real> FlatTriangleObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
+math::random_sample<surface_point, space_real> FlatTriangleObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
 {
 	std::uniform_real_distribution<space_real> distr;
 	const auto rawU = distr(engine);
@@ -181,5 +177,8 @@ math::random_sample<vector3, space_real> FlatTriangleObject::PickRandomPointOnSu
 	const auto finalV = isOnTheOtherHalfOfTheParallelogram ? space_real(1) - rawV : rawV;
 
 	const auto finalPoint = m_vertex0 + (m_vertex1 - m_vertex0) * finalU + (m_vertex2 - m_vertex0) * finalV;
-	return math::random_sample<vector3, space_real>(finalPoint, space_real(1.0) / GetPreciseOneSidedSurfaceArea());
+	return math::random_sample<surface_point, space_real>(
+		surface_point(finalPoint, m_normal),
+		space_real(1.0) / GetPreciseOneSidedSurfaceArea(),
+		false);
 }

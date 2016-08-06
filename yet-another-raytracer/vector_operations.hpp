@@ -11,7 +11,7 @@
 namespace math
 {
 	template <typename T, size_t N>
-	bool inline operator ==( const vector<T, N> & one, const vector<T, N> & another)
+	bool operator ==( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		bool equals = true;
 		iterate<0, N - 1>([&](size_t i)
@@ -22,13 +22,13 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	bool inline operator !=( const vector<T, N> & one, const vector<T, N> & another)
+	bool operator !=( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		return !(one == another);
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator +( const vector<T, N> & one, const vector<T, N> & another)
+	vector<T, N> operator +( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res;
 		iterate<0, N - 1>([&](size_t i)
@@ -39,7 +39,7 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator +=( vector<T, N> & one, const vector<T, N> & another)
+	vector<T, N> & operator +=( vector<T, N> & one, const vector<T, N> & another)
 	{
 		iterate<0, N - 1>([&](size_t i)
 		{
@@ -49,7 +49,7 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator -( const vector<T, N> & one, const vector<T, N> & another)
+	vector<T, N> operator -( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res;
 		iterate<0, N - 1>([&](size_t i)
@@ -60,7 +60,7 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator -=( vector<T, N> & one, const vector<T, N> & another)
+	vector<T, N> & operator -=( vector<T, N> & one, const vector<T, N> & another)
 	{
 		iterate<0, N - 1>([&](size_t i)
 		{
@@ -70,7 +70,7 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator -( const vector<T, N> & one)
+	vector<T, N> operator -( const vector<T, N> & one)
 	{
 		vector<T, N> res;
 		iterate<0, N - 1>([&](size_t i)
@@ -81,7 +81,7 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator *( const vector<T, N> & one, const vector<T, N> & another)
+	vector<T, N> operator *( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res;
 		iterate<0, N - 1>([&](size_t i)
@@ -92,7 +92,17 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator *( const vector<T, N> & one, const T & scalar)
+	vector<T, N> & operator *=(vector<T, N> & one, const vector<T, N> & another)
+	{
+		iterate<0, N - 1>([&](size_t i)
+		{
+			one[i] *= another[i];
+		});
+		return one;
+	}
+
+	template <typename T, size_t N>
+	vector<T, N> operator *( const vector<T, N> & one, const T & scalar)
 	{
 		vector<T, N> res;
 		iterate<0, N - 1>([&](size_t i)
@@ -103,13 +113,23 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator *( const T & scalar, const vector<T, N> & another)
+	vector<T, N> & operator *=(vector<T, N> & one, const T & scalar)
+	{
+		iterate<0, N - 1>([&](size_t i)
+		{
+			one[i] *= scalar;
+		});
+		return one;
+	}
+
+	template <typename T, size_t N>
+	vector<T, N> operator *( const T & scalar, const vector<T, N> & another)
 	{
 		return another * scalar;
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator /( const vector<T, N> & one, const vector<T, N> & another)
+	vector<T, N> operator /( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res;
 		iterate<0, N - 1>([&](size_t i)
@@ -120,7 +140,7 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator /( const vector<T, N> & one, const T & scalar)
+	vector<T, N> operator /( const vector<T, N> & one, const T & scalar)
 	{
 		T recipr = T(1) / scalar;
 		vector<T, N> res;
@@ -132,7 +152,7 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> inline operator /( const T & scalar, const vector<T, N> & another )
+	vector<T, N> operator /( const T & scalar, const vector<T, N> & another )
 	{
 		vector<T, N> res;
 		iterate<0, N - 1>([&](size_t i)

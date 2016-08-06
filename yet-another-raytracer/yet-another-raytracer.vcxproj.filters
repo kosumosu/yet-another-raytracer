@@ -52,6 +52,12 @@
     <Filter Include="Math\BoundingBox">
       <UniqueIdentifier>{7d037c14-fc31-4842-9e4e-68e3473e87ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Integrators">
+      <UniqueIdentifier>{58a20632-ea50-4ffb-817c-fcb8f5d7153c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Math\Color">
+      <UniqueIdentifier>{3b28ab7e-05c4-43b6-b01d-a43057f14edc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Film.h">
@@ -234,9 +240,6 @@
     <ClInclude Include="KDTraverseFrame.h">
       <Filter>Engine\Raytracer\Accelerators\KDTree</Filter>
     </ClInclude>
-    <ClInclude Include="helper.hpp">
-      <Filter>Engine\Math</Filter>
-    </ClInclude>
     <ClInclude Include="vector.hpp">
       <Filter>Math\Vectors</Filter>
     </ClInclude>
@@ -258,9 +261,6 @@
     <ClInclude Include="DielectricMaterial.h">
       <Filter>Engine\Materials</Filter>
     </ClInclude>
-    <ClInclude Include="LightingCommon.h">
-      <Filter>Engine\Lighting</Filter>
-    </ClInclude>
     <ClInclude Include="LightingContext.h">
       <Filter>Engine\Lighting</Filter>
     </ClInclude>
@@ -272,9 +272,6 @@
     </ClInclude>
     <ClInclude Include="discrete_distribution.hpp">
       <Filter>Math\Random</Filter>
-    </ClInclude>
-    <ClInclude Include="constants.hpp">
-      <Filter>Engine\Math</Filter>
     </ClInclude>
     <ClInclude Include="UniformRandomBitGenerator.h">
       <Filter>Engine\Math</Filter>
@@ -298,6 +295,24 @@
     </ClInclude>
     <ClInclude Include="bounding_box_functions.hpp">
       <Filter>Math\BoundingBox</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="helper.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Distribution.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RayIntegrator.h">
+      <Filter>Engine\Integrators</Filter>
+    </ClInclude>
+    <ClInclude Include="MonteCarloPathIntegrator.h">
+      <Filter>Engine\Integrators</Filter>
+    </ClInclude>
+    <ClInclude Include="color_functions.hpp">
+      <Filter>Engine\Math\Color</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -404,5 +419,8 @@
       <Filter>Engine\Scene\Loading</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="MonteCarloPathIntegrator.cpp">
+      <Filter>Engine\Integrators</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,6 +1,10 @@
 #include "DielectricMaterial.h"
 #include "ShadingContext.h"
 
+
+using bsdf_functional_distribution = FunctionalDistribution<const bsdf_sample, const vector3, space_real>;
+
+
 inline bool refract(const vector3 & incidentDirection, const vector3 & normal, space_real ior, vector3 & out_refractedDirection)
 {
 	// borrowed from pbrt
@@ -69,20 +73,20 @@ color_rgbx DielectricMaterial::GetEmission(const ShadingContext & context) const
 
 color_rgbx DielectricMaterial::GetScattering(const ShadingContext & context) const
 {
-	auto cosTheta = -math::dot(context.incident_ray().direction(), context.normal());
-	bool entering = cosTheta > space_real(0.0);
+	const auto cosTheta = -math::dot(context.incident_ray().direction(), context.normal());
+	const bool entering = cosTheta > space_real(0.0);
 
-	space_real iorIn = entering ? m_iorOutside : m_iorInside;
-	space_real iorOut = entering ? m_iorInside : m_iorOutside;
+	const space_real iorIn = entering ? m_iorOutside : m_iorInside;
+	const space_real iorOut = entering ? m_iorInside : m_iorOutside;
 
-	auto reflectedDirection = context.incident_ray().direction() - context.normal() * (space_real(2.0) * math::dot(context.incident_ray().direction(), context.normal()));
+	const auto reflectedDirection = context.incident_ray().direction() - context.normal() * (space_real(2.0) * math::dot(context.incident_ray().direction(), context.normal()));
 
-	auto reflectance = FrDielectric(cosTheta, iorIn, iorOut);
+	const auto reflectance = FrDielectric(cosTheta, iorIn, iorOut);
+	const auto transmission = color_real(1.0) - reflectance;
 
 	color_rgbx totalColor;
 	totalColor += reflectance * context.ray_evaluator()->TraceRay(ray3(context.world_space_hit_point(), reflectedDirection), context.trace_depth(), context.bias(), context.allow_subdivision(), true);
 
-	auto transmission = color_real(1.0) - reflectance;
 
 	if (transmission > color_real(0.0))
 	{
@@ -99,7 +103,7 @@ color_rgbx DielectricMaterial::GetScattering(const ShadingContext & context) con
 	return totalColor;
 }
 
-color_real DielectricMaterial::GetAverageEmission() const
+color_real DielectricMaterial::GetEmissionImportance() const
 {
 	return color_real(0.0);
 }
@@ -107,4 +111,108 @@ color_real DielectricMaterial::GetAverageEmission() const
 Material * DielectricMaterial::Clone() const
 {
 	return new DielectricMaterial(m_iorInside, m_iorOutside);
+}
+
+void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const
+{
+	job(bsdf_functional_distribution(
+		2U,
+		[&](const bsdf_functional_distribution::delta_func & subJob)
+		{
+			const auto cosTheta = -math::dot(incidentDirection, normal);
+			const bool entering = cosTheta > space_real(0.0);
+
+			const space_real iorIn = entering ? m_iorOutside : m_iorInside;
+			const space_real iorOut = entering ? m_iorInside : m_iorOutside;
+
+			const auto reflectedDirection = incidentDirection - normal * (space_real(2.0) * math::dot(incidentDirection, normal));
+
+			const auto reflectance = FrDielectric(cosTheta, iorIn, iorOut);
+			const auto transmission = color_real(1.0) - reflectance;
+
+			subJob(math::random_sample<const bsdf_sample, space_real>(
+				bsdf_sample(
+					reflectedDirection,
+					[&]()
+					{
+						return color_rgbx(reflectance);
+					}
+				),
+				space_real(1.0),
+				true));
+
+			if (transmission > color_real(0.0))
+			{
+				vector3 refractedDirection;
+				if (refract(incidentDirection, normal, iorIn / iorOut, refractedDirection))
+				{
+					subJob(math::random_sample<const bsdf_sample, space_real>(
+						bsdf_sample(
+							refractedDirection,
+							[&]()
+							{
+								return color_rgbx(transmission * color_real((iorIn * iorIn) / (iorOut * iorOut)));
+							}
+						),
+						space_real(1.0),
+						true));
+				}
+			}
+		},
+		[&]()
+		{
+			const auto cosTheta = -math::dot(incidentDirection, normal);
+			const bool entering = cosTheta > space_real(0.0);
+
+			const space_real iorIn = entering ? m_iorOutside : m_iorInside;
+			const space_real iorOut = entering ? m_iorInside : m_iorOutside;
+
+			const auto reflectedDirection = incidentDirection - normal * (space_real(2.0) * math::dot(incidentDirection, normal));
+
+			const auto reflectance = FrDielectric(cosTheta, iorIn, iorOut);
+			const auto transmission = color_real(1.0) - reflectance;
+
+			std::uniform_real_distribution<color_real> distr;
+			const bool doReflectance = distr(randomEngine) <= reflectance;
+
+			if (doReflectance)
+			{
+				return math::random_sample<const bsdf_sample, space_real>(
+					bsdf_sample(
+						reflectedDirection,
+						[&]()
+						{
+							return color_rgbx(reflectance);
+						}),
+					space_real(reflectance),
+					true
+				);
+			}
+			else
+			{
+				vector3 refractedDirection;
+				refract(incidentDirection, normal, iorIn / iorOut, refractedDirection);
+
+				return math::random_sample<const bsdf_sample, space_real>(
+					bsdf_sample(
+						refractedDirection,
+						[&]()
+						{
+							return color_rgbx(transmission * color_real((iorIn * iorIn) / (iorOut * iorOut)));
+						}),
+					space_real(transmission),
+					true
+				);
+			}
+		}));
+}
+
+color_rgbx DielectricMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+{
+	return color_rgbx();
+}
+
+color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+{
+	return color_rgbx();
 }

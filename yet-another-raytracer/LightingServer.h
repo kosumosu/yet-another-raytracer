@@ -1,7 +1,6 @@
 #pragma once
 
 #include "LightSource.h"
-#include "LightingCommon.h"
 #include "Types.h"
 
 class LightingContext;

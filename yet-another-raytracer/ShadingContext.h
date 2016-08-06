@@ -27,8 +27,8 @@ public:
 	const vector3 & normal() const { return m_normal; }
 	void normal(const vector3 & val) { m_normal = val; }
 
-	const math::ray<space_real, 3> & incident_ray() const { return m_incident_ray; }
-	void incident_ray(const math::ray<space_real, 3> & val) { m_incident_ray = val; }
+	const ray3 & incident_ray() const { return m_incident_ray; }
+	void incident_ray(const ray3 & val) { m_incident_ray = val; }
 
 	const RayEvaluator * ray_evaluator() const { return m_ray_evaluator; }
 	void ray_evaluator(const RayEvaluator * val) { m_ray_evaluator = val; }
@@ -57,7 +57,7 @@ private:
 	vector3 m_hit_point;
 	space_real m_bias;
 	vector3 m_normal;
-	math::ray<space_real, 3> m_incident_ray;
+	ray3 m_incident_ray;
 
 	const RayEvaluator * m_ray_evaluator;
 	const LightingServer * m_lighting_server;

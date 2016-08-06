@@ -178,14 +178,17 @@
     <ClInclude Include="base_matrix_functions.hpp" />
     <ClInclude Include="base_matrix_operations.hpp" />
     <ClInclude Include="bounding_box_functions.hpp" />
+    <ClInclude Include="color_functions.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="DielectricMaterial.h" />
     <ClInclude Include="discrete_distribution.hpp" />
+    <ClInclude Include="Distribution.h" />
     <ClInclude Include="GeometryLightSource.h" />
-    <ClInclude Include="LightingCommon.h" />
     <ClInclude Include="LightingContext.h" />
+    <ClInclude Include="MonteCarloPathIntegrator.h" />
     <ClInclude Include="ProcessTimeStopwatch.h" />
     <ClInclude Include="random_sample.hpp" />
+    <ClInclude Include="RayIntegrator.h" />
     <ClInclude Include="ray_functions.hpp" />
     <ClInclude Include="SimpleGILightSource.h" />
     <ClInclude Include="Stopwatch.h" />
@@ -266,6 +269,7 @@
     <ClCompile Include="Film.cpp" />
     <ClCompile Include="FlatTriangleObject.cpp" />
     <ClCompile Include="GeometryLightSource.cpp" />
+    <ClCompile Include="MonteCarloPathIntegrator.cpp" />
     <ClCompile Include="ProcessTimeStopwatch.cpp" />
     <ClCompile Include="StdHigheResolutionClockStopwatch.cpp" />
     <ClCompile Include="KDTreeAccelerator.cpp" />

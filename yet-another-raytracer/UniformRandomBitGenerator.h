@@ -1,7 +1,5 @@
 #pragma once
 
-#include <utility>
-
 namespace math
 {
 	template <typename TValue>

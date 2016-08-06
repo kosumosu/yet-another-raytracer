@@ -23,11 +23,11 @@ Hit Raytracer::TraceRay(const ray3 & ray, space_real minDistance, space_real max
 
 	while (m_marcher->MarcheNext())
 	{
-		auto objects = m_marcher->GetCurrentObjects();
+		const auto objects = m_marcher->GetCurrentObjects();
 
 		for (const auto & object : *objects)
 		{
-			auto hit = object->FindHit(ray, minDistance, maxDistance);
+			const auto hit = object->FindHit(ray, minDistance, maxDistance);
 			if (hit.has_occurred())
 			{
 				if (!nearest_hit.has_occurred() || hit.distance() < nearest_hit.distance())
@@ -50,11 +50,11 @@ bool Raytracer::DoesIntersect(const ray3 & ray, space_real minDistance, space_re
 	m_marcher->Restart(ray, minDistance, maxDistance);
 	while (m_marcher->MarcheNext())
 	{
-		auto objects = m_marcher->GetCurrentObjects();
+		const auto objects = m_marcher->GetCurrentObjects();
 
 		for (const auto & object : *objects)
 		{
-			auto hit = object->FindHit(ray, minDistance, maxDistance);
+			const auto hit = object->FindHit(ray, minDistance, maxDistance);
 			if (hit.has_occurred())
 			{
 				return true;

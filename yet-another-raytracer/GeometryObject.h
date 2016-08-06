@@ -12,6 +12,15 @@
 
 class Material;
 
+struct surface_point
+{
+	surface_point(const vector3 & point, const vector3 & normal): point(point), normal(normal) {
+	}
+
+	vector3 point;
+	vector3 normal;
+};
+
 class GeometryObject
 {
 public:
@@ -50,7 +59,7 @@ public:
 
 	virtual space_real GetOneSidedSurfaceArea() const = 0;
 
-	virtual math::random_sample<vector3, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const = 0;
+	virtual math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const = 0;
 
 	const std::shared_ptr<Material> & material() const { return m_material; }
 	void material(const std::shared_ptr<Material> & val) { m_material = val; }

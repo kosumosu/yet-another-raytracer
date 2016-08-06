@@ -19,7 +19,7 @@ RayEvaluator::~RayEvaluator(void)
 color_rgbx RayEvaluator::TraceRay( const ray3 & ray, unsigned int depth_left, space_real bias, bool allowSubdivision, bool includeEmission) const
 {
 	if (depth_left < 1)
-		return m_background_color;
+		return color_rgbx();
 
 	auto hit = m_raytracer->TraceRay(ray, bias);
 
