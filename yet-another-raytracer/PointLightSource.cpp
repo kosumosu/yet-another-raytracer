@@ -60,7 +60,7 @@ void PointLightSource::DoWithDistribution(const LightingContext & context, math:
 						light_sample(
 							direction,
 							distance,
-							[&]()
+							[=]()
 							{
 								return m_color * m_attenuation.Evaluate(distance);
 							}

@@ -24,7 +24,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3
 
 					if (!isOccluded)
 					{
-						const auto geometricTerm = color_real(std::max(space_real(0.0), math::dot(lightSample.getValue().direction, hit.normal())));
+						const auto geometricTerm = color_real(math::dot(lightSample.getValue().direction, hit.normal()));
 						radianceAtCurrentPathVertex +=
 							lightSample.getValue().evaluate()
 							* hit.object()->material()->EvaluateNonDeltaScattering(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), lightSample.getValue().direction, randomEngine)
@@ -46,51 +46,50 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 
 	ray3 currentRay = ray;
 	bool accountForEmission = true;
-	space_real currentBias = bias;
 	bool earlyExit = false;
 
 	Hit hit = _raytracer->TraceRay(ray, bias);
 
-	if (hit.has_occurred())
-
-
-		for (unsigned bounce = 0; bounce < bounceLimit - 1; ++bounce)
+	for (unsigned bounce = 0; bounce < bounceLimit - 1; ++bounce)
+	{
+		if (hit.has_occurred())
 		{
-			if (hit.has_occurred())
+			hit.object()->material()->WithBsdfDistribution(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine,
+				[&](const bsdf_distribution & bsdfDistribution)
 			{
-				hit.object()->material()->WithBsdfDistribution(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine,
-					            [&](const bsdf_distribution & bsdfDistribution)
-					            {
-						            color_rgbx radianceAtCurrentPathVertex(0);
+				color_rgbx radianceAtCurrentPathVertex(0);
 
-						            if (bsdfDistribution.has_non_delta_component())
-							            radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, bsdfDistribution, randomEngine);
+				if (bsdfDistribution.has_non_delta_component())
+					radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, bsdfDistribution, randomEngine);
 
-						            if (accountForEmission)
-							            radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine);
+				if (accountForEmission)
+					radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine);
 
-						            integral += radianceAtCurrentPathVertex * throughput;
+				integral += radianceAtCurrentPathVertex * throughput;
 
-						            const auto bsdfSample = bsdfDistribution.generate_sample();
-						            const auto bsdfDirection = bsdfSample.getValue().outgoingDirection;
-						            const auto bsdfColor = bsdfSample.getValue().evaluate();
-						            const auto bsdfPdf = color_real(bsdfSample.getPdf());
+				const auto bsdfSample = bsdfDistribution.generate_sample();
+				const auto bsdfDirection = bsdfSample.getValue().outgoingDirection;
+				const auto bsdfColor = bsdfSample.getValue().evaluate();
+				const auto bsdfPdf = color_real(bsdfSample.getPdf());
 
-						            const auto geometricTerm = color_real(std::max(space_real(0.0), math::dot(bsdfDirection, hit.normal())));
-						            throughput *= bsdfColor * geometricTerm * color_real(math::oneOverPi) / bsdfPdf;
-						            currentRay = ray3(hit.point(), bsdfDirection);
-						            hit = _raytracer->TraceRay(currentRay, BIAS);
-						            accountForEmission = !bsdfDistribution.has_non_delta_component();
-					            }
-				            );
+				const auto geometricTerm = color_real(std::abs(math::dot(bsdfDirection, hit.normal())));
+				throughput *= bsdfSample.getIsDelta()
+					? bsdfColor * geometricTerm / bsdfPdf
+					: bsdfColor * geometricTerm * color_real(math::oneOverPi) / bsdfPdf;
+
+				currentRay = ray3(hit.point(), bsdfDirection);
+				hit = _raytracer->TraceRay(currentRay, BIAS);
+				accountForEmission = bsdfSample.getIsDelta();
 			}
-			else
-			{
-				integral += _infinityEvaluator(currentRay) * throughput;
-				earlyExit = true;
-				break;
-			}
+			);
 		}
+		else
+		{
+			integral += _infinityEvaluator(currentRay) * throughput;
+			earlyExit = true;
+			break;
+		}
+	}
 
 	// last bounce is a special case
 	if (bounceLimit > 0 && !earlyExit)

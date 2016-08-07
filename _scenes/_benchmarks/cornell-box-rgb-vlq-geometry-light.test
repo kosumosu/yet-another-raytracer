@@ -1,11 +1,11 @@
 #Cornell box
-size 512 512
+size 1024 1024
 camera 278 273 -800 278 273 -799 0 1 0 39.3
 
 maxdepth 8
 background 0 0 0
 
-samples 1024
+samples 64
 gi 1 false
 #point 275 275 275 1 1 1
 
@@ -88,6 +88,9 @@ maxverts 100
 	
 	diffuse 0.879 0.693 0.659
 	
+	#dielectric
+	#iorInside 1.5
+	
 	#top
 		tri 8 9 10
 		tri 8 10 11
@@ -107,6 +110,8 @@ maxverts 100
 	#back
 		tri 24 25 26
 		tri 24 26 27
+		
+	blinn
 		
 #large box
 	# 28

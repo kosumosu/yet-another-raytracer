@@ -135,10 +135,10 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 					reflectedDirection,
 					[&]()
 					{
-						return color_rgbx(reflectance);
+						return color_rgbx(reflectance / std::abs(color_real(cosTheta)));
 					}
 				),
-				space_real(1.0),
+				space_real(reflectance),
 				true));
 
 			if (transmission > color_real(0.0))
@@ -151,10 +151,10 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 							refractedDirection,
 							[&]()
 							{
-								return color_rgbx(transmission * color_real((iorIn * iorIn) / (iorOut * iorOut)));
+								return color_rgbx(transmission * color_real((iorIn * iorIn) / (iorOut * iorOut)) / std::abs(color_real(cosTheta)));
 							}
 						),
-						space_real(1.0),
+						space_real(transmission),
 						true));
 				}
 			}
@@ -164,25 +164,25 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			const auto cosTheta = -math::dot(incidentDirection, normal);
 			const bool entering = cosTheta > space_real(0.0);
 
-			const space_real iorIn = entering ? m_iorOutside : m_iorInside;
-			const space_real iorOut = entering ? m_iorInside : m_iorOutside;
+			const space_real iorFrom = entering ? m_iorOutside : m_iorInside;
+			const space_real iorTo = entering ? m_iorInside : m_iorOutside;
 
-			const auto reflectedDirection = incidentDirection - normal * (space_real(2.0) * math::dot(incidentDirection, normal));
 
-			const auto reflectance = FrDielectric(cosTheta, iorIn, iorOut);
+			const auto reflectance = FrDielectric(cosTheta, iorFrom, iorTo);
 			const auto transmission = color_real(1.0) - reflectance;
 
 			std::uniform_real_distribution<color_real> distr;
-			const bool doReflectance = distr(randomEngine) <= reflectance;
+			const bool doReflectance = distr(randomEngine) < reflectance;
 
 			if (doReflectance)
 			{
+				const auto reflectedDirection = incidentDirection - normal * (space_real(2.0) * math::dot(incidentDirection, normal));
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
 						reflectedDirection,
-						[&]()
+						[=]()
 						{
-							return color_rgbx(reflectance);
+							return color_rgbx(reflectance / std::abs(color_real(cosTheta)) * 0);
 						}),
 					space_real(reflectance),
 					true
@@ -191,14 +191,14 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			else
 			{
 				vector3 refractedDirection;
-				refract(incidentDirection, normal, iorIn / iorOut, refractedDirection);
+				refract(incidentDirection, normal, iorFrom / iorTo, refractedDirection);
 
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
 						refractedDirection,
-						[&]()
+						[=]()
 						{
-							return color_rgbx(transmission * color_real((iorIn * iorIn) / (iorOut * iorOut)));
+							return color_rgbx(transmission * color_real((iorFrom * iorFrom) / (iorTo * iorTo)) / std::abs(color_real(cosTheta)));
 						}),
 					space_real(transmission),
 					true

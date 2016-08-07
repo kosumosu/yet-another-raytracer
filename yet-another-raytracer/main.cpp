@@ -340,7 +340,7 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 		reportProgress
 		);
 
-	renderer.RenderOld(film, scene);
+	renderer.Render(film, scene);
 
 	film.SaveAsPng(output_image_file);
 }

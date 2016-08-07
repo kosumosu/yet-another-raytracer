@@ -30,7 +30,7 @@ void SkyLightSource::IterateOverFluxes(const LightingContext & context, const Ra
 #endif
 		if (!rayEvaluator.DoesIntersect(ray3(context.getPoint(), direction), context.getBias(), std::numeric_limits<space_real>::max()))
 		{
-			Flux flux(this, direction, m_color * sampleWeight, std::numeric_limits<space_real>::max(), 0.5 * math::oneOverPi);
+			Flux flux(this, direction, m_color * sampleWeight, std::numeric_limits<space_real>::max(), pdf);
 			job(flux);
 		}
 	}
@@ -53,7 +53,7 @@ void SkyLightSource::DoWithDistribution(const LightingContext & context, math::U
 				light_sample(
 					direction,
 					std::numeric_limits<space_real>::max(),
-					[&]()
+					[=]()
 					{
 						return m_color;
 					}

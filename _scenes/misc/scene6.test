@@ -5,8 +5,8 @@ camera 0 0 1 0 0 -1 0 1 0 45
 output scene6.bmp
 
 maxdepth 8
-samples 64
-gi 1
+samples 8
+gi 1 false
 
 
 maxverts 12
@@ -202,3 +202,5 @@ tri 10 9 11
 popTransform
 
 popTransform
+
+geometryLight 1

@@ -80,7 +80,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 #endif
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(direction,
-				            [&]()
+				            [=]()
 				            {
 					            return m_diffuse * (color_rgbx(1.0) - m_specular);
 				            }),
@@ -94,26 +94,27 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			? bsdf_functional_distribution::generate_sample_func(nullptr)
 			: generateDiffuseFuncImpl;
 
-	bsdf_functional_distribution::evaluate_pdf_func evaluateDiffuseFunc =
+	bsdf_functional_distribution::evaluate_pdf_func evaluateDiffusePdfFunc =
 		m_diffuse == color_rgbx() || m_specular == color_rgbx(1.0)
 			? bsdf_functional_distribution::evaluate_pdf_func(nullptr)
 			: [&](const vector3 & direction)
 			{
 #if ENABLE_IMPORTANCE_SAMPLING
-				return color_real(math::dot(direction, normal) * space_real(math::oneOverPi));
+				return color_real(math::dot(direction, normal) * space_real(math::oneOverPi)) * (1.0 - GetReflectionProbability());
 #else
-				return color_real(0.5 * math::oneOverPi);
+				return color_real(0.5 * math::oneOverPi) * (1.0 - GetReflectionProbability());
 #endif
 			};
 
 	bsdf_functional_distribution::generate_sample_func generateReflectionFuncImpl = [&]()
 		{
-			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * math::dot(incidentDirection, normal));
+			const auto cosTheta = math::dot(incidentDirection, normal);
+			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * cosTheta);
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(reflected_direction,
-				            [&]()
+				            [=]()
 				            {
-					            return m_specular;
+					            return m_specular / color_real(-cosTheta);
 				            }),
 				space_real(GetReflectionProbability()),
 				true
@@ -152,7 +153,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 		iterateReflectionFunc,
 		generateReflectionFunc,
 		generateDiffuseFunc,
-		evaluateDiffuseFunc,
+		evaluateDiffusePdfFunc,
 		generateSampleFunc));
 }
 

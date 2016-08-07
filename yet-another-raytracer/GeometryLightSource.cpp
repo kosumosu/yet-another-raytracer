@@ -31,15 +31,15 @@ GeometryLightSource::GeometryLightSource(const ObjectCollection & objects, size_
 void GeometryLightSource::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const
 {
 	size_t actualSampleCount = context.getAllowSubdivision() ? _sampleCount : 1;
-	color_real sampleWeight = color_real(1.0 / actualSampleCount);
 
 	std::uniform_real_distribution<space_real> distr;
+	const auto randomFunc = [&]()
+	{
+		return color_real(distr(randomEngine));
+	};
 	for (size_t i = 0; i < actualSampleCount; ++i)
 	{
-		const auto objectSample = _distribution.GetRandomElement([&]()
-			{
-				return color_real(distr(randomEngine));
-			});
+		const auto objectSample = _distribution.GetRandomElement(randomFunc);
 		const auto pointSample = objectSample.getValue()->PickRandomPointOnSurface(randomEngine);
 
 		const auto pointToLight = pointSample.getValue().point - context.getPoint();
@@ -67,13 +67,14 @@ void GeometryLightSource::IterateOverFluxes(const LightingContext & context, con
 void GeometryLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
 {
 	std::uniform_real_distribution<space_real> distr;
+	const auto randomFunc = [&]()
+	{
+		return color_real(distr(randomEngine));
+	};
 	job(lighting_functional_distribution(
 		[&]()
 		{
-			const auto objectSample = _distribution.GetRandomElement([&]()
-				{
-					return color_real(distr(randomEngine));
-				});
+			const auto objectSample = _distribution.GetRandomElement(randomFunc);
 			const auto pointSample = objectSample.getValue()->PickRandomPointOnSurface(randomEngine);
 
 			const auto pointToLight = pointSample.getValue().point - context.getPoint();
@@ -88,7 +89,7 @@ void GeometryLightSource::DoWithDistribution(const LightingContext & context, ma
 				light_sample(
 					direction,
 					distance,
-					[&]()
+					[=, &randomEngine]()
 					{
 						return objectSample.getValue()->material()->EvaluateEmission(*objectSample.getValue(), pointSample.getValue().point, pointSample.getValue().normal, direction, randomEngine);
 					}
