@@ -48,7 +48,7 @@ public:
 		const generate_sample_func & generateSample
 	)
 		: _deltaComponentCount(deltaComponentCount),
-		  _hasNonDeltaComponents(true),
+		  _hasNonDeltaComponents(generateNonDeltaComponentSample != nullptr),
 		  _iterateOverDeltaComponents(iterateOverDeltaComponents),
 		  _generateDeltaComponentSample(generateDeltaComponentSample),
 		  _generateNonDeltaComponentSample(generateNonDeltaComponentSample),
@@ -60,7 +60,7 @@ public:
 		const evaluate_pdf_func & evaluatePdf
 	)
 		: _deltaComponentCount(0),
-		  _hasNonDeltaComponents(true),
+		  _hasNonDeltaComponents(generateNonDeltaComponentSample != nullptr),
 		  _iterateOverDeltaComponents(nullptr),
 		  _generateNonDeltaComponentSample(generateNonDeltaComponentSample),
 		  _evaluatePdf(evaluatePdf),

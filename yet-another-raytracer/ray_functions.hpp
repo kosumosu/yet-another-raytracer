@@ -17,7 +17,7 @@ namespace math
 	template <typename TSpace>
 	ray<TSpace, 3> transform3by4x4(const ray<TSpace, 3> & inputRay, const base_matrix<TSpace, 4, 4> & matrix)
 	{
-		auto origin = (matrix * vector<TSpace, 4>(inputRay.origin(), TSpace(0.0))).reduce();
+		auto origin = (matrix * vector<TSpace, 4>(inputRay.origin(), TSpace(1.0))).reduce();
 		auto direction = (matrix * vector<TSpace, 4>(inputRay.direction(), TSpace(0.0))).reduce();
 		return ray<TSpace, 3>(origin, direction);
 	}

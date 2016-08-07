@@ -47,7 +47,7 @@ Hit FlatTriangleObject::FindHit(const ray3 & ray, space_real minDistance, space_
 
 	auto hit_point = w * m_vertex0 + u * m_vertex1 + v * m_vertex2;
 
-	return Hit(hit_point, m_normal * -math::sign(math::dot(m_normal, ray.direction())), this, dist);
+	return Hit(hit_point, m_normal, this, dist);
 }
 
 bool FlatTriangleObject::DoesHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const

@@ -81,7 +81,7 @@ color_rgbx DielectricMaterial::GetScattering(const ShadingContext & context) con
 
 	const auto reflectedDirection = context.incident_ray().direction() - context.normal() * (space_real(2.0) * math::dot(context.incident_ray().direction(), context.normal()));
 
-	const auto reflectance = FrDielectric(cosTheta, iorIn, iorOut);
+	const auto reflectance = color_real(0); // FrDielectric(cosTheta, iorIn, iorOut);
 	const auto transmission = color_real(1.0) - reflectance;
 
 	color_rgbx totalColor;
@@ -182,7 +182,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 						reflectedDirection,
 						[=]()
 						{
-							return color_rgbx(reflectance / std::abs(color_real(cosTheta)) * 0);
+							return color_rgbx(reflectance / std::abs(color_real(cosTheta)));
 						}),
 					space_real(reflectance),
 					true

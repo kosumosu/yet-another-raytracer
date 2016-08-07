@@ -5,7 +5,7 @@ camera 278 273 -800 278 273 -799 0 1 0 39.3
 maxdepth 8
 background 0 0 0
 
-samples 1024
+samples 32
 gi 1 false
 #point 275 275 275 1 1 1
 
@@ -35,11 +35,11 @@ maxverts 100
 			tri 0 1 2
 			tri 0 2 3
 
-		#ceiling
+		#back wall
 			tri 4 5 6
 			tri 4 6 7
-			
-		#back wall
+
+		#ceiling
 			tri 6 5 3
 			tri 6 3 2
 
@@ -92,24 +92,24 @@ maxverts 100
 	iorInside 1.5
 	
 	#top
-		tri 8 9 10
-		tri 8 10 11
+		#tri 8 9 10
+		#tri 8 10 11
 	
 	#left
-		tri 12 13 14
-		tri 12 14 15
+		#tri 12 13 14
+		#tri 12 14 15
 	
 	#front
-		tri 16 17 18
-		tri 16 18 19
+		#tri 16 17 18
+		#tri 16 18 19
 		
 	#right
-		tri 20 21 22
-		tri 20 22 23
+		#tri 20 21 22
+		#tri 20 22 23
 		
 	#back
-		tri 24 25 26
-		tri 24 26 27
+		#tri 24 25 26
+		#tri 24 26 27
 		
 	blinn
 		
@@ -190,5 +190,14 @@ maxverts 100
 	dielectric
 	iorInside 1.5
 	sphere 370 40 100 40
+	
+
+
+	blinn
+	emission 200 200 1000
+	specular 0 0 0
+	diffuse 0 0 0
+	sphere 237.3 162.2 97.9 4
+	sphere 215.3 148.4 264.7 4
 	
 geometryLight 1

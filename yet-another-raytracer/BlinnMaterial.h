@@ -74,5 +74,7 @@ private:
 	color_rgbx ComputeDiffuseComponent(const ShadingContext & context, const Flux & flux) const;
 	color_rgbx ComputeSpecularComponent(const ShadingContext & context, const Flux & flux) const;
 	color_real GetReflectionProbability() const;
+
+	color_rgbx EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const;
 };
 
