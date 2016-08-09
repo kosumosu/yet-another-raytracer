@@ -5,7 +5,7 @@ camera 278 273 -800 278 273 -799 0 1 0 39.3
 maxdepth 8
 background 0 0 0
 
-samples 1024
+samples 512
 gi 1 false
 #point 275 275 275 1 1 1
 
@@ -88,8 +88,8 @@ maxverts 100
 	
 	diffuse 0.879 0.693 0.659
 	
-	dielectric
-	iorInside 1.5
+	#dielectric
+	#iorInside 1.5
 	
 	#top
 		tri 8 9 10
@@ -144,10 +144,10 @@ maxverts 100
     vertex 423.0 330.0 247.0
     vertex 423.0   0.0 247.0
 	
-	specular 1 1 1
+	#specular 1 1 1
 	shininess 0
-	diffuse 0 0 0
-	#diffuse 0.879 0.693 0.659
+	#diffuse 0 0 0
+	diffuse 0.879 0.693 0.659
 	
 	#top
 		tri 28 29 30
@@ -176,6 +176,7 @@ maxverts 100
     vertex 213.0 548.8 332.0
     vertex 213.0 548.8 227.0
 	
+	specular 0 0 0
 	diffuse 0.78 0.78 0.78
 	#emission 1.976 1.518 1.3
 	emission 35.821 41.263 17.197
@@ -189,6 +190,6 @@ maxverts 100
 #sphere 
 	dielectric
 	iorInside 1.5
-	sphere 370 40 100 40
+	#sphere 370 40 100 40
 	
 geometryLight 1

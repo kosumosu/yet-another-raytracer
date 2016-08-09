@@ -12,10 +12,10 @@ Raytracer::~Raytracer(void)
 
 Hit Raytracer::TraceRay(const ray3 & ray, space_real bias) const
 {
-	return TraceRay(ray, bias, std::numeric_limits<space_real>::max());
+	return TraceRay(ray, bias, std::numeric_limits<space_real>::max(), nullptr, false);
 }
 
-Hit Raytracer::TraceRay(const ray3 & ray, space_real minDistance, space_real maxDistance) const
+Hit Raytracer::TraceRay(const ray3 & ray, space_real minDistance, space_real maxDistance, const GeometryObject * objectToIgnore, bool ignoreBackFace) const
 {
 	m_marcher->Restart(ray, minDistance, maxDistance);
 
@@ -32,7 +32,8 @@ Hit Raytracer::TraceRay(const ray3 & ray, space_real minDistance, space_real max
 			{
 				if (!nearest_hit.has_occurred() || hit.distance() < nearest_hit.distance())
 				{
-					nearest_hit = hit;
+					if (object != objectToIgnore || (math::is_obtuse_angle(ray.direction(), hit.normal()) == ignoreBackFace))
+						nearest_hit = hit;
 				}
 			}
 		}
@@ -45,7 +46,7 @@ Hit Raytracer::TraceRay(const ray3 & ray, space_real minDistance, space_real max
 	return nearest_hit;
 }
 
-bool Raytracer::DoesIntersect(const ray3 & ray, space_real minDistance, space_real maxDistance) const
+bool Raytracer::DoesIntersect(const ray3 & ray, space_real minDistance, space_real maxDistance, const GeometryObject * objectToIgnore, bool ignoreBackFace) const
 {
 	m_marcher->Restart(ray, minDistance, maxDistance);
 	while (m_marcher->MarcheNext())
@@ -55,7 +56,9 @@ bool Raytracer::DoesIntersect(const ray3 & ray, space_real minDistance, space_re
 		for (const auto & object : *objects)
 		{
 			const auto hit = object->FindHit(ray, minDistance, maxDistance);
-			if (hit.has_occurred())
+			if (hit.has_occurred() 
+				&& (object != objectToIgnore || (math::is_obtuse_angle(ray.direction(), hit.normal()) == ignoreBackFace))
+				)
 			{
 				return true;
 			}

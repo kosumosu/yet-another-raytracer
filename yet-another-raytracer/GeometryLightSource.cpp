@@ -46,7 +46,7 @@ void GeometryLightSource::IterateOverFluxes(const LightingContext & context, con
 		const auto direction = math::normalize(pointToLight);
 
 		const auto ray = ray3(context.getPoint(), direction);
-		const auto hit = rayEvaluator.raytracer()->TraceRay(ray, context.getBias(), math::length(pointToLight) * space_real(1.001));
+		const auto hit = rayEvaluator.raytracer()->TraceRay(ray, context.getBias(), math::length(pointToLight) * space_real(1.001), nullptr, false);
 
 		if (hit.has_occurred() && hit.object() == objectSample.getValue())
 		{

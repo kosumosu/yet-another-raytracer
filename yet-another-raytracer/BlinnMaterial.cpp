@@ -122,7 +122,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 				bsdf_sample(reflected_direction,
 				            [=]()
 				            {
-					            return m_specular / color_real(-cosTheta);
+								return m_specular / color_real(std::abs(cosTheta));
 				            }),
 				space_real(GetReflectionProbability()),
 				true

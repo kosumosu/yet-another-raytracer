@@ -8,22 +8,6 @@ using bsdf_functional_distribution = FunctionalDistribution<const bsdf_sample, c
 inline bool refract(const vector3 & incidentDirection, const vector3 & normal, space_real ior, vector3 & out_refractedDirection)
 {
 	// borrowed from pbrt
-
-	//auto cosThetaI = -math::dot(normal, incidentDirection);
-	//auto sin2ThetaI = std::max(space_real(0), space_real(1.0) - cosThetaI * cosThetaI);
-	//auto sin2ThetaT = ior * ior * sin2ThetaI;
-
-	//// Handle total internal reflection for transmission
-	//if (sin2ThetaT >= 1)
-	//	return false;
-
-	//auto cosThetaT = std::sqrt(1 - sin2ThetaT);
-	//out_refractedDirection = ior * incidentDirection + (ior * cosThetaI - cosThetaT) * normal;
-	//return true;
-
-	//out_refractedDirection = incidentDirection;
-	//return true;
-
 	auto fixedNormal = math::dot(incidentDirection, normal) < 0 ? normal : -normal;
 
 	auto binormal = math::cross(fixedNormal, incidentDirection); // sine scaled

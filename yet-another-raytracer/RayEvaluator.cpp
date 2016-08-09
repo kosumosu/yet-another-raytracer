@@ -50,5 +50,5 @@ color_rgbx RayEvaluator::TraceRay( const ray3 & ray, unsigned int depth_left, sp
 
 bool RayEvaluator::DoesIntersect(const ray3 & ray, space_real minDistance, space_real maxDistance) const
 {
-	return m_raytracer->DoesIntersect(ray, minDistance, maxDistance);
+	return m_raytracer->DoesIntersect(ray, minDistance, maxDistance, nullptr, false);
 }

@@ -28,5 +28,5 @@ private:
 	const std::vector<const LightSource*> _lights;
 	const infinity_func _infinityEvaluator;
 
-	color_rgbx EvaluateRadianceByLightsAtVertex(const ray3 & currentRay, const Hit & hit, const bsdf_distribution & bsdfDistribution, math::UniformRandomBitGenerator<unsigned> & randomEngine) const;
+	color_rgbx EvaluateRadianceByLightsAtVertex(const ray3 & currentRay, const Hit & hit, bool entering, const bsdf_distribution & bsdfDistribution, math::UniformRandomBitGenerator<unsigned> & randomEngine) const;
 };
