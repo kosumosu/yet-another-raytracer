@@ -41,6 +41,9 @@ void Renderer::ProcessPixel(Film& film, const Scene& scene, RayEvaluator & rayEv
 
 void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrator & rayIntegrator, math::UniformRandomBitGenerator<unsigned> & randomEngine, unsigned x, unsigned y) const
 {
+	const unsigned seed = x | (y << 16);
+	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::move(std::mt19937(seed)));
+
 	bool doJitter = scene.getSamplesPerPixel() > 1;
 	color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
 	color_rgbx averageColor;
@@ -49,11 +52,11 @@ void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrato
 
 	for (size_t i = 0; i < scene.getSamplesPerPixel(); i++)
 	{
-		auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), randomEngine) : vector2(0.5, 0.5);
+		auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), pixelPersonalRandomEngine) : vector2(0.5, 0.5);
 		auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
 
 		auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, space_real(film.width()) / space_real(film.height()));
-		averageColor += rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), randomEngine) * sampleWeight;
+		averageColor += rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
 	}
 
 	*film.pixel_at(x, y) = averageColor;
@@ -63,7 +66,6 @@ void Renderer::Render(Film & film, const Scene & scene) const
 {
 	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> randomEngine(std::move(std::mt19937()));
 
-	float total_pixels = float(film.width()) * float(film.height()); // for timer
 
 	PrepareObjects(scene.objects());
 
@@ -81,22 +83,30 @@ void Renderer::Render(Film & film, const Scene & scene) const
 	std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights), [](const auto & lightPtr) { return lightPtr.get(); });
 	MonteCarloPathIntegrator integrator(&raytracer, lights, [&](const ray3 & ray) { return scene.getEnvironmentColor(); });
 
+	const bool isCropped = scene.getCropWidth() > 0 && scene.getCropHeight() > 0;
+
+	const unsigned startX = isCropped ? scene.getCropX() : 0U;
+	const unsigned startY = isCropped ? scene.getCropY() : 0U;
+	const unsigned endX = isCropped ? std::min(film.width(), scene.getCropX() + scene.getCropWidth()) : film.width();
+	const unsigned endY = isCropped ? std::min(film.height(), scene.getCropY() + scene.getCropHeight()) : film.height();
+	float total_pixels = float(endX - startX) * float(endY - startY); // for timer
+
 	m_initializationFinishedCallback();
 
 	StdHigheResolutionClockStopwatch timer;
 
 
 	timer.Restart();
-	for (unsigned int y = 0; y < film.height(); y++)
+	for (unsigned int y = startY; y < endY; ++y)
 	{
-		for (unsigned int x = 0; x < film.width(); x++)
+		for (unsigned int x = startX; x < endX; ++x)
 		{
 			ProcessPixel(film, scene, integrator, randomEngine, x, y);
 
 			if (timer.Sample() > 2.0f)
 			{
 				timer.Restart();
-				m_progressCallback((y * film.width() + x) / total_pixels);
+				m_progressCallback(((y - startY) * (endY - startY) + x - startX) / total_pixels);
 			}
 		}
 	}

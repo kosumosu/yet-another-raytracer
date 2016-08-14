@@ -10,27 +10,26 @@ public:
 	
 
 	BlinnMaterial(void)
-		: m_emission(color_rgbx())
-		, m_diffuse(color_rgbx())
-		, m_specular(color_rgbx())
-		, m_shininess(1.0f)
+		: _shininess(1.0f)
 	{
 	}
 
-	BlinnMaterial(const color_rgbx & emission, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess)
-		: m_emission(emission)
-		, m_diffuse(diffuse)
-		, m_specular(specular)
-		, m_shininess(shininess)
+	BlinnMaterial(const color_rgbx & emission, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess, const color_rgbx & translucency)
+		: _emission(emission)
+		, _diffuse(diffuse)
+		, _specular(specular)
+		, _shininess(shininess)
+		, _translucency(translucency)
 	{
 		
 	}
 
 	BlinnMaterial(const BlinnMaterial & original)
-		: m_emission(original.emission())
-		, m_diffuse(original.diffuse())
-		, m_specular(original.specular())
-		, m_shininess(original.shininess())
+		: _emission(original._emission)
+		, _diffuse(original._diffuse)
+		, _specular(original._specular)
+		, _shininess(original._shininess)
+		, _translucency(original._translucency)
 	{
 
 	}
@@ -41,18 +40,20 @@ public:
 
 
 
-	const color_rgbx & emission() const { return m_emission; }
-	void emission(const color_rgbx & value) { m_emission = value; }
+	const color_rgbx & emission() const { return _emission; }
+	void emission(const color_rgbx & value) { _emission = value; }
 
-	const color_rgbx & diffuse() const { return m_diffuse; }
-	void diffuse(const color_rgbx & value) { m_diffuse = value; }
+	const color_rgbx & diffuse() const { return _diffuse; }
+	void diffuse(const color_rgbx & value) { _diffuse = value; }
 
-	const color_rgbx & specular() const { return m_specular; }
-	void specular(const color_rgbx & value) { m_specular = value; }
+	const color_rgbx & specular() const { return _specular; }
+	void specular(const color_rgbx & value) { _specular = value; }
 
-	color_real shininess() const { return m_shininess; }
-	void shininess(color_real value) { m_shininess = value; }
+	color_real shininess() const { return _shininess; }
+	void shininess(color_real value) { _shininess = value; }
 
+	color_rgbx translucency() const { return _translucency; }
+	void translucency(const color_rgbx & value) { _translucency = value; }
 
 	color_rgbx Shade( const ShadingContext & context ) const override;
 	color_rgbx GetEmission(const ShadingContext & context) const override;
@@ -66,10 +67,11 @@ public:
 	color_rgbx EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
 
 private:
-	color_rgbx m_emission;
-	color_rgbx m_diffuse;
-	color_rgbx m_specular;
-	color_real m_shininess;
+	color_rgbx _emission;
+	color_rgbx _diffuse;
+	color_rgbx _specular;
+	color_real _shininess;
+	color_rgbx _translucency;
 
 	color_rgbx ComputeDiffuseComponent(const ShadingContext & context, const Flux & flux) const;
 	color_rgbx ComputeSpecularComponent(const ShadingContext & context, const Flux & flux) const;

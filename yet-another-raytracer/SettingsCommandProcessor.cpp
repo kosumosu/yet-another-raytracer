@@ -42,6 +42,13 @@ void SettingsCommandProcessor::ProcessCommand( LoadingContext & context, const s
 	{
 		context.scene()->setSamplesPerPixel(ParserHelper::ReadUInt(stream));
 	}
+	else if (command == "crop")
+	{
+		context.scene()->setCropX(ParserHelper::ReadUInt(stream));
+		context.scene()->setCropY(ParserHelper::ReadUInt(stream));
+		context.scene()->setCropWidth(ParserHelper::ReadUInt(stream));
+		context.scene()->setCropHeight(ParserHelper::ReadUInt(stream));
+	}
 	else
 	{
 		throw std::exception();

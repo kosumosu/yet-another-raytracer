@@ -32,7 +32,7 @@ void GeometryLightSource::IterateOverFluxes(const LightingContext & context, con
 {
 	size_t actualSampleCount = context.getAllowSubdivision() ? _sampleCount : 1;
 
-	std::uniform_real_distribution<space_real> distr;
+	std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 	const auto randomFunc = [&]()
 	{
 		return color_real(distr(randomEngine));
@@ -46,7 +46,7 @@ void GeometryLightSource::IterateOverFluxes(const LightingContext & context, con
 		const auto direction = math::normalize(pointToLight);
 
 		const auto ray = ray3(context.getPoint(), direction);
-		const auto hit = rayEvaluator.raytracer()->TraceRay(ray, context.getBias(), math::length(pointToLight) * space_real(1.001), nullptr, false);
+		const auto hit = rayEvaluator.raytracer()->TraceRay(ray, context.getBias(), math::length(pointToLight) * space_real(1.001), nullptr, vector3());
 
 		if (hit.has_occurred() && hit.object() == objectSample.getValue())
 		{
@@ -66,7 +66,7 @@ void GeometryLightSource::IterateOverFluxes(const LightingContext & context, con
 
 void GeometryLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
 {
-	std::uniform_real_distribution<space_real> distr;
+	std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 	const auto randomFunc = [&]()
 	{
 		return color_real(distr(randomEngine));

@@ -8,14 +8,15 @@ class DielectricMaterial : public Material
 public:
 
 	DielectricMaterial(void)
-		: m_iorInside(1.5)
-		, m_iorOutside(1.0)
+		: _iorInside(1.5)
+		, _iorOutside(1.0)
 	{
 	}
 
-	explicit DielectricMaterial(space_real iorInside, space_real iorOutside)
-		: m_iorInside(iorInside)
-		, m_iorOutside(iorOutside)
+	explicit DielectricMaterial(space_real iorInside, space_real iorOutside, const color_rgbx & surfaceTransparency)
+		: _iorInside(iorInside)
+		, _iorOutside(iorOutside)
+		, _surfaceTransparency(surfaceTransparency)
 	{
 
 	}
@@ -25,8 +26,9 @@ public:
 	{
 	}
 
-	void setIorInside(space_real ior) { m_iorInside = ior; }
-	void setIorOutside(space_real ior) { m_iorOutside = ior; }
+	void setIorInside(space_real ior) { _iorInside = ior; }
+	void setIorOutside(space_real ior) { _iorOutside = ior; }
+	void setSurfaceTransparency(const color_rgbx & value) { _surfaceTransparency = value; }
 
 	color_rgbx Shade(const ShadingContext & context) const override;
 	color_rgbx GetEmission(const ShadingContext & context) const override;
@@ -39,7 +41,8 @@ public:
 	color_rgbx EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
 	color_rgbx EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
 private:
-	space_real m_iorInside;
-	space_real m_iorOutside;
+	space_real _iorInside;
+	space_real _iorOutside;
+	color_rgbx _surfaceTransparency;
 };
 

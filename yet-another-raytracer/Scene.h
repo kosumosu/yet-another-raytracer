@@ -12,11 +12,15 @@ class Scene
 public:
 
 	Scene(void)
-		: m_viewport_width(640)
-		, m_viewport_height(480)
-		, m_max_trace_depth(4)
-		, m_camera(new Camera())
-		, m_samplesPerPixel(1)
+		: _viewport_width(640)
+		, _viewport_height(480)
+		, _cropX(0)
+		, _cropY(0)
+		, _cropWidth(0)
+		, _cropHeight(0)
+		, _max_trace_depth(4)
+		, _camera(new Camera())
+		, _samplesPerPixel(1)
 	{
 	}
 
@@ -25,48 +29,66 @@ public:
 	}
 
 
-	unsigned int viewport_width() const { return m_viewport_width; }
-	void viewport_width(unsigned int value) { m_viewport_width = value; }
+	unsigned int viewport_width() const { return _viewport_width; }
+	void viewport_width(unsigned int value) { _viewport_width = value; }
 
-	unsigned int viewport_height() const { return m_viewport_height; }
-	void viewport_height(unsigned int value) { m_viewport_height = value; }
+	unsigned int viewport_height() const { return _viewport_height; }
+	void viewport_height(unsigned int value) { _viewport_height = value; }
 
-	unsigned int max_trace_depth() const { return m_max_trace_depth; }
-	void max_trace_depth(unsigned int val) { m_max_trace_depth = val; }
+	unsigned int max_trace_depth() const { return _max_trace_depth; }
+	void max_trace_depth(unsigned int val) { _max_trace_depth = val; }
 
-	const std::string & output_filename() const { return m_output_filename; }
-	void output_filename(const std::string &  val) { m_output_filename = val; }
+	const std::string & output_filename() const { return _output_filename; }
+	void output_filename(const std::string &  val) { _output_filename = val; }
 
-	const std::shared_ptr<Camera> & camera() const { return m_camera; }
-	void camera(const std::shared_ptr<Camera> & value) { m_camera = value; }
+	const std::shared_ptr<Camera> & camera() const { return _camera; }
+	void camera(const std::shared_ptr<Camera> & value) { _camera = value; }
 
-	ObjectCollection & objects() { return m_objects; }
-	const ObjectCollection & objects() const { return m_objects; }
+	ObjectCollection & objects() { return _objects; }
+	const ObjectCollection & objects() const { return _objects; }
 
-	const LightSourceCollection& lights() const { return m_lights; }
-	LightSourceCollection& lights() { return m_lights; }
-	void lights(const LightSourceCollection & val) { m_lights = val; }
-	void lights(const LightSourceCollection && val) { m_lights = std::move(val); }
+	const LightSourceCollection& lights() const { return _lights; }
+	LightSourceCollection& lights() { return _lights; }
+	void lights(const LightSourceCollection & val) { _lights = val; }
+	void lights(const LightSourceCollection && val) { _lights = std::move(val); }
 
-	color_rgbx getEnvironmentColor() const { return m_environmentColor; }
-	void setEnvironmentColor(const color_rgbx & color) { m_environmentColor = color; }
+	color_rgbx getEnvironmentColor() const { return _environmentColor; }
+	void setEnvironmentColor(const color_rgbx & color) { _environmentColor = color; }
 
-	size_t getSamplesPerPixel() const { return m_samplesPerPixel; }
-	void setSamplesPerPixel(size_t samplesPerPixel) { m_samplesPerPixel = samplesPerPixel; }
+	size_t getSamplesPerPixel() const { return _samplesPerPixel; }
+	void setSamplesPerPixel(size_t samplesPerPixel) { _samplesPerPixel = samplesPerPixel; }
+
+
+	unsigned getCropX() const { return _cropX; }
+	void setCropX(const unsigned cropX) { _cropX = cropX; }
+
+	unsigned getCropY() const { return _cropY; }
+	void setCropY(const unsigned cropY) { _cropY = cropY; }
+
+	unsigned getCropWidth() const { return _cropWidth; }
+	void setCropWidth(const unsigned cropWidth) { _cropWidth = cropWidth; }
+
+	unsigned getCropHeight() const { return _cropHeight; }
+	void setCropHeight(const unsigned cropHeight) { _cropHeight = cropHeight; }
 
 private:
-	unsigned int m_viewport_width;
-	unsigned int m_viewport_height;
-	unsigned int m_max_trace_depth;
+	unsigned int _viewport_width;
+	unsigned int _viewport_height;
+	unsigned int _cropX;
+	unsigned int _cropY;
+	unsigned int _cropWidth;
+	unsigned int _cropHeight;
 
-	std::string m_output_filename; // it's not good place for it.
+	unsigned int _max_trace_depth;
 
-	std::shared_ptr<Camera> m_camera;
+	std::string _output_filename; // it's not good place for it.
 
-	ObjectCollection m_objects;
-	LightSourceCollection m_lights;
+	std::shared_ptr<Camera> _camera;
 
-	color_rgbx m_environmentColor;
-	size_t m_samplesPerPixel;
+	ObjectCollection _objects;
+	LightSourceCollection _lights;
+
+	color_rgbx _environmentColor;
+	size_t _samplesPerPixel;
 };
 

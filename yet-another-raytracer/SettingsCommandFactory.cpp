@@ -22,6 +22,7 @@ std::vector<std::string> SettingsCommandFactory::GetSupportedCommands() const
 	commands.push_back("output");
 	commands.push_back("background");
 	commands.push_back("samples");
+	commands.push_back("crop");
 	return commands;
 }
 

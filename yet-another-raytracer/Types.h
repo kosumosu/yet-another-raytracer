@@ -26,3 +26,8 @@ typedef math::bounding_box<space_real, 3> bounding_box3;
 typedef float color_real;
 typedef math::vector<color_real, 3> color_rgb;
 typedef math::vector<color_real, 4> color_rgbx;
+
+
+// to workaround upper bound issue with STL PRNG
+template <typename T>
+constexpr T upperRandomBound() { return std::nextafter(T(1.0), T(0.0)); } // made it a func to pleasure resharper.

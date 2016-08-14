@@ -21,10 +21,12 @@ std::vector<std::string> MaterialCommandFactory::GetSupportedCommands() const
 	commands.push_back("diffuse");
 	commands.push_back("specular");
 	commands.push_back("shininess");
+	commands.push_back("translucency");
 
 	commands.push_back("dielectric");
 	commands.push_back("iorInside");
 	commands.push_back("iorOutside");
+	commands.push_back("surfaceTransparency");
 
 	return commands;
 }

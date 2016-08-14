@@ -4,7 +4,9 @@
 #include "LightSource.h"
 #include "Material.h"
 #include "LightingContext.h"
+#include "color_functions.hpp"
 #include <iostream>
+#include <iomanip>
 
 constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 //constexpr space_real BIAS = space_real(0); // std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
@@ -24,11 +26,11 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3
 				{
 					const auto lightSample = lightDistribution.generate_sample();
 
-					const bool isOccluded = _raytracer->DoesIntersect(ray3(hit.point(), lightSample.getValue().direction), BIAS, lightSample.getValue().distance - BIAS * lightSample.getValue().distance, hit.object(), entering);
+					const bool isOccluded = _raytracer->DoesIntersect(ray3(hit.point(), lightSample.getValue().direction), BIAS, lightSample.getValue().distance - BIAS * lightSample.getValue().distance, hit.object(), hit.normal());
 
 					if (!isOccluded)
 					{
-						const auto geometricTerm = color_real(std::max(space_real(0), math::dot(lightSample.getValue().direction, hit.normal())));
+						const auto geometricTerm = color_real(std::abs(math::dot(lightSample.getValue().direction, hit.normal())));
 						const auto radianceByLight =
 							lightSample.getValue().evaluate()
 							* hit.object()->material()->EvaluateNonDeltaScattering(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), lightSample.getValue().direction, randomEngine)
@@ -36,8 +38,8 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3
 							* color_real(math::oneOverPi)
 							/ color_real(lightSample.getPdf());
 
-						//if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
-						//	throw std::exception();
+						if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
+							throw std::exception();
 
 						radianceAtCurrentPathVertex += radianceByLight;
 					}
@@ -94,18 +96,42 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 						                          ? bsdfColor * geometricTerm / bsdfPdf
 						                          : bsdfColor * geometricTerm * color_real(math::oneOverPi) / bsdfPdf;
 
-								//if (vertexThroughput[0] < color_real(0.0) || vertexThroughput[1] < color_real(0.0) || vertexThroughput[2] < color_real(0.0))
-								//{
-								//	std::cout << typeid(*hit.object()->material()).name() << "\n";
-								//	std::cout << vertexThroughput[0] << " " << vertexThroughput[1] << " " << vertexThroughput[2] << "\n";
-								//	std::cout << hit.point()[0] << " " << hit.point()[1] << " " << hit.point()[2] << "\n";
-								//	throw std::exception();
-								//}
+								const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
 
-								throughput *= vertexThroughput;
+								std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+								if (importance < color_real(1.0) && distr(randomEngine) >= importance)
+								{
+									earlyExit = true;
+									return;
+								}
+								else
+								{
+									throughput *= vertexThroughput / std::min(color_real(1.0), importance);
+								}
+
+								//throughput *= vertexThroughput;
+
+#if false
+								if (
+									vertexThroughput[0] < color_real(0.0) || vertexThroughput[1] < color_real(0.0) || vertexThroughput[2] < color_real(0.0)
+									|| std::isnan(vertexThroughput[0]) || std::isnan(vertexThroughput[1]) || std::isnan(vertexThroughput[2])
+									)
+								{
+									std::cout << typeid(*hit.object()->material()).name() << "\n";
+									std::cout << std::setprecision(std::numeric_limits<space_real>::max_digits10 + 1);
+									std::cout << vertexThroughput[0] << " " << vertexThroughput[1] << " " << vertexThroughput[2] << "\n";
+									std::cout << "hit point " << hit.point()[0] << " " << hit.point()[1] << " " << hit.point()[2] << "\n";
+									std::cout << "hit normal " << hit.normal()[0] << " " << hit.normal()[1] << " " << hit.normal()[2] << "\n";
+									std::cout << "ray direction " << currentRay.direction()[0] << " " << currentRay.direction()[1] << " " << currentRay.direction()[2] << "\n";
+									std::cout << "ray origin " << currentRay.origin()[0] << " " << currentRay.origin()[1] << " " << currentRay.origin()[2] << "\n";
+									std::cout << "bsdfPdf " << bsdfPdf << "\n";
+									throw std::exception();
+								}
+#endif
+								
 
 					            currentRay = ray3(hit.point(), bsdfDirection);
-					            hit = _raytracer->TraceRay(currentRay, BIAS, std::numeric_limits<space_real>::max(), hit.object(), entering);
+					            hit = _raytracer->TraceRay(currentRay, BIAS, std::numeric_limits<space_real>::max(), hit.object(), hit.normal());
 					            accountForEmission = bsdfSample.getIsDelta();
 				            }
 			            );

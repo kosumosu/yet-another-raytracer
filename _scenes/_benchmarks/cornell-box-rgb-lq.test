@@ -2,11 +2,11 @@
 size 512 512
 camera 278 273 -800 278 273 -799 0 1 0 39.3
 
-maxdepth 8
+maxdepth 32
 background 0 0 0
 
 samples 16
-gi 16 true
+#gi 16 true
 #point 275 275 275 1 1 1
 
 ambient 0 0 0

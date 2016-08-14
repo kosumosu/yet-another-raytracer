@@ -18,7 +18,7 @@ void MaterialCommandProcessor::PrepareContext(LoadingContext & context)
 {
 	// TODO: fix memory leak
 	m_blinnMaterial = std::make_shared<BlinnMaterial>();
-	m_dielectricMaterial = std::shared_ptr<DielectricMaterial>(new DielectricMaterial(1.5, 1.0));
+	m_dielectricMaterial = std::shared_ptr<DielectricMaterial>(new DielectricMaterial(1.5, 1.0, color_rgbx(1.0)));
 
 	m_last_ambient = color_rgbx(0.2f);
 	m_blinnMaterial->emission(m_last_ambient);
@@ -58,6 +58,10 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	{
 		m_blinnMaterial->shininess(ParserHelper::ReadColorReal(stream));
 	}
+	else if (command == "translucency")
+	{
+		m_blinnMaterial->translucency(color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f));
+	}
 	
 	else if (command == "dielectric")
 	{
@@ -72,6 +76,10 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	{
 		auto ior = ParserHelper::ReadSpaceReal(stream);
 		m_dielectricMaterial->setIorOutside(ior);
+	}
+	else if (command == "surfaceTransparency")
+	{
+		m_dielectricMaterial->setSurfaceTransparency(color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f));
 	}
 	else
 	{

@@ -5,7 +5,7 @@ camera 278 273 -800 278 273 -799 0 1 0 39.3
 maxdepth 8
 background 0 0 0
 
-samples 32
+samples 128
 gi 1 false
 #point 275 275 275 1 1 1
 
@@ -96,8 +96,8 @@ maxverts 100
 		#tri 8 10 11
 	
 	#left
-		#tri 12 13 14
-		#tri 12 14 15
+		tri 12 13 14
+		tri 12 14 15
 	
 	#front
 		#tri 16 17 18
@@ -194,9 +194,11 @@ maxverts 100
 
 
 	blinn
-	emission 2 2 10
+	emission 0 0 1
 	specular 0 0 0
 	diffuse 0 0 0
-	sphere 213.0 548.8 316.0 4
+	sphere 268.25 85.81 107.34 4
+	emission 1 0 0
+	sphere 255.48 69.97 223.09 4
 	
 geometryLight 1
