@@ -320,7 +320,7 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 	InsertGILight(scene, 512);
 #endif
 
-	std::unique_ptr<Stopwatch> timer(new StdHigheResolutionClockStopwatch());
+	std::unique_ptr<Stopwatch> timer(new ProcessTimeStopwatch());
 	timer->Restart();
 
 	Film film(scene.viewport_width(), scene.viewport_height());

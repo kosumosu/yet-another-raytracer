@@ -1,6 +1,5 @@
 #include "DielectricMaterial.h"
 #include "ShadingContext.h"
-#include <iostream>
 #include <iomanip>
 
 

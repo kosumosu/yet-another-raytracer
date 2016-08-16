@@ -38,8 +38,8 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3
 							* color_real(math::oneOverPi)
 							/ color_real(lightSample.getPdf());
 
-						if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
-							throw std::exception();
+						//if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
+						//	throw std::exception();
 
 						radianceAtCurrentPathVertex += radianceByLight;
 					}

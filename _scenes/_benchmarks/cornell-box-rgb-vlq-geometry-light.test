@@ -1,14 +1,14 @@
 #Cornell box
-size 512 512
+size 1024 1024
 camera 278 273 -800 278 273 -799 0 1 0 39.3
 
-#crop 386 385 1 1
+#crop 383 367 1 1
 #crop 242 322 160 160
 
-maxdepth 16
+maxdepth 32
 background 0 0 0
 
-samples 16
+samples 4096
 #gi 1 false
 #point 275 275 275 1 1 1
 
