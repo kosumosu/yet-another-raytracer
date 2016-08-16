@@ -9,9 +9,6 @@
 
 class LightingContext;
 class RayEvaluator;
-class Flux;
-
-using flux_func = std::function<void(const Flux & flux)>;
 
 struct light_sample
 {
@@ -40,8 +37,6 @@ public:
 	LightSource(void) { }
 
 	virtual ~LightSource(void) { }
-
-	virtual void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const = 0;
 
 	virtual void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const distibution_func & job) const = 0;
 };

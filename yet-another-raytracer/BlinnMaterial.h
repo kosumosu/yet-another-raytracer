@@ -2,7 +2,6 @@
 
 #include "Material.h"
 #include "Types.h"
-#include "Flux.h"
 
 class BlinnMaterial : public Material
 {
@@ -55,9 +54,6 @@ public:
 	color_rgbx translucency() const { return _translucency; }
 	void translucency(const color_rgbx & value) { _translucency = value; }
 
-	color_rgbx Shade( const ShadingContext & context ) const override;
-	color_rgbx GetEmission(const ShadingContext & context) const override;
-	color_rgbx GetScattering(const ShadingContext & context) const override;
 	color_real GetEmissionImportance() const override;
 
 	Material * Clone() const override;
@@ -73,8 +69,6 @@ private:
 	color_real _shininess;
 	color_rgbx _translucency;
 
-	color_rgbx ComputeDiffuseComponent(const ShadingContext & context, const Flux & flux) const;
-	color_rgbx ComputeSpecularComponent(const ShadingContext & context, const Flux & flux) const;
 	color_real GetReflectionProbability() const;
 
 	color_rgbx EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const;

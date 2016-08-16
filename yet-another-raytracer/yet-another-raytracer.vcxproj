@@ -190,7 +190,6 @@
     <ClInclude Include="random_sample.hpp" />
     <ClInclude Include="RayIntegrator.h" />
     <ClInclude Include="ray_functions.hpp" />
-    <ClInclude Include="SimpleGILightSource.h" />
     <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="UniformRandomBitGenerator.h" />
     <ClInclude Include="vector.hpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="Film.h" />
     <ClInclude Include="BlinnMaterial.h" />
     <ClInclude Include="FlatTriangleObject.h" />
-    <ClInclude Include="Flux.h" />
     <ClInclude Include="GeometryObject.h" />
     <ClInclude Include="helper.hpp" />
     <ClInclude Include="Hit.h" />
@@ -216,7 +214,6 @@
     <ClInclude Include="KDTraverseFrame.h" />
     <ClInclude Include="KDTreeAccelerator.h" />
     <ClInclude Include="KDTreeMarcher.h" />
-    <ClInclude Include="LightingServer.h" />
     <ClInclude Include="LightSource.h" />
     <ClInclude Include="LightSourceCommandFactory.h" />
     <ClInclude Include="LightSourceCommandProcessor.h" />
@@ -236,13 +233,11 @@
     <ClInclude Include="random.hpp" />
     <ClInclude Include="ray.hpp" />
     <ClInclude Include="Raytracer.h" />
-    <ClInclude Include="RayEvaluator.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneLoader.h" />
     <ClInclude Include="SettingsCommandFactory.h" />
     <ClInclude Include="SettingsCommandProcessor.h" />
-    <ClInclude Include="ShadingContext.h" />
     <ClInclude Include="LoadingContext.h" />
     <ClInclude Include="SkyLightSource.h" />
     <ClInclude Include="sse_float_vector4.hpp" />
@@ -274,7 +269,6 @@
     <ClCompile Include="StdHigheResolutionClockStopwatch.cpp" />
     <ClCompile Include="KDTreeAccelerator.cpp" />
     <ClCompile Include="KDTreeMarcher.cpp" />
-    <ClCompile Include="LightingServer.cpp" />
     <ClCompile Include="LightSourceCommandFactory.cpp" />
     <ClCompile Include="LightSourceCommandProcessor.cpp" />
     <ClCompile Include="main.cpp" />
@@ -287,12 +281,10 @@
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PointLightSource.cpp" />
     <ClCompile Include="Raytracer.cpp" />
-    <ClCompile Include="RayEvaluator.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SceneLoader.cpp" />
     <ClCompile Include="SettingsCommandFactory.cpp" />
     <ClCompile Include="SettingsCommandProcessor.cpp" />
-    <ClCompile Include="SimpleGILightSource.cpp" />
     <ClCompile Include="SkyLightSource.cpp" />
     <ClCompile Include="SphereObject.cpp" />
     <ClCompile Include="stdafx.cpp">

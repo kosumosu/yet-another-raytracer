@@ -1,5 +1,4 @@
 #include "DielectricMaterial.h"
-#include "ShadingContext.h"
 #include <iomanip>
 
 
@@ -62,50 +61,6 @@ color_real FrDielectric(space_real cosThetaI, space_real etaI, space_real etaT)
 	return color_real((Rparl * Rparl + Rperp * Rperp) / space_real(2.0));
 }
 
-color_rgbx DielectricMaterial::Shade(const ShadingContext & context) const
-{
-	return DielectricMaterial::GetScattering(context);
-}
-
-color_rgbx DielectricMaterial::GetEmission(const ShadingContext & context) const
-{
-	return color_rgbx();
-}
-
-color_rgbx DielectricMaterial::GetScattering(const ShadingContext & context) const
-{
-	const auto cosTheta = -math::dot(context.incident_ray().direction(), context.normal());
-	const bool entering = cosTheta > space_real(0.0);
-
-	const space_real iorIn = entering ? _iorOutside : _iorInside;
-	const space_real iorOut = entering ? _iorInside : _iorOutside;
-
-	const auto reflectedDirection = context.incident_ray().direction() - context.normal() * (space_real(2.0) * math::dot(context.incident_ray().direction(), context.normal()));
-
-	const auto reflectance = color_real(0); // FrDielectric(cosTheta, iorIn, iorOut);
-	const auto transmission = color_real(1.0) - reflectance;
-
-	color_rgbx totalColor;
-	totalColor += reflectance * context.ray_evaluator()->TraceRay(ray3(context.world_space_hit_point(), reflectedDirection), context.trace_depth(), context.bias(), context.allow_subdivision(), true);
-
-
-	if (transmission > color_real(0.0))
-	{
-		vector3 refractedDirection;
-		space_real refractedCosTheta;
-		if (refract(context.incident_ray().direction(), context.normal(), iorIn / iorOut, refractedDirection, refractedCosTheta))
-		{
-			totalColor +=
-				_surfaceTransparency
-				* transmission
-				* color_real((iorIn * iorIn) / (iorOut * iorOut))
-				* context.ray_evaluator()->TraceRay(ray3(context.world_space_hit_point(), refractedDirection), context.trace_depth(), context.bias(), context.allow_subdivision(), true);
-		}
-	}
-
-	return totalColor;
-}
-
 color_real DielectricMaterial::GetEmissionImportance() const
 {
 	return color_real(0.0);
@@ -120,6 +75,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 {
 	job(bsdf_functional_distribution(
 		2U,
+		// iterate over delta components
 		[&](const bsdf_functional_distribution::delta_func & subJob)
 		{
 			const auto cosTheta = -math::dot(incidentDirection, normal);
@@ -163,6 +119,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 				}
 			}
 		},
+		// generate delta sample
 		[&]()
 		{
 			const auto cosTheta = -math::dot(incidentDirection, normal);

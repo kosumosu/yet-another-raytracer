@@ -13,7 +13,6 @@
 #include "DirectionalLightSource.h"
 #include "PointLightSource.h"
 #include "SkyLightSource.h"
-#include "SimpleGILightSource.h"
 
 #include "SceneLoader.h"
 
@@ -213,14 +212,6 @@ void InsertSkyLight(Scene & scene, unsigned int samples)
 	scene.lights().push_back(light_source);
 }
 
-void InsertGILight(Scene & scene, unsigned int samples, bool includeEmission)
-{
-	std::shared_ptr<SimpleGILightSource> light_source(new SimpleGILightSource(includeEmission, samples));
-
-	scene.lights().push_back(light_source);
-}
-
-
 void InitCamera(Scene & scene, unsigned int width, unsigned int height)
 {
 	scene.camera()->fovy(90.0);
@@ -296,9 +287,6 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 
 #if true
 	LoadFromFile(scene, scene_file);
-
-	//InsertGILight(scene, 128);
-	//InsertSkyLight(scene, 64);
 #else
 
 	std::mt19937 engine;
@@ -317,7 +305,6 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 	//InsertTriangle(scene);
 	InsertRandomTriangles(scene, 20, 1.0, engine);
 	//InsertSkyLight(scene, 128);
-	InsertGILight(scene, 512);
 #endif
 
 	std::unique_ptr<Stopwatch> timer(new ProcessTimeStopwatch());

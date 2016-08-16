@@ -18,7 +18,6 @@ std::vector<std::string> LightSourceCommandFactory::GetSupportedCommands() const
 	commands.push_back("directional");
 	commands.push_back("point");
 	commands.push_back("attenuation");
-	commands.push_back("gi");
 	commands.push_back("geometryLight");
 
 	return commands;

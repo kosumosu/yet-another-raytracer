@@ -69,12 +69,6 @@
     <ClInclude Include="GeometryObject.h">
       <Filter>Engine\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="LightingServer.h">
-      <Filter>Engine\Lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="Flux.h">
-      <Filter>Engine\Lighting</Filter>
-    </ClInclude>
     <ClInclude Include="Raytracer.h">
       <Filter>Engine\Raytracer</Filter>
     </ClInclude>
@@ -84,13 +78,7 @@
     <ClInclude Include="LightSource.h">
       <Filter>Engine\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="RayEvaluator.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadingContext.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="SphereObject.h">
@@ -255,9 +243,6 @@
     <ClInclude Include="ParserHelper.h">
       <Filter>Engine\Scene\Loading</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleGILightSource.h">
-      <Filter>Engine\Lighting</Filter>
-    </ClInclude>
     <ClInclude Include="DielectricMaterial.h">
       <Filter>Engine\Materials</Filter>
     </ClInclude>
@@ -322,9 +307,6 @@
     <ClCompile Include="Film.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="RayEvaluator.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="StdHigheResolutionClockStopwatch.cpp" />
     <ClCompile Include="ProcessTimeStopwatch.cpp" />
     <ClCompile Include="main.cpp" />
@@ -334,13 +316,7 @@
     <ClCompile Include="GeometryLightSource.cpp">
       <Filter>Engine\Lighting</Filter>
     </ClCompile>
-    <ClCompile Include="LightingServer.cpp">
-      <Filter>Engine\Lighting</Filter>
-    </ClCompile>
     <ClCompile Include="PointLightSource.cpp">
-      <Filter>Engine\Lighting</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleGILightSource.cpp">
       <Filter>Engine\Lighting</Filter>
     </ClCompile>
     <ClCompile Include="SkyLightSource.cpp">

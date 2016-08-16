@@ -19,7 +19,6 @@ public:
 	Attenuation attenuation() const { return m_attenuation; }
 	void attenuation(Attenuation val) { m_attenuation = val; }
 
-	void IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const override;
 	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const override;
 private:
 	vector3 m_position;

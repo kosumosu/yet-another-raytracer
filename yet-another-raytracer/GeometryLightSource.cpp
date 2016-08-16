@@ -1,9 +1,6 @@
 #include "GeometryLightSource.h"
 #include "Material.h"
 #include "LightingContext.h"
-#include "RayEvaluator.h"
-#include "Flux.h"
-#include "ShadingContext.h"
 
 using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
 
@@ -26,42 +23,6 @@ GeometryLightSource::GeometryLightSource(const ObjectCollection & objects, size_
 
 	_totalPower = totalPower;
 	_distribution = math::discrete_distribution<GeometryObject*, color_real>(std::begin(objectsWithWeights), std::end(objectsWithWeights));
-}
-
-void GeometryLightSource::IterateOverFluxes(const LightingContext & context, const RayEvaluator & rayEvaluator, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const flux_func & job) const
-{
-	size_t actualSampleCount = context.getAllowSubdivision() ? _sampleCount : 1;
-
-	std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
-	const auto randomFunc = [&]()
-	{
-		return color_real(distr(randomEngine));
-	};
-	for (size_t i = 0; i < actualSampleCount; ++i)
-	{
-		const auto objectSample = _distribution.GetRandomElement(randomFunc);
-		const auto pointSample = objectSample.getValue()->PickRandomPointOnSurface(randomEngine);
-
-		const auto pointToLight = pointSample.getValue().point - context.getPoint();
-		const auto direction = math::normalize(pointToLight);
-
-		const auto ray = ray3(context.getPoint(), direction);
-		const auto hit = rayEvaluator.raytracer()->TraceRay(ray, context.getBias(), math::length(pointToLight) * space_real(1.001), nullptr, vector3());
-
-		if (hit.has_occurred() && hit.object() == objectSample.getValue())
-		{
-			ShadingContext subContext;
-			subContext.normal(hit.normal());
-			subContext.object(hit.object());
-			subContext.incident_ray(ray);
-
-			const auto geometricFactor = std::max(color_real(0), color_real(-math::dot(hit.normal(), ray.direction())));
-			const auto irradiance = objectSample.getValue()->material()->GetEmission(subContext);
-
-			Flux flux(this, direction, irradiance, std::numeric_limits<space_real>::max(), objectSample.getPdf() * color_real(pointSample.getPdf() * actualSampleCount) * color_real(hit.distance() * hit.distance()) / geometricFactor);
-			job(flux);
-		}
-	}
 }
 
 void GeometryLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const

@@ -30,9 +30,6 @@ public:
 	void setIorOutside(space_real ior) { _iorOutside = ior; }
 	void setSurfaceTransparency(const color_rgbx & value) { _surfaceTransparency = value; }
 
-	color_rgbx Shade(const ShadingContext & context) const override;
-	color_rgbx GetEmission(const ShadingContext & context) const override;
-	color_rgbx GetScattering(const ShadingContext & context) const override;
 	color_real GetEmissionImportance() const override;
 
 	Material * Clone() const override;
