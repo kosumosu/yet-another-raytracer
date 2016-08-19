@@ -1,5 +1,5 @@
 #Cornell box
-size 512 512
+size 1024 1024
 camera 278 273 -800 278 273 -799 0 1 0 39.3
 
 #crop 383 367 1 1
@@ -8,7 +8,7 @@ camera 278 273 -800 278 273 -799 0 1 0 39.3
 maxdepth 32
 background 0 0 0
 
-samples 128
+samples 16384
 #point 275 275 275 1 1 1
 
 ambient 0 0 0

@@ -2,64 +2,51 @@
 
 #include <algorithm>
 
+#define ENABLE_TEMPLATE_LOOP false
+
 namespace math
 {
+#if ENABLE_TEMPLATE_LOOP
 	namespace details
 	{
-
-		template <int level>
-		struct tag { };
-
-		template <bool VALUE>
-		struct bool_tag { enum { value = VALUE }; };
-
-
-		template<int FROM, int TO>
-		struct index_iterator
-		{
-			enum { from = FROM, to = TO };
-
-			template<typename T>
-			static void iterate(const T & func)
-			{
-				iterate(tag<from>(), func);
-			}
-
-		private:
-			template<typename T, int INDEX>
-			static void iterate(tag<INDEX>, const T & func)
-			{
-				func(INDEX);
-				iterate(tag<INDEX + 1>(), func);
-			}
-
-			template<typename T>
-			static void iterate(tag<to>, const T & func)
-			{
-				func(TO);
-			}
-		};
-
 		template<int FROM, int TO, typename T>
-		void iterate(bool_tag<false>, const T & func)
+		std::enable_if_t<FROM == TO>
+			iterate_sfinae(const T & func)
 		{
-			// NOOP
+			func(FROM);
 		}
 
 		template<int FROM, int TO, typename T>
-		void iterate(bool_tag<true>, const T & func)
+		std::enable_if_t<(FROM > TO)>
+			iterate_sfinae(const T & func)
 		{
-			static_assert(FROM <= TO, "TO cannot be less than FROM!");
-			details::index_iterator<FROM, TO>::iterate(func);
+		}
+
+		template<int FROM, int TO, typename T>
+		std::enable_if_t<(FROM < TO)>
+			iterate_sfinae(const T & func)
+		{
+			func(FROM);
+			iterate_sfinae<FROM + 1, TO>(func);
 		}
 	}
 
-	// Implements static loop with templates
-	template<int FROM, int TO, typename T>
+	// Implements static loop with templates. It was faster at some moment.
+	template<int FIRST, int LAST, typename T>
 	void iterate(const T & func)
 	{
-		details::iterate<FROM, TO, T>(details::bool_tag<FROM <= TO>(), func);
+		details::iterate_sfinae<FIRST, LAST, T>(func);
 	}
+#else
+	template<int FIRST, int LAST, typename T>
+	void iterate(const T & func)
+	{
+		for (int i = FIRST; i <= LAST; ++i)
+		{
+			func(i);
+		}
+	}
+#endif
 
 	template <typename TArray, typename TFirst, typename ... TRest>
 	void setValues(TArray array[], const TFirst & first, const TRest & ... rest)

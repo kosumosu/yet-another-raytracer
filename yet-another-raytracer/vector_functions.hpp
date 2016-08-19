@@ -176,20 +176,20 @@ namespace math
 		return res;
 	}
 
-	template <typename T, size_t N, size_t ELEMENT>
+	template <typename T, size_t N, size_t ELEMENT_TO_EXCLUDE, class = std::enable_if_t<(ELEMENT_TO_EXCLUDE >= 0)>>
 	vector<T, N - 1> subvector( const vector<T, N> & vec)
 	{
 		static_assert(N > 1, "N must be greater then 1!");
-		static_assert(ELEMENT >= 0, "ELEMENT can't be negative!");
-		static_assert(ELEMENT < N, "ELEMENT must be less than N!");
+		static_assert(ELEMENT_TO_EXCLUDE >= 0, "ELEMENT_TO_EXCLUDE can't be negative!");
+		static_assert(ELEMENT_TO_EXCLUDE < N, "ELEMENT_TO_EXCLUDE must be less than N!");
 
 		vector<T, N - 1> res;
-		iterate<0, int(ELEMENT) - 1>([&](size_t i)
+		iterate<0, int(ELEMENT_TO_EXCLUDE) - 1>([&](size_t i)
 		{
 			res[i] = vec[i];
 		});
 
-		iterate<int(ELEMENT), int(N) - 2>([&](size_t i)
+		iterate<int(ELEMENT_TO_EXCLUDE), int(N) - 2>([&](size_t i)
 		{
 			res[i] = vec[i + 1];
 		});
