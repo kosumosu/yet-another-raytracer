@@ -13,8 +13,8 @@ namespace math
 	public:
 
 		bounding_box(void)
-			: m_min_corner()
-			, m_max_corner(TSpace(-1.0))
+			: m_min_corner(vector<TSpace, DIMENSIONS>::zero())
+			, m_max_corner(vector<TSpace, DIMENSIONS>::fill(-1))
 		{
 		}
 
@@ -143,8 +143,8 @@ namespace math
 		void ExtendForEpsilon()
 		{
 			const TSpace minimum_positive = std::numeric_limits<TSpace>::min();
-			m_min_corner -= math::max(math::abs(m_min_corner) * std::numeric_limits<TSpace>::epsilon(), vector<TSpace, DIMENSIONS>(minimum_positive));
-			m_max_corner += math::max(math::abs(m_max_corner) * std::numeric_limits<TSpace>::epsilon(), vector<TSpace, DIMENSIONS>(minimum_positive));
+			m_min_corner -= math::max(math::abs(m_min_corner) * std::numeric_limits<TSpace>::epsilon(), vector<TSpace, DIMENSIONS>::fill(minimum_positive));
+			m_max_corner += math::max(math::abs(m_max_corner) * std::numeric_limits<TSpace>::epsilon(), vector<TSpace, DIMENSIONS>::fill(minimum_positive));
 		}
 
 	private:

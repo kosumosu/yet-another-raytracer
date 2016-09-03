@@ -5,8 +5,8 @@
 using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
 
 DirectionalLightSource::DirectionalLightSource(void)
-	: m_direction(vector3())
-	  , m_color(color_rgbx()) {}
+	: m_direction(vector3::zero())
+	, m_color(color_rgbx::zero()) {}
 
 
 DirectionalLightSource::~DirectionalLightSource(void) {}

@@ -94,8 +94,8 @@ void SphereObject::PrepareForRendering()
 	auto translate = extractTranslate(transform());
 
 	bounding_box3 bbox;
-	bbox.min_corner((m_center + vector3(-m_radius)) * scale + translate);
-	bbox.max_corner((m_center + vector3(m_radius)) * scale + translate);
+	bbox.min_corner((m_center + vector3::fill(-m_radius)) * scale + translate);
+	bbox.max_corner((m_center + vector3::fill(m_radius)) * scale + translate);
 
 	bbox.ExtendForEpsilon();
 

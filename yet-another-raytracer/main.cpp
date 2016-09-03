@@ -1,7 +1,6 @@
 // 184-1x-hw3.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
 #include "Film.h"
 #include "Scene.h"
 #include "SphereObject.h"
@@ -20,6 +19,9 @@
 #include <iostream>
 #include <iomanip>
 #include <memory>
+#include <tchar.h>
+#define NOGDI
+#include <windows.h>
 
 
 void reportProgress(float progress)
@@ -30,22 +32,17 @@ void reportProgress(float progress)
 template <typename TRandomEngine>
 void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
-	color_rgbx zero4;
-	color_rgbx one4(1.0f);
-	vector3 one3(1.0f);
-	vector3 minus_one3(-1.0f);
-
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<BlinnMaterial> material(new BlinnMaterial());
-		material->diffuse(math::linearRand(zero4, one4, engine));
+		material->diffuse(math::linearRand(color_rgbx::zero(), color_rgbx::fill(1.0), engine));
 		//material->specular(math::linearRand(zero4, one4));
 		//material->shininess(math::linearRand(10.0f, 300.0f));
 		//material->emission(math::linearRand(zero4, one4 * 0.2f));
 
 		std::shared_ptr<SphereObject> object(new SphereObject());
 		object->radius(math::linearRand(space_real(0.1), space_real(1.0), engine));
-		object->center(math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0), engine));
+		object->center(math::linearRand(vector3::fill(-1.0) * space_real(2.0), vector3::fill(1.0) * space_real(2.0), engine));
 		object->material(material);
 
 		scene.objects().push_back(object);
@@ -61,7 +58,7 @@ void InsertSkyLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 	{
 		std::shared_ptr<DirectionalLightSource> light_source(new DirectionalLightSource());
 		light_source->direction(math::sphericalRand<space_real>(engine));
-		light_source->color(color_rgbx(intensity_per_light));
+		light_source->color(color_rgbx::fill(intensity_per_light));
 
 		scene.lights().push_back(light_source);
 	}
@@ -70,17 +67,14 @@ void InsertSkyLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 template <typename TRandomEngine>
 void InsertRandomPointLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
-	color_rgbx zero4;
-	vector3 one3(1.0f);
-	vector3 minus_one3(-1.0f);
 
 	color_real intensity_per_light = color_real(60.0) / count;
 
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<PointLightSource> light_source(new PointLightSource());
-		light_source->position(math::linearRand(minus_one3 * space_real(3.0), one3 * space_real(3.0), engine));
-		light_source->color(math::linearRand(zero4, color_rgbx(intensity_per_light), engine));
+		light_source->position(math::linearRand(vector3::fill(-1.0) * space_real(3.0), vector3::fill(1.0) * space_real(3.0), engine));
+		light_source->color(math::linearRand(color_rgbx::zero(), color_rgbx::fill(intensity_per_light), engine));
 
 		scene.lights().push_back(light_source);
 	}
@@ -156,23 +150,18 @@ void InsertTriangle(Scene & scene)
 template <typename TRandomEngine>
 void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real & size, TRandomEngine & engine)
 {
-	color_rgbx zero4;
-	color_rgbx one4(1.0);
-	vector3 one3(1.0);
-	vector3 minus_one3(-1.0);
-
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<BlinnMaterial> material(new BlinnMaterial());
-		material->diffuse(math::linearRand(zero4, one4, engine));
+		material->diffuse(math::linearRand(color_rgbx::zero(), color_rgbx::fill(1.0), engine));
 		//material->specular(math::linearRand(zero4, one4));
 		//material->shininess(math::linearRand(10.0, 300.0));
 		//material->emission(math::linearRand(zero4, one4 * 0.2));
 
-		const vector3 min_bound(minus_one3 * size);
-		const vector3 max_bound(one3 * size);
+		const vector3 min_bound = vector3::fill(-size);
+		const vector3 max_bound = vector3::fill(size);
 
-		auto pivot = math::linearRand(minus_one3 * space_real(2.0), one3 * space_real(2.0), engine);
+		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), engine);
 
 		std::shared_ptr<FlatTriangleObject> object(new FlatTriangleObject());
 		object->material(material);

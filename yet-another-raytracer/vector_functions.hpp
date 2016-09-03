@@ -1,8 +1,8 @@
 #pragma once
 
 #include "vector.hpp"
+#include "helper.hpp"
 #include <algorithm>
-
 
 namespace math
 {
@@ -101,7 +101,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> max( const vector<T, N> & one, const vector<T, N> & another)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = std::max(one[i], another[i]);
@@ -112,7 +112,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> min( const vector<T, N> & one, const vector<T, N> & another)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = std::min(one[i], another[i]);
@@ -143,15 +143,15 @@ namespace math
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> clamp( const vector<T, N> & vec, const vector<T, N> & low, const vector<T, N> & high)
+	vector<T, N> clamp(const vector<T, N> & vec, const vector<T, N> & low, const vector<T, N> & high)
 	{
 		return min(high, max(low, vec));
 	}
 
 	template <typename T, size_t N>
-	vector<T, N> abs( const vector<T, N> & one)
+	vector<T, N> abs(const vector<T, N> & one)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = std::abs(one[i]);
@@ -162,7 +162,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N - 1> subvector( const vector<T, N> & vec, size_t element)
 	{
-		vector<T, N - 1> res;
+		vector<T, N - 1> res = vector<T, N - 1>::zero();
 		for (size_t i = 0; i < element; i++)
 		{
 			res[i] = vec[i];
@@ -183,7 +183,7 @@ namespace math
 		static_assert(ELEMENT_TO_EXCLUDE >= 0, "ELEMENT_TO_EXCLUDE can't be negative!");
 		static_assert(ELEMENT_TO_EXCLUDE < N, "ELEMENT_TO_EXCLUDE must be less than N!");
 
-		vector<T, N - 1> res;
+		vector<T, N - 1> res = vector<T, N - 1>::zero();
 		iterate<0, int(ELEMENT_TO_EXCLUDE) - 1>([&](size_t i)
 		{
 			res[i] = vec[i];
@@ -200,8 +200,8 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> blend( const vector<T, N> & one, const vector<T, N> & another, const T & fraction)
 	{
-		T inv_fraction = T(1) - fraction;
-		vector<T, N> res;
+		const T inv_fraction = T(1) - fraction;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = one[i] * inv_fraction + another[i] * fraction;
@@ -212,7 +212,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> blend( const vector<T, N> & one, const vector<T, N> & another, const vector<T, N> & fractions)
 	{
-		auto inv_fraction = vector<T, N>(T(1)) - fractions;
+		const auto inv_fraction = vector<T, N>::fill(1) - fractions;
 		vector<T, N> res = one * inv_fraction + another * fractions;
 		return res;
 	}
@@ -220,7 +220,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> pow(const vector<T, N> & one, const T & power)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = std::pow(one[i], power);
@@ -231,7 +231,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> pow(const vector<T, N> & one, const vector<T, N> & another)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = std::pow(one[i], another[i]);

@@ -57,9 +57,7 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 	}
 	else if (command == "geometryLight")
 	{
-		const size_t samples = ParserHelper::ReadUInt(stream);
-
-		std::shared_ptr<GeometryLightSource> light(new GeometryLightSource(context.scene()->objects(), samples));
+		std::shared_ptr<GeometryLightSource> light(new GeometryLightSource(context.scene()->objects()));
 
 		context.scene()->lights().push_back(std::move(light));
 	}

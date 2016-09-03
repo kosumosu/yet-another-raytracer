@@ -6,6 +6,27 @@
 
 namespace math
 {
+	namespace details
+	{
+		template <std::size_t N, std::size_t... Indices>
+		struct my_make_index_sequence_struct {
+			using type = typename my_make_index_sequence_struct<N - 1, N - 1, Indices...>::type;
+		};
+
+		template <std::size_t... Indices>
+		struct my_make_index_sequence_struct<0, Indices...> {
+			using type = std::index_sequence<Indices...>;
+		};
+	}
+
+	// helper analog to std::make_index_sequence<N>. Used to workaround a bug with __make_integer_seq
+	template <std::size_t N>
+	using my_make_index_sequence = typename details::my_make_index_sequence_struct<N>::type;
+
+	// helper to unfold index pack into repeating T pack
+	template<size_t, typename T>
+	using get_type = T;
+
 #if ENABLE_TEMPLATE_LOOP
 	namespace details
 	{

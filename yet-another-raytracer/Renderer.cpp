@@ -20,11 +20,11 @@ Renderer::Renderer(const initialization_finished_callback & initializationFinish
 void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrator & rayIntegrator, math::UniformRandomBitGenerator<unsigned> & randomEngine, unsigned x, unsigned y) const
 {
 	const unsigned seed = x | (y << 16);
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::move(std::mt19937(seed)));
+	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::mt19937{ seed });
 
 	bool doJitter = scene.getSamplesPerPixel() > 1;
 	color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
-	color_rgbx averageColor;
+	color_rgbx averageColor = color_rgbx::zero();
 	vector2 pixelLeftBottomCoord(x, y);
 	vector2 sizeNormalizationFactor(1.0 / film.width(), 1.0 / film.height());
 
@@ -37,12 +37,12 @@ void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrato
 		averageColor += rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
 	}
 
-	*film.pixel_at(x, y) = averageColor;
+	film.setPixel(x, y, averageColor);
 }
 
 void Renderer::Render(Film & film, const Scene & scene) const
 {
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> randomEngine(std::move(std::mt19937()));
+	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> randomEngine(std::mt19937{});
 
 
 	PrepareObjects(scene.objects());

@@ -20,9 +20,8 @@ public:
 		, _cropHeight(0)
 		, _max_trace_depth(4)
 		, _camera(new Camera())
-		, _samplesPerPixel(1)
-	{
-	}
+		, _environmentColor(color_rgbx::zero())
+		, _samplesPerPixel(1) { }
 
 	~Scene(void)
 	{

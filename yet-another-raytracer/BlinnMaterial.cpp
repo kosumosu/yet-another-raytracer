@@ -49,7 +49,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 					bsdf_sample(direction,
 						[=]()
 						{
-							return _translucency * (color_rgbx(1.0) - _specular);
+							return _translucency * (color_rgbx::fill(1.0) - _specular);
 						}),
 						pdf * (1.0 - GetReflectionProbability()) * translucenceProbability,
 						false
@@ -61,7 +61,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 					bsdf_sample(direction,
 						[=]()
 						{
-							return diffuseColor * (color_rgbx(1.0) - _specular) * (color_rgbx(1.0) - _translucency);
+							return diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency);
 						}),
 						pdf * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability),
 						false
@@ -70,12 +70,12 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 		};
 
 	bsdf_functional_distribution::generate_sample_func generateDiffuseFunc =
-		diffuseColor == color_rgbx() || _specular == color_rgbx(1.0)
+		diffuseColor == color_rgbx::zero() || _specular == color_rgbx::fill(1.0)
 			? bsdf_functional_distribution::generate_sample_func(nullptr)
 			: generateDiffuseFuncImpl;
 
 	bsdf_functional_distribution::evaluate_pdf_func evaluateDiffusePdfFunc =
-		diffuseColor == color_rgbx() || _specular == color_rgbx(1.0)
+		diffuseColor == color_rgbx::zero() || _specular == color_rgbx::fill(1.0)
 			? bsdf_functional_distribution::evaluate_pdf_func(nullptr)
 			: [&](const vector3 & direction)
 			{
@@ -107,12 +107,12 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 		};
 
 	bsdf_functional_distribution::generate_sample_func generateReflectionFunc =
-		_specular == color_rgbx()
+		_specular == color_rgbx::zero()
 			? bsdf_functional_distribution::generate_sample_func(nullptr)
 			: generateReflectionFuncImpl;
 
 	bsdf_functional_distribution::iterate_over_delta_func iterateReflectionFunc =
-		_specular == color_rgbx()
+		_specular == color_rgbx::zero()
 			? bsdf_functional_distribution::iterate_over_delta_func(nullptr)
 			: [&](const bsdf_functional_distribution::delta_func & subJob)
 			{
@@ -120,7 +120,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			};
 
 	bsdf_functional_distribution::generate_sample_func generateSampleFunc =
-		_specular == color_rgbx() && diffuseColor == color_rgbx()
+		_specular == color_rgbx::zero() && diffuseColor == color_rgbx::zero()
 			? bsdf_functional_distribution::generate_sample_func(nullptr)
 			: [&]()
 			{
@@ -151,8 +151,8 @@ color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(const GeometryObject & obje
 {
 	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, incidentDirection, randomEngine);
 	return math::is_obtuse_angle(incidentDirection, normal)
-		? diffuseColor * (color_rgbx(1.0) - _specular) * (color_rgbx(1.0) - _translucency)
-		: (color_rgbx(1.0) - _specular) * _translucency;
+		? diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency)
+		: (color_rgbx::fill(1.0) - _specular) * _translucency;
 }
 
 Material * BlinnMaterial::Clone() const

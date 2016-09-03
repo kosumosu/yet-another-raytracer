@@ -10,8 +10,7 @@ public:
 	DielectricMaterial(void)
 		: _iorInside(1.5)
 		, _iorOutside(1.0)
-	{
-	}
+		, _surfaceTransparency(color_rgbx::fill(1)) { }
 
 	explicit DielectricMaterial(space_real iorInside, space_real iorOutside, const color_rgbx & surfaceTransparency)
 		: _iorInside(iorInside)

@@ -10,6 +10,7 @@ public:
 		: m_vertex0(vert0)
 		, m_vertex1(vert1)
 		, m_vertex2(vert2)
+		, m_normal(vector3::zero())
 	{
 		calculate_normal();
 	}

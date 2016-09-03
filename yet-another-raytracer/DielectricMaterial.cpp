@@ -94,7 +94,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 					reflectedDirection,
 					[&]()
 					{
-						return color_rgbx(reflectance / std::abs(color_real(cosTheta)));
+						return color_rgbx::fill(reflectance / std::abs(color_real(cosTheta)));
 					}
 				),
 				space_real(reflectance),
@@ -102,7 +102,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 
 			if (transmission > color_real(0.0))
 			{
-				vector3 refractedDirection;
+				vector3 refractedDirection = vector3::zero();
 				space_real refractedCosTheta;
 				if (refract(incidentDirection, normal, iorIn / iorOut, refractedDirection, refractedCosTheta))
 				{
@@ -145,7 +145,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 						reflectedDirection,
 						[=]()
 						{
-							return color_rgbx(reflectance / std::abs(color_real(cosTheta)));
+							return color_rgbx::fill(reflectance / std::abs(color_real(cosTheta)));
 						}),
 					space_real(reflectance),
 					true
@@ -153,7 +153,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			}
 			else
 			{
-				vector3 refractedDirection;
+				vector3 refractedDirection = vector3::zero();
 				space_real refractedCosTheta;
 				refract(incidentDirection, normal, iorFrom / iorTo, refractedDirection, refractedCosTheta);
 
@@ -173,10 +173,10 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 
 color_rgbx DielectricMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
-	return color_rgbx();
+	return color_rgbx::zero();
 }
 
 color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
-	return color_rgbx();
+	return color_rgbx::zero();
 }

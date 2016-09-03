@@ -13,7 +13,7 @@ namespace math
 	{
 		std::uniform_real_distribution<TValue> distr;
 
-		vector<TValue, N> rand;
+		vector<TValue, N> rand = vector<TValue, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			rand[i] = distr(engine);

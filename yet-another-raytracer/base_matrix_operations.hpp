@@ -2,6 +2,7 @@
 
 #include "base_matrix.hpp"
 #include "vector_operations.hpp"
+#include "helper.hpp"
 
 namespace math
 {
@@ -26,7 +27,7 @@ namespace math
 	template <typename T, size_t COLS, size_t ROWS>
 	base_matrix<T, COLS, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const T & scalar)
 	{
-		base_matrix<T, COLS, ROWS> res;
+		base_matrix<T, COLS, ROWS> res = base_matrix<T, COLS, ROWS>::identity();
 		iterate<0, ROWS - 1>([&](size_t i)
 		{
 			res[i] = one[i] * scalar;
@@ -50,7 +51,7 @@ namespace math
 	template <typename T, size_t COLS_ROWS_BOTH, size_t ROWS_ONE, size_t COLS_ANOTHER>
 	base_matrix<T, COLS_ANOTHER, ROWS_ONE> inline operator * (const base_matrix<T, COLS_ROWS_BOTH, ROWS_ONE> & one, const base_matrix<T, COLS_ANOTHER, COLS_ROWS_BOTH> & another)
 	{
-		base_matrix<T, COLS_ANOTHER, ROWS_ONE> res;
+		base_matrix<T, COLS_ANOTHER, ROWS_ONE> res = base_matrix<T, COLS_ANOTHER, ROWS_ONE>::identity();
 		for (size_t j = 0; j < ROWS_ONE; j++)
 		{
 			iterate<0, COLS_ANOTHER - 1>([&](size_t i)
@@ -64,7 +65,7 @@ namespace math
 	template <typename T, size_t COLS, size_t ROWS>
 	base_matrix<T, COLS, ROWS> inline operator +(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
-		base_matrix<T, COLS, ROWS> res;
+		base_matrix<T, COLS, ROWS> res = base_matrix<T, COLS, ROWS>::identity();
 		iterate<0, ROWS - 1>([&](size_t i)
 		{
 			res[i] = one[i] + another[i];
@@ -75,7 +76,7 @@ namespace math
 	template <typename T, size_t COLS, size_t ROWS>
 	base_matrix<T, COLS, ROWS> inline operator -(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
-		base_matrix<T, COLS, ROWS> res;
+		base_matrix<T, COLS, ROWS> res = base_matrix<T, COLS, ROWS>::identity();
 		iterate<0, ROWS - 1>([&](size_t i)
 		{
 			res[i] = one[i] - another[i];
@@ -87,10 +88,10 @@ namespace math
 	template <typename T, size_t COLS, size_t ROWS>
 	vector<T, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const vector<T, COLS> & another)
 	{
-		vector<T, ROWS> res;
+		vector<T, ROWS> res = vector<T, ROWS>::zero();
 		iterate<0, ROWS - 1>([&](size_t i)
 		{
-			res[i] = math::dot( one[i] , another );
+			res[i] = math::dot(one[i], another);
 		});
 		return res;
 	}

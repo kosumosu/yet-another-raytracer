@@ -4,7 +4,11 @@
 
 constexpr space_real EPSILON = std::numeric_limits<space_real>::min() * space_real(16.0);
 
-FlatTriangleObject::FlatTriangleObject(void) {}
+FlatTriangleObject::FlatTriangleObject(void)
+	: m_vertex0(vector3::zero())
+	, m_vertex1(vector3::zero())
+	, m_vertex2(vector3::zero())
+	, m_normal(vector3::zero()) {}
 
 
 FlatTriangleObject::~FlatTriangleObject(void) {}
@@ -121,7 +125,7 @@ void include_in_box_if_valid(bounding_box3 & refinedBox, const bounding_box3 & e
 template <unsigned int axis0, unsigned int axis1, unsigned int axis2>
 void refine_box_for_edge(bounding_box3 & refinedBox, const bounding_box3 & enclosingBox, const vector3 normal, space_real d, const vector3 & corner0, const vector3 & corner1)
 {
-	vector3 vec;
+	vector3 vec = vector3::zero();
 	vec[axis0] = corner0[axis0];
 	vec[axis1] = corner1[axis1];
 	vec[axis2] = find_intersection(normal[axis0], normal[axis1], normal[axis2], corner0[axis0], corner1[axis1], d);

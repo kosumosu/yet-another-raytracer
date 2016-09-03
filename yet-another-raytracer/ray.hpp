@@ -8,7 +8,11 @@ namespace math
 	class ray
 	{
 	public:
-		ray(void) { }
+		ray(void)
+			: m_origin(vector<TSpace, DIMENSIONS>::zero())
+			, m_direction(vector<TSpace, DIMENSIONS>::zero())
+			, m_inversed_direction(vector<TSpace, DIMENSIONS>::zero())
+		{ }
 
 		ray(const vector<TSpace, DIMENSIONS> & origin, const vector<TSpace, DIMENSIONS> & direction)
 			: m_origin(origin)
@@ -54,7 +58,7 @@ namespace math
 
 		ray(const vector<TSpace, DIMENSIONS> & origin, const vector<TSpace, DIMENSIONS> & direction, const vector<TSpace, DIMENSIONS> & inversedDirection)
 			: m_origin(origin)
-			  , m_direction(direction)
-			  , m_inversed_direction(inversedDirection) { }
+			, m_direction(direction)
+			, m_inversed_direction(inversedDirection) { }
 	};
 }

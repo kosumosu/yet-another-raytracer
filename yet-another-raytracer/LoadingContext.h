@@ -11,6 +11,7 @@ public:
 
 	LoadingContext(Scene * scene)
 		: m_scene(scene)
+		, m_transform(matrix4::identity())
 	{
 	}
 

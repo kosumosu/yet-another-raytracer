@@ -4,6 +4,9 @@
 
 namespace math
 {
+	template <typename T, size_t SIDE, size_t EXCLUDE_COL, size_t EXCLUDE_ROW>
+	T minor(const base_matrix<T, SIDE, SIDE> & mat);
+
 	template <typename T, size_t SIDE, size_t COLUMN, size_t COLUMNS_LEFT>
 	class determinant_iter
 	{
@@ -38,7 +41,7 @@ namespace math
 	};
 
 	template <typename T>
-	T inline determinant(const base_matrix<T, 1, 1> & mat)
+	T determinant(const base_matrix<T, 1, 1> & mat)
 	{
 		return mat[0][0];
 	}
@@ -57,15 +60,15 @@ namespace math
 	}
 
 	template <typename T, size_t SIDE>
-	T inline determinant(const base_matrix<T, SIDE, SIDE> & mat)
+	T determinant(const base_matrix<T, SIDE, SIDE> & mat)
 	{
 		return determinant_iter<T, SIDE, 0, SIDE - 1>::determinant(mat);
 	}
 
 	template <typename T, size_t COLS, size_t ROWS>
-	base_matrix<T, COLS - 1, ROWS - 1> inline submatrix(const base_matrix<T, COLS, ROWS> & mat, size_t column, size_t row)
+	base_matrix<T, COLS - 1, ROWS - 1> submatrix(const base_matrix<T, COLS, ROWS> & mat, size_t column, size_t row)
 	{
-		base_matrix<T, COLS - 1, ROWS - 1> res;
+		base_matrix<T, COLS - 1, ROWS - 1> res = base_matrix<T, COLS - 1, ROWS - 1>::identity();
 		for (size_t i = 0; i < row; i++)
 		{
 			res[i] = math::subvector(mat[i], column);
@@ -80,14 +83,14 @@ namespace math
 	}
 
 	template <typename T, size_t COLS, size_t ROWS, size_t EXCLUDE_COL, size_t EXCLUDE_ROW>
-	base_matrix<T, COLS - 1, ROWS - 1> inline submatrix(const base_matrix<T, COLS, ROWS> & mat)
+	base_matrix<T, COLS - 1, ROWS - 1> submatrix(const base_matrix<T, COLS, ROWS> & mat)
 	{
 		static_assert(EXCLUDE_COL >= 0, "EXCLUDE_COL can't be negative");
 		static_assert(EXCLUDE_ROW >= 0, "EXCLUDE_ROW can't be negative");
 		static_assert(EXCLUDE_COL < COLS, "EXCLUDE_COL must be less than COLS");
 		static_assert(EXCLUDE_ROW < ROWS, "EXCLUDE_ROW must be less than ROWS");
 
-		base_matrix<T, COLS - 1, ROWS - 1> res;
+		base_matrix<T, COLS - 1, ROWS - 1> res = base_matrix<T, COLS - 1, ROWS - 1>::identity();
 		for (size_t i = 0; i < EXCLUDE_ROW; i++)
 		{
 			res[i] = math::subvector<T, COLS, EXCLUDE_COL>(mat[i]);
@@ -102,13 +105,13 @@ namespace math
 	}
 
 	template <typename T, size_t SIDE>
-	T inline minor(const base_matrix<T, SIDE, SIDE> & mat, size_t column, size_t row)
+	T minor(const base_matrix<T, SIDE, SIDE> & mat, size_t column, size_t row)
 	{
 		return math::determinant(submatrix(mat, column, row));
 	}
 
 	template <typename T, size_t SIDE, size_t EXCLUDE_COL, size_t EXCLUDE_ROW>
-	T inline minor(const base_matrix<T, SIDE, SIDE> & mat)
+	T minor(const base_matrix<T, SIDE, SIDE> & mat)
 	{
 		static_assert(EXCLUDE_COL >= 0, "EXCLUDE_COL can't be negative");
 		static_assert(EXCLUDE_ROW >= 0, "EXCLUDE_ROW can't be negative");
@@ -119,9 +122,9 @@ namespace math
 	}
 
 	template <typename T, size_t SIDE>
-	base_matrix<T, SIDE, SIDE> inline inverse(const base_matrix<T, SIDE, SIDE> & mat)
+	base_matrix<T, SIDE, SIDE> inverse(const base_matrix<T, SIDE, SIDE> & mat)
 	{
-		base_matrix<T, SIDE, SIDE> res;
+		base_matrix<T, SIDE, SIDE> res = base_matrix<T, SIDE, SIDE>::identity();
 
 		T row_sign = T(1);
 		for (size_t j = 0; j < SIDE; j++, row_sign = -row_sign)
@@ -137,9 +140,9 @@ namespace math
 	}
 
 	template <typename T, size_t COLS, size_t ROWS>
-	base_matrix<T, ROWS, COLS> inline transpose(const base_matrix<T, COLS, ROWS> & mat)
+	base_matrix<T, ROWS, COLS> transpose(const base_matrix<T, COLS, ROWS> & mat)
 	{
-		base_matrix<T, ROWS, COLS> res;
+		base_matrix<T, ROWS, COLS> res = base_matrix<T, ROWS, COLS>::identity();
 		for (size_t j = 0; j < ROWS; j++)
 		{
 			for (size_t i = 0; i < COLS; i++)
@@ -152,7 +155,7 @@ namespace math
 	}
 
 	template <typename T, size_t SIDE>
-	base_matrix<T, SIDE, SIDE> inline inverse_transpose(const base_matrix<T, SIDE, SIDE> & mat)
+	base_matrix<T, SIDE, SIDE> inverse_transpose(const base_matrix<T, SIDE, SIDE> & mat)
 	{
 		base_matrix<T, SIDE, SIDE> res;
 
@@ -174,7 +177,7 @@ namespace math
 	template <typename T, size_t COLS, size_t ROWS>
 	inline vector<T, ROWS> extractBoundsScale(const base_matrix<T, COLS, ROWS> & matrix)
 	{
-		vector<T, ROWS> scale;
+		vector<T, ROWS> scale = vector<T, ROWS>::zero();
 		for (int i = 0; i < ROWS; i++)
 		{
 			scale[i] = length(matrix[i].reduce());

@@ -197,4 +197,4 @@ maxverts 100
 	#surfaceTransparency 0 0 0 
 	sphere 370 40 100 40
 	
-geometryLight 1
+geometryLight

@@ -1,6 +1,5 @@
 #pragma once
 #include "Stopwatch.h"
-#include "Windows.h"
 
 
 class ProcessTimeStopwatch : public Stopwatch

@@ -1,5 +1,8 @@
 #include "ProcessTimeStopwatch.h"
 
+#define NOGDI
+#include "Windows.h"
+
 unsigned long long FromFileTime(const FILETIME & fileTime)
 {
 	ULARGE_INTEGER largeInteger;

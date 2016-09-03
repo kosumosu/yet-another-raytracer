@@ -14,7 +14,7 @@ TransformCommandProcessor::~TransformCommandProcessor(void)
 
 void TransformCommandProcessor::PrepareContext( LoadingContext & context )
 {
-	context.transform(matrix4());
+	context.transform(matrix4::identity());
 }
 
 void TransformCommandProcessor::ProcessCommand( LoadingContext & context, const std::string & command, std::istream & stream )

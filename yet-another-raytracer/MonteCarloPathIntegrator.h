@@ -4,7 +4,6 @@
 
 #include <functional>
 #include "Material.h"
-#include "base_matrix4x4.hpp"
 
 class Hit;
 class GeometryObject;

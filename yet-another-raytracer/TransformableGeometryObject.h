@@ -9,10 +9,16 @@ class TransfromableGeometryObject : public GeometryObject
 public:
 	
 
-	TransfromableGeometryObject() { }
+	TransfromableGeometryObject()
+		: m_transform(matrix4::identity())
+		, m_normals_transform(matrix4::identity())
+		, m_inverse_transform(matrix4::identity())
+	{ }
 
 	TransfromableGeometryObject(const matrix4 & transform)
 		: m_transform(transform)
+		, m_normals_transform(math::transpose(math::inverse(transform)))
+		, m_inverse_transform(math::inverse(transform))
 	{
 	}
 

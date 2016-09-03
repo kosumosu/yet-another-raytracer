@@ -4,8 +4,7 @@
 
 using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
 
-GeometryLightSource::GeometryLightSource(const ObjectCollection & objects, size_t sampleCount)
-	: _sampleCount(sampleCount)
+GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 {
 	std::vector<std::pair<GeometryObject*, color_real>> objectsWithWeights;
 

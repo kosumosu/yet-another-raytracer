@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "Types.h"
 #include "discrete_distribution.hpp"
 
@@ -8,6 +6,7 @@
 
 #include <iostream>
 #include <map>
+#include <tchar.h>
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -37,43 +36,25 @@ bool TestFloatVectorDotProduct()
 	glm::vec3 _vec2(4, 5, 6);
 
 	auto result = math::dot(vec1, vec2);
-	
+
 	auto expected = glm::dot(_vec1, _vec2);
 
 	return result == expected;
 }
 
-
 __declspec(noinline)
 bool TestMatMatMult()
 {
-	math::base_matrix<float, 3, 2> mat1;
-	mat1[0][0] = 2.0f;
-	mat1[0][1] = 1.0f;
-	mat1[0][2] = 3.0f;
+	//const std::tuple<math::vector<float, 2>, math::vector<float, 2>> a = { {1, 2.0f}, {3, 4.0f} };
+	//const math::base_matrix<float, 3, 2> mat0 = { {2.0f, 1.0f, 3.0f},  { 6.0f, 4.0f, 5.0f } };
+	const math::base_matrix<float, 3, 2> mat1{ math::vector<float, 3> {2.0f, 1.0f, 3.0f},  math::vector<float, 3> { 6.0f, 4.0f, 5.0f } };
 
-	mat1[1][0] = 6.0f;
-	mat1[1][1] = 4.0f;
-	mat1[1][2] = 5.0f;
+	const math::base_matrix<float, 2, 3> mat2{ math::vector<float, 2> { 3, 1 }, math::vector<float, 2> {1, 2}, math::vector<float, 2> {5, 3} };
 
-	math::base_matrix<float, 2, 3> mat2;
-	mat2[0][0] = 3.0f;
-	mat2[0][1] = 1.0f;
+	const auto res = mat1 * mat2;
 
-	mat2[1][0] = 1.0f;
-	mat2[1][1] = 2.0f;
+	const math::base_matrix<float, 2, 2> mat3{ math::vector<float, 2> {22, 13}, math::vector<float, 2> { 47, 29 } };
 
-	mat2[2][0] = 5.0f;
-	mat2[2][1] = 3.0f;
-
-	auto res = mat1 * mat2;
-
-	math::base_matrix<float, 2, 2> mat3;
-	mat3[0][0] = 22.0f;
-	mat3[0][1] = 13.0f;
-
-	mat3[1][0] = 47.0f;
-	mat3[1][1] = 29.0f;
 
 	return res == mat3;
 }
@@ -81,7 +62,7 @@ bool TestMatMatMult()
 __declspec(noinline)
 bool TestMatInverse()
 {
-	math::base_matrix<float, 3, 3> mat;
+	math::base_matrix<float, 3, 3> mat = math::base_matrix<float, 3, 3>::identity();
 	mat[0][0] = -2.0f;
 	mat[0][1] = 2.0f;
 	mat[0][2] = 3.0f;
@@ -98,7 +79,7 @@ bool TestMatInverse()
 
 	auto ident = mat * inversed;
 
-	return ident == math::base_matrix<float, 3, 3>();
+	return ident == math::base_matrix<float, 3, 3>::identity();
 }
 
 __declspec(noinline)
@@ -163,12 +144,12 @@ bool TestDiscreteDistribution()
 
 	for (size_t i = 0; i < iterationCount; i++)
 	{
-		auto sample = distribution.GetRandomElement([&]() { return distr(engine); });
-		bool isOkItem = std::abs(sample.getPdf() - items.at(sample.getValue())) < items.at(sample.getValue()) * allowedPdfError;
+		const auto sample = distribution.GetRandomElement([&]() { return distr(engine); });
+		const bool isOkItem = std::abs(sample.getPdf() - items.at(sample.getValue())) < items.at(sample.getValue()) * allowedPdfError;
 		allOk = allOk && isOkItem;
 		if (!isOkItem)
 		{
-			int asdf = 666; // put breakpoint here
+			//int asdf = 666; // put breakpoint here
 		}
 
 		bins[sample.getValue()]++;
@@ -176,13 +157,42 @@ bool TestDiscreteDistribution()
 
 	for (const auto & bin : bins)
 	{
-		float ratio = (bin.second / float(iterationCount)) / items.at(bin.first);
+		const float ratio = (bin.second / float(iterationCount)) / items.at(bin.first);
 
-		bool isOk = ratio > 0.9f && ratio < 1.1f;
+		const bool isOk = ratio > 0.9f && ratio < 1.1f;
 		allOk = allOk && isOk;
 	}
 
 	return allOk;
+}
+
+__declspec(noinline)
+bool TestConstexprVector()
+{
+	constexpr float arr[] = { 1.0f, 1.0f, 1.0f };
+	constexpr math::vector<float, 3> zeroVec = math::vector<float, 3>::zero();
+	constexpr math::vector<float, 3> vec1(arr);
+	constexpr math::vector<float, 3> vec2 = vector3::fill(2.0f);
+
+	constexpr bool isCorrect =
+		zeroVec[0] == 0.0f && zeroVec[1] == 0.0f && zeroVec[2] == 0.0f
+		&& vec1[0] == 1.0f && vec1[1] == 1.0f && vec1[2] == 1.0f
+		&& vec2[0] == 2.0f && vec2[1] == 2.0f && vec2[2] == 2.0f;
+
+	return isCorrect;
+}
+
+__declspec(noinline)
+bool TestConstexprMatrix()
+{
+	constexpr math::base_matrix<float, 3, 2> mat1{ math::vector<float, 3>{2.0f, 1.0f, 3.0f}, math::vector<float, 3>{ 6.0f, 4.0f, 5.0f } };
+
+	constexpr bool isCorrect =
+		mat1[0][0] == 2.0f && mat1[0][1] == 1.0f && mat1[0][2] == 3.0f
+		&& mat1[1][0] == 6.0f && mat1[1][1] == 4.0f && mat1[1][2] == 5.0f
+		;
+
+	return isCorrect;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -191,6 +201,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	std::cout << "vec linearRand\t\t" << (TestFloatVectorLinearRand() ? "ok" : "failed") << std::endl;
 	std::cout << "vec dot\t\t\t" << (TestFloatVectorDotProduct() ? "ok" : "failed") << std::endl;
+	std::cout << "vec constexpr\t\t" << (TestConstexprVector() ? "ok" : "failed") << std::endl;
 
 	std::cout << std::endl;
 
@@ -199,6 +210,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::cout << "mat translate\t\t" << (TestMatTranslate() ? "ok" : "failed") << std::endl;
 	std::cout << "mat scale\t\t" << (TestMatScale() ? "ok" : "failed") << std::endl;
 	std::cout << "mat rotate\t\t" << (TestMatRotate() ? "ok" : "failed") << std::endl;
+	std::cout << "mat constexpr\t\t" << (TestConstexprMatrix() ? "ok" : "failed") << std::endl;
+
 	std::cout << "discrete_distribution \t" << (TestDiscreteDistribution() ? "ok" : "failed") << std::endl;
 
 	std::cin.clear();

@@ -9,9 +9,11 @@ public:
 	
 
 	BlinnMaterial(void)
-		: _shininess(1.0f)
-	{
-	}
+		: _emission(color_rgbx::zero())
+		, _diffuse(color_rgbx::zero())
+		, _specular(color_rgbx::zero())
+		, _shininess(1.0f)
+		, _translucency(color_rgbx::zero()) { }
 
 	BlinnMaterial(const color_rgbx & emission, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess, const color_rgbx & translucency)
 		: _emission(emission)

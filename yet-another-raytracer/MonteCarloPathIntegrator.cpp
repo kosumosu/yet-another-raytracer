@@ -14,7 +14,7 @@ constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_r
 
 color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3 & currentRay, const Hit & hit, bool entering, const bsdf_distribution & bsdfDistribution, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
-	color_rgbx radianceAtCurrentPathVertex(0);
+	color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
 	const LightingContext context(hit.point(), hit.normal(), BIAS, 1, false);
 	
 	for (const auto & light : _lights)
@@ -52,8 +52,8 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3
 
 color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned bounceLimit, space_real bias, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
-	color_rgbx integral(0);
-	color_rgbx throughput(1);
+	color_rgbx integral(color_rgbx::zero());
+	color_rgbx throughput(color_rgbx::fill(1));
 
 	ray3 currentRay = ray;
 	bool accountForEmission = true;
@@ -69,7 +69,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 				            [&](const bsdf_distribution & bsdfDistribution)
 				            {
 								const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
-					            color_rgbx radianceAtCurrentPathVertex(0);
+					            color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
 
 					            if (bsdfDistribution.has_non_delta_component())
 						            radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
@@ -155,7 +155,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 				            [&](const bsdf_distribution & bsdfDistribution)
 				            {
 								const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
-					            color_rgbx radianceAtCurrentPathVertex(0);
+					            color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
 					            if (bsdfDistribution.has_non_delta_component())
 						            radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
 

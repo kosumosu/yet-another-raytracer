@@ -8,14 +8,9 @@ public:
 	Film(unsigned int width, unsigned int height)
 		: m_width(width)
 		, m_height(height)
-		, m_pixels(new color_rgbx[width * height])
+		, m_pixels(width * height, color_rgbx::zero())
 	{
 
-	}
-
-	~Film(void)
-	{
-		delete[] m_pixels;
 	}
 
 	unsigned int width() const { return m_width; }
@@ -24,15 +19,10 @@ public:
 	unsigned int height() const { return m_height; }
 	void height(unsigned int val) { m_height = val; }
 
-	// Returns pointer to pixel buffer
-	color_rgbx * pixels() const { return m_pixels; }
+	const std::vector<color_rgbx> & pixels() const { return m_pixels; }
 
-	// Returns pointer to the beginning of the line_num-th line.
-	color_rgbx * line_at(unsigned int line_num) const { return m_pixels + m_width * line_num; }
-
-	// Returns pointer to the (x, y) pixel.
-	color_rgbx * pixel_at(unsigned int x, unsigned int y) const { return line_at(y) + x; }
-
+	const color_rgbx & getPixel(unsigned int x, unsigned int y) const { return m_pixels[y * m_width + x]; }
+	void setPixel(unsigned int x, unsigned int y, const color_rgbx & value) { m_pixels[y * m_width + x] = value; }
 
 	void SaveAsPng(const std::wstring & filename);
 
@@ -40,7 +30,7 @@ private:
 	unsigned int m_width;
 	unsigned int m_height;
 
-	color_rgbx * m_pixels;
+	std::vector<color_rgbx> m_pixels;
 
 };
 

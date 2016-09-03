@@ -5,9 +5,7 @@
 #include "ParserHelper.h"
 #include <typeinfo>
 
-MaterialCommandProcessor::MaterialCommandProcessor(void)
-{
-}
+MaterialCommandProcessor::MaterialCommandProcessor(void): m_last_ambient(color_rgbx::zero()) {}
 
 
 MaterialCommandProcessor::~MaterialCommandProcessor(void)
@@ -18,9 +16,9 @@ void MaterialCommandProcessor::PrepareContext(LoadingContext & context)
 {
 	// TODO: fix memory leak
 	m_blinnMaterial = std::make_shared<BlinnMaterial>();
-	m_dielectricMaterial = std::shared_ptr<DielectricMaterial>(new DielectricMaterial(1.5, 1.0, color_rgbx(1.0)));
+	m_dielectricMaterial = std::shared_ptr<DielectricMaterial>(new DielectricMaterial(1.5, 1.0, color_rgbx::fill(1.0)));
 
-	m_last_ambient = color_rgbx(0.2f);
+	m_last_ambient = color_rgbx::fill(0.2f);
 	m_blinnMaterial->emission(m_last_ambient);
 
 

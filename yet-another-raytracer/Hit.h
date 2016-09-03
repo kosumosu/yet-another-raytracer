@@ -23,9 +23,9 @@ public:
 	Hit()
 		: m_object(nullptr)
 		, m_has_occurred(false)
-		, m_distance(0) {
-
-	}
+		, m_point(vector3::zero())
+		, m_normal(vector3::zero())
+		, m_distance(0) { }
 
 	const GeometryObject * object() const { return m_object; }
 

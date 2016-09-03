@@ -43,7 +43,7 @@ namespace math
 		}
 
 		template <typename TGenerator>
-		random_sample<TElement, TPdf> GetRandomElement(TGenerator & rng) const
+		random_sample<TElement, TPdf> GetRandomElement(TGenerator && rng) const
 		{
 			TWeight randomValue = rng() * _weightSum;
 			auto weightIterator = std::lower_bound(std::begin(_cdf), std::end(_cdf), randomValue);

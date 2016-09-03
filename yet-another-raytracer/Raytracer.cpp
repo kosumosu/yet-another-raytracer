@@ -12,7 +12,7 @@ Raytracer::~Raytracer(void)
 
 Hit Raytracer::TraceRay(const ray3 & ray, space_real bias) const
 {
-	return TraceRay(ray, bias, std::numeric_limits<space_real>::max(), nullptr, vector3());
+	return TraceRay(ray, bias, std::numeric_limits<space_real>::max(), nullptr, vector3::zero());
 }
 
 Hit Raytracer::TraceRay(const ray3 & ray, space_real minDistance, space_real maxDistance, const GeometryObject * objectToIgnore, const vector3 & directionToIgnore) const

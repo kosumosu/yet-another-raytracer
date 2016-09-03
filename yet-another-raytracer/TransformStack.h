@@ -15,7 +15,7 @@ public:
 	TransformStack(void)
 	{
 		// pushing Identity.
-		m_stack.push(matrix4());
+		m_stack.push(matrix4::identity());
 	}
 
 	~TransformStack(void)

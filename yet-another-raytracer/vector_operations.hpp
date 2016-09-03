@@ -5,6 +5,7 @@
 #undef min
 
 #include "vector.hpp"
+#include "helper.hpp"
 #include <algorithm>
 
 
@@ -30,7 +31,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> operator +( const vector<T, N> & one, const vector<T, N> & another)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = one[i] + another[i];
@@ -51,7 +52,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> operator -( const vector<T, N> & one, const vector<T, N> & another)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = one[i] - another[i];
@@ -72,7 +73,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> operator -( const vector<T, N> & one)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = -one[i];
@@ -83,7 +84,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> operator *( const vector<T, N> & one, const vector<T, N> & another)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = one[i] * another[i];
@@ -104,7 +105,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> operator *( const vector<T, N> & one, const T & scalar)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = one[i] * scalar;
@@ -131,7 +132,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> operator /( const vector<T, N> & one, const vector<T, N> & another)
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = one[i] / another[i];
@@ -143,7 +144,7 @@ namespace math
 	vector<T, N> operator /( const vector<T, N> & one, const T & scalar)
 	{
 		T recipr = T(1) / scalar;
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = one[i] * recipr;
@@ -154,7 +155,7 @@ namespace math
 	template <typename T, size_t N>
 	vector<T, N> operator /( const T & scalar, const vector<T, N> & another )
 	{
-		vector<T, N> res;
+		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](size_t i)
 		{
 			res[i] = scalar / another[i];

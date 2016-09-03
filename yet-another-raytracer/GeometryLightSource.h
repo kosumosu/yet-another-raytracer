@@ -10,12 +10,11 @@ class GeometryObject;
 class GeometryLightSource : public LightSource
 {
 public:
-	GeometryLightSource(const ObjectCollection & objects, size_t sampleCount);
+	GeometryLightSource(const ObjectCollection & objects);
 
 	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const override;
 private:
 	math::discrete_distribution<GeometryObject *, color_real> _distribution;
 	std::vector<GeometryObject *> _objects;
-	size_t _sampleCount;
 	color_real _totalPower;
 };
