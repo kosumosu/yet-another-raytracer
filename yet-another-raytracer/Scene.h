@@ -38,7 +38,7 @@ public:
 	void max_trace_depth(unsigned int val) { _max_trace_depth = val; }
 
 	const std::string & output_filename() const { return _output_filename; }
-	void output_filename(const std::string &  val) { _output_filename = val; }
+	void output_filename(const std::string & val) { _output_filename = val; }
 
 	const std::shared_ptr<Camera> & camera() const { return _camera; }
 	void camera(const std::shared_ptr<Camera> & value) { _camera = value; }

@@ -6,8 +6,9 @@
 #include "ParserHelper.h"
 #include "Types.h"
 
+
 LightSourceCommandProcessor::LightSourceCommandProcessor(void)
-	: m_attenuation(0.0f, 0.0f, 1.0f)
+	: m_attenuation(1.0f, 0.0f, 0.0f)
 {
 }
 

@@ -147,12 +147,10 @@ bool TestDiscreteDistribution()
 		const auto sample = distribution.GetRandomElement([&]() { return distr(engine); });
 		const bool isOkItem = std::abs(sample.getPdf() - items.at(sample.getValue())) < items.at(sample.getValue()) * allowedPdfError;
 		allOk = allOk && isOkItem;
-		if (!isOkItem)
-		{
-			//int asdf = 666; // put breakpoint here
-		}
+
 
 		bins[sample.getValue()]++;
+		auto asd = bins.at(sample.getValue());
 	}
 
 	for (const auto & bin : bins)
@@ -172,7 +170,7 @@ bool TestConstexprVector()
 	constexpr float arr[] = { 1.0f, 1.0f, 1.0f };
 	constexpr math::vector<float, 3> zeroVec = math::vector<float, 3>::zero();
 	constexpr math::vector<float, 3> vec1(arr);
-	constexpr math::vector<float, 3> vec2 = vector3::fill(2.0f);
+	constexpr math::vector<float, 3> vec2 = math::vector<float, 3>::fill(2.0f);
 
 	constexpr bool isCorrect =
 		zeroVec[0] == 0.0f && zeroVec[1] == 0.0f && zeroVec[2] == 0.0f

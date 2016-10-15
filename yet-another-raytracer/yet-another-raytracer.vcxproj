@@ -35,7 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>LLVM-vs2014</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -75,23 +75,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>
     </LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\Release Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\x64\Release Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\Release Library;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\_PROGRAMMING\_libraries\lpng159;D:\_PROGRAMMING\_libraries\png++-0.2.5;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\_PROGRAMMING\_libraries\lpng159\projects\vstudio\x64\Release Library;$(LibraryPath)</LibraryPath>
     <EnableExperimentalCppCoreCheck>true</EnableExperimentalCppCoreCheck>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -168,6 +160,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <MSCompilerVersion>1900</MSCompilerVersion>
+      <StrictAliasing>true</StrictAliasing>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -13,8 +13,8 @@ namespace math
 		constexpr static size_t rows() { return ROWS; }
 
 		constexpr static base_matrix<T, COLS, ROWS> uniform_scale(const T & scale) { return generate_matrix(scale, std::make_index_sequence<ROWS>()); }
-		constexpr static base_matrix<T, COLS, ROWS> identity() { return uniform_scale(T(1)); }
-		constexpr static base_matrix<T, COLS, ROWS> zero() { return uniform_scale(T(0)); }
+		constexpr static base_matrix<T, COLS, ROWS> identity() { return uniform_scale(1); }
+		constexpr static base_matrix<T, COLS, ROWS> zero() { return uniform_scale(0); }
 
 
 		// Constructs identity matrix
