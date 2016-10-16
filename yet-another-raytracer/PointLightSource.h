@@ -7,7 +7,7 @@
 class PointLightSource : public LightSource
 {
 public:
-	PointLightSource(void);
+	PointLightSource();
 	~PointLightSource(void);
 
 	const vector3 & position() const { return m_position; }

@@ -8,25 +8,27 @@
 
 #if defined (DOUBLE_PRECISION)
 
-typedef double space_real;
+using space_real = double;
 
 #else
 
-typedef float space_real;
+using space_real = float;
 
 #endif
 
-typedef math::vector<space_real, 2> vector2;
-typedef math::vector<space_real, 3> vector3;
-typedef math::vector<space_real, 4> vector4;
-typedef math::base_matrix<space_real, 4, 4> matrix4;
-typedef math::ray<space_real, 3> ray3;
-typedef math::bounding_box<space_real, 3> bounding_box3;
+using vector2 = math::vector<space_real, 2>;
+using vector3 = math::vector<space_real, 3>;
+using vector4 = math::vector<space_real, 4>;
+using matrix4 = math::base_matrix<space_real, 4, 4>;
+using ray3 = math::ray<space_real, 3>;
+using bounding_box3 = math::bounding_box<space_real, 3>;
 
-typedef float color_real;
-typedef math::vector<color_real, 3> color_rgb;
-typedef math::vector<color_real, 4> color_rgbx;
+using color_real = float;
+using color_rgb = math::vector<color_real, 3>;
+using color_rgbx = math::vector<color_real, 4>;
 
+constexpr size_t UVS_COUNT = 1;
+using uvs_t = std::array<vector2, UVS_COUNT>;
 
 // to workaround upper bound issue with STL PRNG
 template <typename T>

@@ -82,18 +82,19 @@ void InsertRandomPointLights(Scene & scene, unsigned int count, TRandomEngine & 
 
 void InsertTwoSpheres(Scene & scene)
 {
-	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial());
-	material1->diffuse(color_rgbx(0.75f, 0.3f, 0.0f, 1.0f));
-	material1->specular(color_rgbx(0.6f, 0.6f, 0.6f, 1.0f));
-	material1->shininess(200.0f);
-	material1->emission(color_rgbx(0.1f, 0.05f, 0.15f, 1.0f));
+	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial{color_rgbx(0.1f, 0.05f, 0.15f, 1.0f), nullptr, color_rgbx(0.75f, 0.3f, 0.0f, 1.0f), color_rgbx(0.6f, 0.6f, 0.6f, 1.0f), 200.0f, color_rgbx::zero() });
+
+	scene.getMaterials().insert(std::make_pair("InsertTwoSpheres()::material1", material1));
 
 	std::shared_ptr<SphereObject> object1(new SphereObject());
 	object1->radius(1.0f);
 	object1->center(vector3(0.0f, -0.9f, 0.0f));
-	object1->material(material1);
+	object1->material(material1.get());
 
 	std::shared_ptr<BlinnMaterial> material2(new BlinnMaterial());
+
+	scene.getMaterials().insert(std::make_pair("InsertTwoSpheres()::material2", material2));
+
 	material2->diffuse(color_rgbx(0.3f, 0.75f, 0.0f, 1.0f));
 	material2->specular(color_rgbx(0.6f, 0.6f, 0.6f, 1.0f));
 	material2->shininess(200.0f);
@@ -102,7 +103,7 @@ void InsertTwoSpheres(Scene & scene)
 	std::shared_ptr<SphereObject> object2(new SphereObject());
 	object2->radius(1.0f);
 	object2->center(vector3(0.0f, 0.9f, 0.0f));
-	object2->material(material2);
+	object2->material(material2.get());
 
 	scene.objects().push_back(object1);
 	scene.objects().push_back(object2);
@@ -112,19 +113,21 @@ void InsertCalibrationSpheres(Scene & scene)
 {
 	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial());
 	material1->diffuse(color_rgbx(1.0f, 1.0f, 1.0f, 0.0f));
+	scene.getMaterials().insert(std::make_pair("InsertCalibrationSpheres()::material1", material1));
 
 	std::shared_ptr<SphereObject> object1(new SphereObject());
 	object1->radius(1.0f);
 	object1->center(vector3(0.0f, -0.9f, 0.0f));
-	object1->material(material1);
+	object1->material(material1.get());
 
 	std::shared_ptr<BlinnMaterial> material2(new BlinnMaterial());
 	material2->diffuse(color_rgbx(0.5f, 0.5f, 0.5f, 0.0f));
+	scene.getMaterials().insert(std::make_pair("InsertCalibrationSpheres()::material2", material2));
 
 	std::shared_ptr<SphereObject> object2(new SphereObject());
 	object2->radius(1.0f);
 	object2->center(vector3(0.0f, 0.9f, 0.0f));
-	object2->material(material2);
+	object2->material(material2.get());
 
 	scene.objects().push_back(object1);
 	scene.objects().push_back(object2);
@@ -133,13 +136,14 @@ void InsertCalibrationSpheres(Scene & scene)
 void InsertTriangle(Scene & scene)
 {
 	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial());
+	scene.getMaterials().insert(std::make_pair("InsertTriangle()::material1", material1));
 	material1->diffuse(color_rgbx(0.1f, 0.3f, 0.75f, 1.0f));
 	material1->specular(color_rgbx(0.5f, 0.5f, 0.5f, 1.0f));
 	material1->shininess(100.0f);
 	material1->emission(color_rgbx(0.01f, 0.03f, 0.075f, 1.0f));
 
 	std::shared_ptr<FlatTriangleObject> object1(new FlatTriangleObject());
-	object1->material(material1);
+	object1->material(material1.get());
 	object1->vertex0(vector3(0.0f, 0.0f, 0.0f));
 	object1->vertex1(vector3(0.0f, 2.0f, 0.0f));
 	object1->vertex2(vector3(0.0f, 0.0f, 1.0f));
@@ -153,6 +157,7 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<BlinnMaterial> material(new BlinnMaterial());
+		scene.getMaterials().insert(std::make_pair("InsertTriangle()::material #" + std::to_string(i), material));
 		material->diffuse(math::linearRand(color_rgbx::zero(), color_rgbx::fill(1.0), engine));
 		//material->specular(math::linearRand(zero4, one4));
 		//material->shininess(math::linearRand(10.0, 300.0));
@@ -164,7 +169,7 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), engine);
 
 		std::shared_ptr<FlatTriangleObject> object(new FlatTriangleObject());
-		object->material(material);
+		object->material(material.get());
 		object->vertex0(pivot + math::linearRand(min_bound, max_bound, engine));
 		object->vertex1(pivot + math::linearRand(min_bound, max_bound, engine));
 		object->vertex2(pivot + math::linearRand(min_bound, max_bound, engine));
@@ -175,30 +180,30 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 
 void InsertPointLight(Scene & scene)
 {
-	std::shared_ptr<PointLightSource> light_source(new PointLightSource());
-	light_source->position(vector3(2.0, 2.0, 2.0));
-	light_source->color(color_rgbx(20.0, 20.0, 30.0, 1.0));
-	light_source->attenuation(Attenuation(1.0, 0.0, 0.0));
+	std::shared_ptr<PointLightSource> lightSource(new PointLightSource());
+	lightSource->position(vector3(2.0, 2.0, 2.0));
+	lightSource->color(color_rgbx(20.0, 20.0, 30.0, 1.0));
+	lightSource->attenuation(Attenuation(1.0, 0.0, 0.0));
 
-	scene.lights().push_back(light_source);
+	scene.lights().push_back(lightSource);
 }
 
 void InsertDirectionalLight(Scene & scene)
 {
-	std::shared_ptr<DirectionalLightSource> light_source(new DirectionalLightSource());
-	light_source->direction(math::normalize(vector3(1.0, 1.0, 1.0)));
-	light_source->color(color_rgbx(0.6f, 0.6f, 0.6f, 1.0f));
+	std::shared_ptr<DirectionalLightSource> lightSource(new DirectionalLightSource());
+	lightSource->direction(math::normalize(vector3(1.0, 1.0, 1.0)));
+	lightSource->color(color_rgbx(0.6f, 0.6f, 0.6f, 1.0f));
 
-	scene.lights().push_back(light_source);
+	scene.lights().push_back(lightSource);
 }
 
 void InsertSkyLight(Scene & scene, unsigned int samples)
 {
-	std::shared_ptr<SkyLightSource> light_source(new SkyLightSource());
-	light_source->color(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
-	light_source->samples(samples);
+	std::shared_ptr<SkyLightSource> lightSource(new SkyLightSource());
+	lightSource->color(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
+	lightSource->samples(samples);
 
-	scene.lights().push_back(light_source);
+	scene.lights().push_back(lightSource);
 }
 
 void InitCamera(Scene & scene, unsigned int width, unsigned int height)

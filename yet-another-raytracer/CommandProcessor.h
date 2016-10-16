@@ -9,19 +9,10 @@
 class CommandProcessor
 {
 public:
-
-	CommandProcessor(void)
-	{
-	}
-
-	virtual ~CommandProcessor(void)
-	{
-	}
-
+	virtual ~CommandProcessor() = default;
 	virtual void PrepareContext(LoadingContext & context) = 0;
-
 	virtual void ProcessCommand(LoadingContext & context, const std::string & command, std::istream & stream) = 0;
 };
 
-typedef std::map< std::string, std::shared_ptr<CommandProcessor> > ProcessorMap;
-typedef std::vector< std::shared_ptr<CommandProcessor> > ProcessorCollection;
+using ProcessorMap = std::map<std::string, std::shared_ptr<CommandProcessor>>;
+using ProcessorCollection = std::vector<std::shared_ptr<CommandProcessor>>;

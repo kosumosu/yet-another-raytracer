@@ -16,14 +16,15 @@ SettingsCommandFactory::~SettingsCommandFactory( void )
 
 std::vector<std::string> SettingsCommandFactory::GetSupportedCommands() const
 {
-	std::vector<std::string> commands;
-	commands.push_back("size");
-	commands.push_back("maxdepth");
-	commands.push_back("output");
-	commands.push_back("background");
-	commands.push_back("samples");
-	commands.push_back("crop");
-	return commands;
+	return 
+	{
+		"size",
+		"maxdepth",
+		"output",
+		"background",
+		"samples",
+		"crop"
+	};
 }
 
 CommandProcessor * SettingsCommandFactory::CreateCommandProcessor() const

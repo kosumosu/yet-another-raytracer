@@ -4,10 +4,8 @@ const char eol_chars[] = { '\n', '\r' };
 const char whitespace_chars[] = { ' ', '\t' };
 
 Parser::Parser( std::istream * stream )
-	: m_stream(stream)
-{
-
-}
+	: _stream(stream)
+	, _currentLineNumber(1) {}
 
 
 Parser::~Parser(void)
@@ -20,9 +18,12 @@ bool Parser::MoveToNextCommand()
 	char character;
 	do
 	{
-		m_stream->get(character);
+		_stream->get(character);
 
-		if (m_stream->eof())
+		if (IsEol(character))
+			++_currentLineNumber;
+
+		if (_stream->eof())
 			return false;
 
 		if (parsing_comment)
@@ -47,9 +48,9 @@ bool Parser::MoveToNextCommand()
 
 	std::string command;
 
-	*m_stream >> command;
+	*_stream >> command;
 
-	m_current_command = character + command;
+	_currentCommand = character + command;
 
 	return true;
 }

@@ -5,7 +5,7 @@
 
 using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
 
-SkyLightSource::SkyLightSource(void)
+SkyLightSource::SkyLightSource()
 	: m_samples(20)
 	, m_color(color_rgbx::fill(0.5)) {}
 

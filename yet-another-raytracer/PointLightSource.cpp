@@ -3,7 +3,7 @@
 
 using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
 
-PointLightSource::PointLightSource(void)
+PointLightSource::PointLightSource()
 	: m_position(vector3::zero())
 	, m_color(color_rgbx::zero())
 	, m_attenuation(1.0f, 0.0f, 0.0f) {}

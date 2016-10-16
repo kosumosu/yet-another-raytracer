@@ -2,9 +2,11 @@
 
 #include "Scene.h"
 #include "CommandFactory.h"
+#include "CommandProcessor.h"
 #include <map>
 #include <memory>
 #include <string>
+
 
 class SceneLoader
 {

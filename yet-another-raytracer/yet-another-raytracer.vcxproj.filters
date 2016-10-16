@@ -58,6 +58,9 @@
     <Filter Include="Engine\Math\Color">
       <UniqueIdentifier>{3b28ab7e-05c4-43b6-b01d-a43057f14edc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Maps">
+      <UniqueIdentifier>{ccd554f0-a05e-4f5f-881a-d191ba709b3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Film.h">
@@ -298,6 +301,24 @@
     <ClInclude Include="color_functions.hpp">
       <Filter>Engine\Math\Color</Filter>
     </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Engine\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="MapCoords.h">
+      <Filter>Engine\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="SolidColorMap.h">
+      <Filter>Engine\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="MapCommandProcessor.h">
+      <Filter>Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="MapCommandFactory.h">
+      <Filter>Engine\Scene\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualizeUVMap.h">
+      <Filter>Engine\Maps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Renderer.cpp">
@@ -395,6 +416,12 @@
     </ClCompile>
     <ClCompile Include="MonteCarloPathIntegrator.cpp">
       <Filter>Engine\Integrators</Filter>
+    </ClCompile>
+    <ClCompile Include="MapCommandProcessor.cpp">
+      <Filter>Engine\Scene\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="MapCommandFactory.cpp">
+      <Filter>Engine\Scene\Loading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

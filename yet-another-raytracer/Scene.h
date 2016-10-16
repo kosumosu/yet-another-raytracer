@@ -6,6 +6,11 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <map>
+#include "Map.h"
+
+using MaterialCollection = std::map<std::string, std::shared_ptr<Material>>;
+using MapCollection = std::map<std::string, std::shared_ptr<Map>>;
 
 class Scene
 {
@@ -19,13 +24,11 @@ public:
 		, _cropWidth(0)
 		, _cropHeight(0)
 		, _max_trace_depth(4)
-		, _camera(new Camera())
+		, _camera(std::make_shared<Camera>())
 		, _environmentColor(color_rgbx::zero())
 		, _samplesPerPixel(1) { }
 
-	~Scene(void)
-	{
-	}
+	~Scene(void) { }
 
 
 	unsigned int viewport_width() const { return _viewport_width; }
@@ -46,10 +49,8 @@ public:
 	ObjectCollection & objects() { return _objects; }
 	const ObjectCollection & objects() const { return _objects; }
 
-	const LightSourceCollection& lights() const { return _lights; }
-	LightSourceCollection& lights() { return _lights; }
-	void lights(const LightSourceCollection & val) { _lights = val; }
-	void lights(const LightSourceCollection && val) { _lights = std::move(val); }
+	const LightSourceCollection & lights() const { return _lights; }
+	LightSourceCollection & lights() { return _lights; }
 
 	color_rgbx getEnvironmentColor() const { return _environmentColor; }
 	void setEnvironmentColor(const color_rgbx & color) { _environmentColor = color; }
@@ -70,6 +71,12 @@ public:
 	unsigned getCropHeight() const { return _cropHeight; }
 	void setCropHeight(const unsigned cropHeight) { _cropHeight = cropHeight; }
 
+	MaterialCollection & getMaterials() { return _materials; }
+	const MaterialCollection & getMaterials() const { return _materials; }
+
+	MapCollection & getMaps() { return _maps; }
+	const MapCollection & getMaps() const { return _maps; }
+
 private:
 	unsigned int _viewport_width;
 	unsigned int _viewport_height;
@@ -86,8 +93,9 @@ private:
 
 	ObjectCollection _objects;
 	LightSourceCollection _lights;
+	MaterialCollection _materials;
+	MapCollection _maps;
 
 	color_rgbx _environmentColor;
 	size_t _samplesPerPixel;
 };
-

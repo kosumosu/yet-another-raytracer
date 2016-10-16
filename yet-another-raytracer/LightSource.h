@@ -2,10 +2,10 @@
 
 #include "UniformRandomBitGenerator.h"
 #include "Types.h"
+#include "Distribution.h"
 #include <vector>
 #include <memory>
 #include <functional>
-#include "Distribution.h"
 
 class LightingContext;
 class RayEvaluator;
@@ -34,7 +34,7 @@ class LightSource
 {
 public:
 
-	LightSource(void) { }
+	LightSource() = default;
 
 	virtual ~LightSource(void) { }
 

@@ -6,7 +6,7 @@
 class DirectionalLightSource : public LightSource
 {
 public:
-	DirectionalLightSource(void);
+	DirectionalLightSource();
 	~DirectionalLightSource(void);
 
 	const vector3 & direction() const { return m_direction; }

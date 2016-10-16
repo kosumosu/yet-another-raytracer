@@ -6,7 +6,7 @@
 class SkyLightSource : public LightSource
 {
 public:
-	SkyLightSource(void);
+	SkyLightSource();
 	virtual ~SkyLightSource(void);
 
 	unsigned int samples() const { return m_samples; }

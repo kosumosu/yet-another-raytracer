@@ -6,6 +6,13 @@
 class ParserHelper
 {
 public:
+	static vector2 ReadVec2(std::istream & stream)
+	{
+		space_real x, y;
+		stream >> x >> y;
+		return vector2(x, y);
+	}
+
 	static vector3 ReadVec3(std::istream & stream)
 	{
 		space_real x, y, z;
@@ -40,7 +47,12 @@ public:
 		return Read<unsigned int>(stream);
 	}
 
-	template<typename T>
+	static std::string ReadId(std::istream & stream)
+	{
+		return Read<std::string>(stream);
+	}
+
+	template <typename T>
 	static T Read(std::istream & stream)
 	{
 		T x;
@@ -49,12 +61,7 @@ public:
 	}
 
 private:
-	ParserHelper(void)
-	{
-	}
+	ParserHelper(void) { }
 
-	~ParserHelper(void)
-	{
-	}
+	~ParserHelper(void) { }
 };
-

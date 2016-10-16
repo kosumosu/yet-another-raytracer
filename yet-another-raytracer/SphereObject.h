@@ -5,9 +5,7 @@
 class SphereObject : public TransfromableGeometryObject
 {
 public:
-	
-
-	SphereObject(void);
+	SphereObject();
 	virtual ~SphereObject(void);
 
 	Hit FindHit( const ray3 & ray, space_real minDistance, space_real maxDistance) const override;

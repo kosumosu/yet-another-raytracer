@@ -2,9 +2,9 @@
 
 #include "ray_functions.hpp"
 
-SphereObject::SphereObject(void)
+SphereObject::SphereObject()
 	: m_center(vector3(0.0, 0.0, 0.0))
-	  , m_radius(1.0) {}
+	, m_radius(1.0) {}
 
 
 SphereObject::~SphereObject(void) {}
@@ -54,7 +54,7 @@ Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real m
 			auto transformed_hit_point = (this->transform() * vector4(world_space_hit_point, 1.0)).reduce();
 			auto transformed_normal = math::normalize((this->normal_transform() * vector4(normal, space_real(0.0))).reduce());
 
-			return Hit(transformed_hit_point, transformed_normal, this, x);
+			return Hit(transformed_hit_point, transformed_normal, this, x, uvs_t{ vector2::zero() });
 		}
 	}
 }
@@ -114,7 +114,7 @@ math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSu
 	const auto worldPoint = transform() * vector4(m_center + directionFromCenter * m_radius, space_real(1.0));
 	const auto worldNormal = normal_transform() * vector4(directionFromCenter, space_real(0.0));
 	return math::random_sample<surface_point, space_real>(
-		surface_point(worldPoint.reduce(), worldNormal.reduce()),
+		surface_point(worldPoint.reduce(), worldNormal.reduce(), uvs_t{ vector2::zero() }),
 		space_real(1.0) / GetOneSidedSurfaceArea(),
 		false);
 }

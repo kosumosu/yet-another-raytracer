@@ -14,11 +14,14 @@ class Material;
 
 struct surface_point
 {
-	surface_point(const vector3 & point, const vector3 & normal): point(point), normal(normal) {
-	}
+	surface_point(const vector3 & point, const vector3 & normal, const uvs_t & uvs)
+		: point(point),
+		  normal(normal),
+		  uvs(uvs) { }
 
 	vector3 point;
 	vector3 normal;
+	uvs_t uvs;
 };
 
 class GeometryObject
@@ -26,9 +29,7 @@ class GeometryObject
 public:
 
 
-	GeometryObject(void)
-	{
-	}
+	GeometryObject() { }
 
 	//GeometryObject(const matrix4 & transform, std::shared_ptr<Material> & material)
 	//	//: SceneObject(transform)
@@ -36,9 +37,7 @@ public:
 	//{
 	//}
 
-	virtual ~GeometryObject(void)
-	{
-	}
+	virtual ~GeometryObject(void) { }
 
 
 	// Finds point of intersection with given ray
@@ -52,7 +51,7 @@ public:
 	virtual void PrepareForRendering() = 0;
 
 	// Gets transformed bounding box
-	bounding_box3 bounding_box() const { return m_bounding_box; }
+	bounding_box3 bounding_box() const { return _bounding_box; }
 
 	// Gets bounds of that part of the object that lies within given box.
 	virtual bounding_box3 GetBoundsWithinBounds(const bounding_box3 & box) const = 0;
@@ -61,15 +60,15 @@ public:
 
 	virtual math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const = 0;
 
-	const std::shared_ptr<Material> & material() const { return m_material; }
-	void material(const std::shared_ptr<Material> & val) { m_material = val; }
+	const Material * material() const { return _material; }
+	void material(const Material * val) { _material = val; }
 
 protected:
-	void bounding_box(const bounding_box3 & val) { m_bounding_box = val; }
+	void bounding_box(const bounding_box3 & val) { _bounding_box = val; }
 
 private:
-	std::shared_ptr<Material> m_material;
-	bounding_box3 m_bounding_box;
+	const Material * _material;
+	bounding_box3 _bounding_box;
 };
 
-typedef std::vector< std::shared_ptr<GeometryObject> > ObjectCollection;
+typedef std::vector<std::shared_ptr<GeometryObject>> ObjectCollection;

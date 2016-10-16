@@ -186,11 +186,16 @@
     <ClInclude Include="Distribution.h" />
     <ClInclude Include="GeometryLightSource.h" />
     <ClInclude Include="LightingContext.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="MapCommandFactory.h" />
+    <ClInclude Include="MapCommandProcessor.h" />
+    <ClInclude Include="MapCoords.h" />
     <ClInclude Include="MonteCarloPathIntegrator.h" />
     <ClInclude Include="ProcessTimeStopwatch.h" />
     <ClInclude Include="random_sample.hpp" />
     <ClInclude Include="RayIntegrator.h" />
     <ClInclude Include="ray_functions.hpp" />
+    <ClInclude Include="SolidColorMap.h" />
     <ClInclude Include="Stopwatch.h" />
     <ClInclude Include="UniformRandomBitGenerator.h" />
     <ClInclude Include="vector.hpp" />
@@ -254,6 +259,7 @@
     <ClInclude Include="KDTreeNode.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="vector3.hpp" />
+    <ClInclude Include="VisualizeUVMap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BlinnMaterial.cpp" />
@@ -264,6 +270,8 @@
     <ClCompile Include="Film.cpp" />
     <ClCompile Include="FlatTriangleObject.cpp" />
     <ClCompile Include="GeometryLightSource.cpp" />
+    <ClCompile Include="MapCommandFactory.cpp" />
+    <ClCompile Include="MapCommandProcessor.cpp" />
     <ClCompile Include="MonteCarloPathIntegrator.cpp" />
     <ClCompile Include="ProcessTimeStopwatch.cpp" />
     <ClCompile Include="StdHigheResolutionClockStopwatch.cpp" />

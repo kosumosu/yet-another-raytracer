@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Types.h"
 #include "UniformRandomBitGenerator.h"
 #include "Distribution.h"
+#include "Types.h"
 #include <functional>
 
 class GeometryObject;
@@ -11,7 +11,7 @@ struct bsdf_sample
 {
 	bsdf_sample(const vector3 & outgoingDirection, const std::function<color_rgbx()> & evaluate)
 		: outgoingDirection(outgoingDirection),
-		  evaluate(evaluate) {}
+		evaluate(evaluate) {}
 
 	vector3 outgoingDirection;
 	std::function<color_rgbx()> evaluate;
@@ -24,7 +24,7 @@ class Material
 {
 public:
 
-	Material(void) { }
+	Material() = default;
 
 	virtual ~Material(void) { }
 
@@ -35,6 +35,7 @@ public:
 		const GeometryObject & object,
 		const vector3 & hitPoint,
 		const vector3 & normal,
+		const uvs_t & uvs,
 		const vector3 & incidentDirection,
 		math::UniformRandomBitGenerator<unsigned int> & randomEngine,
 		const bsdf_distribution_func & job) const = 0;
@@ -43,6 +44,7 @@ public:
 		const GeometryObject & object,
 		const vector3 & hitPoint,
 		const vector3 & normal,
+		const uvs_t & uvs,
 		const vector3 & incidentDirection,
 		math::UniformRandomBitGenerator<unsigned int> & randomEngine) const = 0;
 
@@ -50,9 +52,8 @@ public:
 		const GeometryObject & object,
 		const vector3 & hitPoint,
 		const vector3 & normal,
+		const uvs_t & uvs,
 		const vector3 & incidentDirection,
 		const vector3 & outgoingDirection,
 		math::UniformRandomBitGenerator<unsigned int> & randomEngine) const = 0;
-
-	virtual Material * Clone() const = 0;
 };

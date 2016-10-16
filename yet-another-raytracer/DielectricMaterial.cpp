@@ -66,12 +66,7 @@ color_real DielectricMaterial::GetEmissionImportance() const
 	return color_real(0.0);
 }
 
-Material * DielectricMaterial::Clone() const
-{
-	return new DielectricMaterial(_iorInside, _iorOutside, _surfaceTransparency);
-}
-
-void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const
+void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const
 {
 	job(bsdf_functional_distribution(
 		2U,
@@ -171,12 +166,12 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 		}));
 }
 
-color_rgbx DielectricMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx DielectricMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
 	return color_rgbx::zero();
 }
 
-color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
 	return color_rgbx::zero();
 }

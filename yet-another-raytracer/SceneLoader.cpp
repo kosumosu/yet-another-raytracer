@@ -9,6 +9,7 @@
 #include "ObjectCommandFactory.h"
 #include "SettingsCommandFactory.h"
 #include "TransformCommandFactory.h"
+#include "MapCommandFactory.h"
 
 // Static members
 
@@ -21,15 +22,17 @@ void SceneLoader::AddFactory( std::vector< std::shared_ptr<CommandFactory> > & c
 
 SceneLoader * SceneLoader::CreateDefault()
 {
-	std::vector< std::shared_ptr<CommandFactory> > factories;
+	std::vector< std::shared_ptr<CommandFactory> > factories
+	{
+		std::make_shared<CameraCommandFactory>(),
+		std::make_shared<LightSourceCommandFactory>(),
+		std::make_shared<MaterialCommandFactory>(),
+		std::make_shared<ObjectCommandFactory>(),
+		std::make_shared<SettingsCommandFactory>(),
+		std::make_shared<TransformCommandFactory>(),
+		std::make_shared<MapCommandFactory>()
 
-	AddFactory(factories, new CameraCommandFactory());
-	AddFactory(factories, new LightSourceCommandFactory());
-	AddFactory(factories, new MaterialCommandFactory());
-	AddFactory(factories, new ObjectCommandFactory());
-	AddFactory(factories, new SettingsCommandFactory());
-	AddFactory(factories, new TransformCommandFactory());
-
+	};
 	return new SceneLoader(factories);
 }
 
@@ -98,7 +101,7 @@ void SceneLoader::Load(Scene & scene, const std::wstring & filename) const
 
 	while (parser.MoveToNextCommand())
 	{
-		auto command = command_map[parser.current_command()];
+		auto command = command_map.at(parser.current_command());
 		if (command == nullptr)
 			throw std::exception();
 		command->ProcessCommand(context, parser.current_command(), stream);

@@ -1,21 +1,14 @@
 #pragma once
 
-#include "CommandProcessor.h"
 #include <string>
 #include <vector>
-#include <iostream>
+
+class CommandProcessor;
 
 class CommandFactory
 {
 public:
-
-	CommandFactory(void)
-	{
-	}
-
-	virtual ~CommandFactory(void)
-	{
-	}
+	virtual ~CommandFactory() = default;
 
 	virtual std::vector<std::string> GetSupportedCommands() const = 0;
 

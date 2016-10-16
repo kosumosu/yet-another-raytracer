@@ -51,7 +51,7 @@ void GeometryLightSource::DoWithDistribution(const LightingContext & context, ma
 					distance,
 					[=, &randomEngine]()
 					{
-						return objectSample.getValue()->material()->EvaluateEmission(*objectSample.getValue(), pointSample.getValue().point, pointSample.getValue().normal, direction, randomEngine);
+						return objectSample.getValue()->material()->EvaluateEmission(*objectSample.getValue(), pointSample.getValue().point, pointSample.getValue().normal, pointSample.getValue().uvs, direction, randomEngine);
 					}
 				),
 				pdf,

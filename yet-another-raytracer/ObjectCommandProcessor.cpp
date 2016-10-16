@@ -23,7 +23,7 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 {
 	if (command == "maxverts")
 	{
-		m_vertices.reserve(ParserHelper::ReadUInt(stream));
+		_vertices.reserve(ParserHelper::ReadUInt(stream));
 	}
 	else if (command == "maxvertnorms")
 	{
@@ -31,7 +31,11 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 	}
 	else if (command == "vertex")
 	{
-		m_vertices.push_back(ParserHelper::ReadVec3(stream));
+		_vertices.push_back(ParserHelper::ReadVec3(stream));
+	}
+	else if (command == "uv")
+	{
+		_uvs.push_back(ParserHelper::ReadVec2(stream));
 	}
 	else if (command == "vertexnormal")
 	{
@@ -39,14 +43,41 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 	}
 	else if (command == "tri")
 	{
-		unsigned int index0, index1, index2;
-		stream >> index0 >> index1 >> index2;
-		auto vertex0 = (context.transform() * vector4(m_vertices[index0], space_real(1.0))).reduce();
-		auto vertex1 = (context.transform() * vector4(m_vertices[index1], space_real(1.0))).reduce();
-		auto vertex2 = (context.transform() * vector4(m_vertices[index2], space_real(1.0))).reduce();
+		const unsigned int index0 = ParserHelper::ReadUInt(stream); 
+		const unsigned int index1 = ParserHelper::ReadUInt(stream);
+		const unsigned int index2 = ParserHelper::ReadUInt(stream);
 
-		FlatTriangleObject * triangle = new FlatTriangleObject(vertex0, vertex1, vertex2);
-		triangle->material(std::shared_ptr<Material>(context.material()->Clone()));
+		auto vertex0 = (context.transform() * vector4(_vertices[index0], space_real(1.0))).reduce();
+		auto vertex1 = (context.transform() * vector4(_vertices[index1], space_real(1.0))).reduce();
+		auto vertex2 = (context.transform() * vector4(_vertices[index2], space_real(1.0))).reduce();
+
+		uvs_t zeroUVs({ vector2::zero() });
+
+		FlatTriangleObject * triangle = new FlatTriangleObject(vertex0, vertex1, vertex2, zeroUVs, zeroUVs, zeroUVs);
+		triangle->material(context.material());
+
+		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(triangle));
+	}
+	else if (command == "triUV")
+	{
+		const unsigned int index0 = ParserHelper::ReadUInt(stream);
+		const unsigned int index1 = ParserHelper::ReadUInt(stream);
+		const unsigned int index2 = ParserHelper::ReadUInt(stream);
+
+		const unsigned int uvIndex0 = ParserHelper::ReadUInt(stream);
+		const unsigned int uvIndex1 = ParserHelper::ReadUInt(stream);
+		const unsigned int uvIndex2 = ParserHelper::ReadUInt(stream);
+
+		const auto vertex0 = (context.transform() * vector4(_vertices[index0], space_real(1.0))).reduce();
+		const auto vertex1 = (context.transform() * vector4(_vertices[index1], space_real(1.0))).reduce();
+		const auto vertex2 = (context.transform() * vector4(_vertices[index2], space_real(1.0))).reduce();
+
+		const vector2 vertex0uv = _uvs[uvIndex0];
+		const vector2 vertex1uv = _uvs[uvIndex1];
+		const vector2 vertex2uv = _uvs[uvIndex2];
+
+		FlatTriangleObject * triangle = new FlatTriangleObject(vertex0, vertex1, vertex2, uvs_t({vertex0uv}), uvs_t({ vertex1uv }), uvs_t({ vertex2uv }));
+		triangle->material(context.material());
 
 		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(triangle));
 	}
@@ -62,7 +93,7 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 		sphere->center(center);
 		sphere->radius(radius);
 		sphere->transform(context.transform());
-		sphere->material(std::shared_ptr<Material>(context.material()->Clone()));
+		sphere->material(context.material());
 
 		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(sphere));
 	}

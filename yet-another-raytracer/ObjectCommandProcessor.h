@@ -16,6 +16,7 @@ public:
 	void ProcessCommand(LoadingContext & context, const std::string & command, std::istream & stream) override;
 
 private:
-	std::vector<vector3> m_vertices;
+	std::vector<vector3> _vertices;
+	std::vector<vector2> _uvs;
 };
 

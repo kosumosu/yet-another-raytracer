@@ -18,8 +18,17 @@ public:
 	void ProcessCommand(LoadingContext & context, const std::string & command, std::istream & stream) override;
 
 private:
-	color_rgbx m_last_ambient;
-	std::shared_ptr<BlinnMaterial> m_blinnMaterial;
-	std::shared_ptr<DielectricMaterial> m_dielectricMaterial;
+	color_rgbx _ambient;
+	color_rgbx _emission;
+	const Map *  _diffuseMap;
+	color_rgbx _diffuse;
+	color_rgbx _specular;
+	color_real _shininess;
+	color_rgbx _translucency;
+
+	space_real _iorInside;
+	space_real _iorOutside;
+	color_rgbx _surfaceTransparency;
+
 };
 

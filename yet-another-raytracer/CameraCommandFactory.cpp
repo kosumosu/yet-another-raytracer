@@ -13,11 +13,7 @@ CameraCommandFactory::~CameraCommandFactory(void)
 
 std::vector<std::string> CameraCommandFactory::GetSupportedCommands() const
 {
-	std::vector<std::string> commands;
-
-	commands.push_back("camera");
-
-	return commands;
+	return{ "camera" };
 }
 
 CommandProcessor * CameraCommandFactory::CreateCommandProcessor() const

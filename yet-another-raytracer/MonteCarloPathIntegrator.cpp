@@ -33,7 +33,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3
 						const auto geometricTerm = color_real(std::abs(math::dot(lightSample.getValue().direction, hit.normal())));
 						const auto radianceByLight =
 							lightSample.getValue().evaluate()
-							* hit.object()->material()->EvaluateNonDeltaScattering(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), lightSample.getValue().direction, randomEngine)
+							* hit.object()->material()->EvaluateNonDeltaScattering(*hit.object(), hit.point(), hit.normal(), hit.uvs(), currentRay.direction(), lightSample.getValue().direction, randomEngine)
 							* geometricTerm
 							* color_real(math::oneOverPi)
 							/ color_real(lightSample.getPdf());
@@ -65,7 +65,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 	{
 		if (hit.has_occurred())
 		{
-			hit.object()->material()->WithBsdfDistribution(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine,
+			hit.object()->material()->WithBsdfDistribution(*hit.object(), hit.point(), hit.normal(), hit.uvs(), currentRay.direction(), randomEngine,
 				            [&](const bsdf_distribution & bsdfDistribution)
 				            {
 								const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
@@ -75,7 +75,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 						            radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
 
 					            if (accountForEmission)
-						            radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine);
+						            radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(*hit.object(), hit.point(), hit.normal(), hit.uvs(), currentRay.direction(), randomEngine);
 
 					            integral += radianceAtCurrentPathVertex * throughput;
 
@@ -151,7 +151,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 	{
 		if (hit.has_occurred())
 		{
-			hit.object()->material()->WithBsdfDistribution(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine,
+			hit.object()->material()->WithBsdfDistribution(*hit.object(), hit.point(), hit.normal(), hit.uvs(), currentRay.direction(), randomEngine,
 				            [&](const bsdf_distribution & bsdfDistribution)
 				            {
 								const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
@@ -160,7 +160,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 						            radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
 
 					            if (accountForEmission)
-						            radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(*hit.object(), hit.point(), hit.normal(), currentRay.direction(), randomEngine);
+						            radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(*hit.object(), hit.point(), hit.normal(), hit.uvs(), currentRay.direction(), randomEngine);
 
 					            integral += radianceAtCurrentPathVertex * throughput;
 				            }

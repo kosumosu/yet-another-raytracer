@@ -3,20 +3,23 @@
 #include "Material.h"
 #include "Types.h"
 
+class Map;
+
 class BlinnMaterial : public Material
 {
 public:
-	
-
-	BlinnMaterial(void)
+	BlinnMaterial()
 		: _emission(color_rgbx::zero())
+		, _diffuseMap(nullptr)
 		, _diffuse(color_rgbx::zero())
 		, _specular(color_rgbx::zero())
 		, _shininess(1.0f)
 		, _translucency(color_rgbx::zero()) { }
 
-	BlinnMaterial(const color_rgbx & emission, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess, const color_rgbx & translucency)
+	 
+	BlinnMaterial(const color_rgbx & emission, const Map * diffuseMap, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess, const color_rgbx & translucency)
 		: _emission(emission)
+		, _diffuseMap(diffuseMap)
 		, _diffuse(diffuse)
 		, _specular(specular)
 		, _shininess(shininess)
@@ -24,21 +27,6 @@ public:
 	{
 		
 	}
-
-	BlinnMaterial(const BlinnMaterial & original)
-		: _emission(original._emission)
-		, _diffuse(original._diffuse)
-		, _specular(original._specular)
-		, _shininess(original._shininess)
-		, _translucency(original._translucency)
-	{
-
-	}
-
-	~BlinnMaterial(void)
-	{
-	}
-
 
 
 	const color_rgbx & emission() const { return _emission; }
@@ -58,21 +46,21 @@ public:
 
 	color_real GetEmissionImportance() const override;
 
-	Material * Clone() const override;
-
-	void WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const override;
-	color_rgbx EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
-	color_rgbx EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
+	void WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const override;
+	color_rgbx EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
+	color_rgbx EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
 
 private:
 	color_rgbx _emission;
+	const Map * _diffuseMap;
 	color_rgbx _diffuse;
 	color_rgbx _specular;
 	color_real _shininess;
 	color_rgbx _translucency;
 
+
 	color_real GetReflectionProbability() const;
 
-	color_rgbx EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const;
+	color_rgbx EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector2 & uv, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const;
 };
 

@@ -1,5 +1,6 @@
 #include "BlinnMaterial.h"
 #include "LightingContext.h"
+#include "Map.h"
 #include "color_functions.hpp"
 
 #define ENABLE_IMPORTANCE_SAMPLING true
@@ -16,16 +17,23 @@ color_real BlinnMaterial::GetReflectionProbability() const
 	return color::get_importance(_specular);
 }
 
-color_rgbx BlinnMaterial::EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx BlinnMaterial::EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector2 & uv, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
 	//return math::dot(incidentDirection, normal) < 0 ? color_rgbx(1.0, 0.0, 0.0, 0.0) : color_rgbx(0.0, 1.0, 1.0, 0.0);
 
-	return _diffuse;
+	if (_diffuseMap == nullptr)
+	{
+		return _diffuse;
+	}
+	else
+	{
+		return _diffuseMap->Sample(MapCoords{ hitPoint, normal, {uv} });
+	}
 }
 
-void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const
+void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const
 {
-	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, incidentDirection, randomEngine);
+	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, randomEngine);
 	bsdf_functional_distribution::generate_sample_func generateDiffuseFuncImpl = [&]()
 		{
 			const bool isEntering = math::is_obtuse_angle(incidentDirection, normal);
@@ -51,9 +59,9 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 						{
 							return _translucency * (color_rgbx::fill(1.0) - _specular);
 						}),
-						pdf * (1.0 - GetReflectionProbability()) * translucenceProbability,
-						false
-						);
+					pdf * (1.0 - GetReflectionProbability()) * translucenceProbability,
+					false
+				);
 			}
 			else
 			{
@@ -63,9 +71,9 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 						{
 							return diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency);
 						}),
-						pdf * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability),
-						false
-						);
+					pdf * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability),
+					false
+				);
 			}
 		};
 
@@ -82,8 +90,8 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 				const auto translucenceProbability = color::get_importance(_translucency);
 #if ENABLE_IMPORTANCE_SAMPLING
 				return math::is_obtuse_angle(direction, normal)
-					? color_real(math::dot(direction, normal) * space_real(math::oneOverPi)) * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability)
-					: color_real(math::dot(direction, -normal) * space_real(math::oneOverPi)) * (1.0 - GetReflectionProbability()) * translucenceProbability;
+					       ? color_real(math::dot(direction, normal) * space_real(math::oneOverPi)) * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability)
+					       : color_real(math::dot(direction, -normal) * space_real(math::oneOverPi)) * (1.0 - GetReflectionProbability()) * translucenceProbability;
 #else
 				return math::is_obtuse_angle(direction, normal)
 					? color_real(0.5 * math::oneOverPi) * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability)
@@ -97,10 +105,10 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * cosTheta);
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(reflected_direction,
-				            [=]()
-				            {
-								return _specular / color_real(std::abs(cosTheta));
-				            }),
+					[=]()
+					{
+						return _specular / color_real(std::abs(cosTheta));
+					}),
 				space_real(GetReflectionProbability()),
 				true
 			);
@@ -142,20 +150,15 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 		generateSampleFunc));
 }
 
-color_rgbx BlinnMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx BlinnMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
 	return _emission;
 }
 
-color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
-	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, incidentDirection, randomEngine);
+	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, randomEngine);
 	return math::is_obtuse_angle(incidentDirection, normal)
-		? diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency)
-		: (color_rgbx::fill(1.0) - _specular) * _translucency;
-}
-
-Material * BlinnMaterial::Clone() const
-{
-	return new BlinnMaterial(*this);
+		       ? diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency)
+		       : (color_rgbx::fill(1.0) - _specular) * _translucency;
 }
