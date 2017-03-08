@@ -43,7 +43,7 @@ void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engi
 		std::shared_ptr<SphereObject> object(new SphereObject());
 		object->radius(math::linearRand(space_real(0.1), space_real(1.0), engine));
 		object->center(math::linearRand(vector3::fill(-1.0) * space_real(2.0), vector3::fill(1.0) * space_real(2.0), engine));
-		object->material(material);
+		object->material(material.get());
 
 		scene.objects().push_back(object);
 	}

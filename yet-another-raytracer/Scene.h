@@ -7,10 +7,10 @@
 #include <memory>
 #include <string>
 #include <map>
-#include "Map.h"
+#include "Texture.h"
 
 using MaterialCollection = std::map<std::string, std::shared_ptr<Material>>;
-using MapCollection = std::map<std::string, std::shared_ptr<Map>>;
+using MapCollection = std::map<std::string, std::shared_ptr<Texture>>;
 
 class Scene
 {

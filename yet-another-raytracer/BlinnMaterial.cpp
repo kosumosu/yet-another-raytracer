@@ -1,6 +1,6 @@
 #include "BlinnMaterial.h"
 #include "LightingContext.h"
-#include "Map.h"
+#include "Texture.h"
 #include "color_functions.hpp"
 
 #define ENABLE_IMPORTANCE_SAMPLING true
@@ -27,7 +27,7 @@ color_rgbx BlinnMaterial::EvaluateDiffuseColor(const GeometryObject & object, co
 	}
 	else
 	{
-		return _diffuseMap->Sample(MapCoords{ hitPoint, normal, {uv} });
+		return _diffuseMap->Sample(TextureCoords{ hitPoint, normal, {uv} });
 	}
 }
 
@@ -152,7 +152,14 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 
 color_rgbx BlinnMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
-	return _emission;
+	if (_diffuseMap == nullptr)
+	{
+		return _emission;
+	}
+	else
+	{
+		return _emission * _diffuseMap->Sample(TextureCoords{ hitPoint, normal, uvs });
+	}
 }
 
 color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const

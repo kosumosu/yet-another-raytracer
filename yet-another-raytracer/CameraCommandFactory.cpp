@@ -16,7 +16,7 @@ std::vector<std::string> CameraCommandFactory::GetSupportedCommands() const
 	return{ "camera" };
 }
 
-CommandProcessor * CameraCommandFactory::CreateCommandProcessor() const
+CommandProcessor * CameraCommandFactory::CreateCommandProcessor(const std::wstring & sceneFileName) const
 {
 	return new CameraCommandProcessor();
 }

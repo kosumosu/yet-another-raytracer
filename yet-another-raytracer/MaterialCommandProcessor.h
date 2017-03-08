@@ -20,7 +20,7 @@ public:
 private:
 	color_rgbx _ambient;
 	color_rgbx _emission;
-	const Map *  _diffuseMap;
+	const Texture *  _diffuseMap;
 	color_rgbx _diffuse;
 	color_rgbx _specular;
 	color_real _shininess;

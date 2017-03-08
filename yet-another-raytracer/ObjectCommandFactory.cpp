@@ -27,7 +27,7 @@ std::vector<std::string> ObjectCommandFactory::GetSupportedCommands() const
 	};
 }
 
-CommandProcessor * ObjectCommandFactory::CreateCommandProcessor() const
+CommandProcessor * ObjectCommandFactory::CreateCommandProcessor(const std::wstring & sceneFileName) const
 {
 	return new ObjectCommandProcessor();
 }

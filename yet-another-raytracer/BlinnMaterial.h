@@ -3,7 +3,7 @@
 #include "Material.h"
 #include "Types.h"
 
-class Map;
+class Texture;
 
 class BlinnMaterial : public Material
 {
@@ -17,7 +17,7 @@ public:
 		, _translucency(color_rgbx::zero()) { }
 
 	 
-	BlinnMaterial(const color_rgbx & emission, const Map * diffuseMap, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess, const color_rgbx & translucency)
+	BlinnMaterial(const color_rgbx & emission, const Texture * diffuseMap, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess, const color_rgbx & translucency)
 		: _emission(emission)
 		, _diffuseMap(diffuseMap)
 		, _diffuse(diffuse)
@@ -52,7 +52,7 @@ public:
 
 private:
 	color_rgbx _emission;
-	const Map * _diffuseMap;
+	const Texture * _diffuseMap;
 	color_rgbx _diffuse;
 	color_rgbx _specular;
 	color_real _shininess;

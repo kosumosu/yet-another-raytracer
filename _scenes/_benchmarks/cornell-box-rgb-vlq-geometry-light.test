@@ -8,11 +8,12 @@ camera 278 273 -800 278 273 -799 0 1 0 39.3
 maxdepth 32
 background 0 0 0
 
-samples 1280
+samples 128
 #point 275 275 275 1 1 1
 
-visualizeUV "visualize-uv"
-nullMap "null-map"
+bitmapTexture "bitmap-texture" "TexturesCom_BrickLargeBrown0001_1_seamless_S.png"
+visualizeUVTexture "visualize-uv"
+nullTexture "null-texture"
 
 ambient 0 0 0
 specular 0 0 0
@@ -21,9 +22,9 @@ emission 0 0 0
 diffuse 0 0 0
 
 diffuse 1 1 1
-diffuseMap "visualize-uv"
+diffuseMap "bitmap-texture"
 blinn "small-box-uv"
-diffuseMap "null-map"
+diffuseMap "null-texture"
 
 diffuse 0.879 0.693 0.659
 blinn "white-wall"
@@ -142,24 +143,24 @@ maxverts 100
 
 	
 	#top
-		triUV 8 9 10  0 1 2
-		triUV 8 10 11 0 2 3
+		triUV 8 9 10  2 1 0
+		triUV 8 10 11 2 0 3
 	
 	#left
-		triUV 12 13 14 0 1 2
-		triUV 12 14 15 0 2 3
+		triUV 12 13 14 2 1 0
+		triUV 12 14 15 2 0 3
 	
 	#front
-		triUV 16 17 18 0 1 2
-		triUV 16 18 19 0 2 3
+		triUV 16 17 18 2 1 0
+		triUV 16 18 19 2 0 3
 		
 	#right
-		triUV 20 21 22 0 1 2
-		triUV 20 22 23 0 2 3
+		triUV 20 21 22 2 1 0
+		triUV 20 22 23 2 0 3
 		
 	#back
-		triUV 24 25 26 0 1 2
-		triUV 24 26 27 0 2 3
+		triUV 24 25 26 2 1 0
+		triUV 24 26 27 2 0 3
 		
 	#blinn
 	selectMaterial "large-box"

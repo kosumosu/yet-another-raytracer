@@ -301,23 +301,26 @@
     <ClInclude Include="color_functions.hpp">
       <Filter>Engine\Math\Color</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
+    <ClInclude Include="BitmapTexture.h">
       <Filter>Engine\Maps</Filter>
     </ClInclude>
-    <ClInclude Include="MapCoords.h">
+    <ClInclude Include="Texture.h">
       <Filter>Engine\Maps</Filter>
     </ClInclude>
-    <ClInclude Include="SolidColorMap.h">
+    <ClInclude Include="TextureCoords.h">
       <Filter>Engine\Maps</Filter>
     </ClInclude>
-    <ClInclude Include="MapCommandProcessor.h">
+    <ClInclude Include="SolidColorTexture.h">
+      <Filter>Engine\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualizeUVTexture.h">
+      <Filter>Engine\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureCommandProcessor.h">
       <Filter>Engine\Scene\Loading</Filter>
     </ClInclude>
-    <ClInclude Include="MapCommandFactory.h">
+    <ClInclude Include="TextureCommandFactory.h">
       <Filter>Engine\Scene\Loading</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualizeUVMap.h">
-      <Filter>Engine\Maps</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -417,10 +420,13 @@
     <ClCompile Include="MonteCarloPathIntegrator.cpp">
       <Filter>Engine\Integrators</Filter>
     </ClCompile>
-    <ClCompile Include="MapCommandProcessor.cpp">
+    <ClCompile Include="BitmapTexture.cpp">
+      <Filter>Engine\Maps</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureCommandProcessor.cpp">
       <Filter>Engine\Scene\Loading</Filter>
     </ClCompile>
-    <ClCompile Include="MapCommandFactory.cpp">
+    <ClCompile Include="TextureCommandFactory.cpp">
       <Filter>Engine\Scene\Loading</Filter>
     </ClCompile>
   </ItemGroup>

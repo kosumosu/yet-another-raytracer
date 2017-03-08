@@ -21,7 +21,7 @@ public:
 
 private:
 	std::vector< std::shared_ptr<CommandFactory> > m_factories;
-	void CreateProcessors(ProcessorMap & command_map, ProcessorCollection & processors ) const;
+	void CreateProcessors(ProcessorMap & command_map, ProcessorCollection & processors, const std::wstring & sceneFileName) const;
 	void PrepareContext(LoadingContext & context, const ProcessorCollection & processors) const;
 
 	static void AddFactory(std::vector< std::shared_ptr<CommandFactory> > & collection, CommandFactory * factory);

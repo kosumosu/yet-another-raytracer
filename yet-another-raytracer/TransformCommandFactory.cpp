@@ -2,11 +2,6 @@
 
 #include "TransformCommandProcessor.h"
 
-CommandProcessor * TransformCommandFactory::CreateCommandProcessor() const
-{
-	return new TransformCommandProcessor();
-}
-
 std::vector<std::string> TransformCommandFactory::GetSupportedCommands() const
 {
 	return
@@ -17,4 +12,9 @@ std::vector<std::string> TransformCommandFactory::GetSupportedCommands() const
 		"pushTransform",
 		"popTransform"
 	};
+}
+
+CommandProcessor * TransformCommandFactory::CreateCommandProcessor(const std::wstring & sceneFileName) const
+{
+	return new TransformCommandProcessor();
 }

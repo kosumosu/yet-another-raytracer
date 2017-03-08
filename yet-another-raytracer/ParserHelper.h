@@ -2,6 +2,7 @@
 
 #include "Types.h"
 #include <istream>
+#include <iomanip>
 
 class ParserHelper
 {
@@ -47,9 +48,20 @@ public:
 		return Read<unsigned int>(stream);
 	}
 
+	static std::string ReadString(std::istream & stream) {
+		std::string string;
+		stream >> std::quoted(string);
+		return string;
+	}
+
 	static std::string ReadId(std::istream & stream)
 	{
-		return Read<std::string>(stream);
+		return ReadString(stream);
+	}
+
+	static std::string ReadFileName(std::istream & stream)
+	{
+		return ReadString(stream);
 	}
 
 	template <typename T>

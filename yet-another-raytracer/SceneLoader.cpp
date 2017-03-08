@@ -9,7 +9,7 @@
 #include "ObjectCommandFactory.h"
 #include "SettingsCommandFactory.h"
 #include "TransformCommandFactory.h"
-#include "MapCommandFactory.h"
+#include "TextureCommandFactory.h"
 
 // Static members
 
@@ -30,7 +30,7 @@ SceneLoader * SceneLoader::CreateDefault()
 		std::make_shared<ObjectCommandFactory>(),
 		std::make_shared<SettingsCommandFactory>(),
 		std::make_shared<TransformCommandFactory>(),
-		std::make_shared<MapCommandFactory>()
+		std::make_shared<TextureCommandFactory>()
 
 	};
 	return new SceneLoader(factories);
@@ -51,12 +51,12 @@ SceneLoader::~SceneLoader( void )
 }
 
 
-void SceneLoader::CreateProcessors(ProcessorMap & command_map, ProcessorCollection & processors ) const
+void SceneLoader::CreateProcessors(ProcessorMap & command_map, ProcessorCollection & processors, const std::wstring & sceneFileName ) const
 {
 	for (auto & factory : m_factories)
 	{
 		auto commands = factory->GetSupportedCommands();
-		std::shared_ptr<CommandProcessor> processor(factory->CreateCommandProcessor());
+		std::shared_ptr<CommandProcessor> processor(factory->CreateCommandProcessor(sceneFileName));
 
 		processors.push_back(processor);
 
@@ -92,7 +92,7 @@ void SceneLoader::Load(Scene & scene, const std::wstring & filename) const
 
 	ProcessorMap command_map;
 	ProcessorCollection processors;
-	CreateProcessors(command_map, processors);
+	CreateProcessors(command_map, processors, filename);
 
 	LoadingContext context(&scene);
 	PrepareContext(context, processors);

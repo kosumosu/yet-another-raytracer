@@ -78,7 +78,7 @@ void Renderer::Render(Film & film, const Scene & scene) const
 			if (timer.Sample() > 2.0f)
 			{
 				timer.Restart();
-				m_progressCallback(((y - startY) * (endY - startY) + x - startX) / total_pixels);
+				m_progressCallback(((y - startY) * (endX - startX) + x - startX) / total_pixels);
 			}
 		}
 	}

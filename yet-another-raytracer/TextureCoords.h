@@ -2,10 +2,10 @@
 
 #include "Types.h"
 
-class MapCoords
+class TextureCoords
 {
 public:
-	MapCoords(const vector3 & worldSpacePoint, const vector3 & worldSpaceNormal, const std::array<vector2, 1> & vectors)
+	TextureCoords(const vector3 & worldSpacePoint, const vector3 & worldSpaceNormal, const std::array<vector2, 1> & vectors)
 		: worldSpacePoint(worldSpacePoint),
 		  worldSpaceNormal(worldSpaceNormal),
 		  uvs(vectors) {}

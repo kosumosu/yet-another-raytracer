@@ -13,7 +13,7 @@ DirectionalLightSource::~DirectionalLightSource(void) {}
 
 void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
 {
-	if (math::dot(m_direction, context.getNormal()) >= 0.0f)
+	if (true || math::dot(m_direction, context.getNormal()) >= 0.0f)
 	{
 		job(lighting_functional_distribution(
 				1U,

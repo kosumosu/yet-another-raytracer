@@ -12,7 +12,7 @@ std::vector<std::string> LightSourceCommandFactory::GetSupportedCommands() const
 	return {"directional", "point", "attenuation", "geometryLight"};
 }
 
-CommandProcessor * LightSourceCommandFactory::CreateCommandProcessor() const
+CommandProcessor * LightSourceCommandFactory::CreateCommandProcessor(const std::wstring & sceneFileName) const
 {
 	return new LightSourceCommandProcessor();
 }
