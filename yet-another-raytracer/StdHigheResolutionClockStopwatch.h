@@ -6,9 +6,6 @@
 class StdHigheResolutionClockStopwatch : public Stopwatch
 {
 public:
-	StdHigheResolutionClockStopwatch(void);
-	~StdHigheResolutionClockStopwatch(void);
-
 	void Restart() override;
 
 	float Sample() const override;

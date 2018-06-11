@@ -8,7 +8,6 @@ class PointLightSource : public LightSource
 {
 public:
 	PointLightSource();
-	~PointLightSource(void);
 
 	const vector3 & position() const { return m_position; }
 	void position(const vector3 & val) { m_position = val; }
@@ -20,6 +19,8 @@ public:
 	void attenuation(Attenuation val) { m_attenuation = val; }
 
 	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const override;
+
+	color_real GetApproximateTotalPower() const override;
 private:
 	vector3 m_position;
 	color_rgbx m_color;

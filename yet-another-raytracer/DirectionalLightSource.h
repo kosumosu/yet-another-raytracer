@@ -3,21 +3,19 @@
 #include "LightSource.h"
 #include "Types.h"
 
+class Scene;
+
 class DirectionalLightSource : public LightSource
 {
 public:
-	DirectionalLightSource();
-	~DirectionalLightSource(void);
-
-	const vector3 & direction() const { return m_direction; }
-	void direction(const vector3 & val) { m_direction = val; }
-
-	const color_rgbx & color() const { return m_color; }
-	void color(const color_rgbx & val) { m_color = val; }
+	DirectionalLightSource(const vector3 & direction, const color_rgbx & color, const Scene & scene);
 
 	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const override;
+
+	color_real GetApproximateTotalPower() const override;
 private:
-	vector3 m_direction;
-	color_rgbx m_color;
+	vector3 _direction;
+	color_rgbx _color;
+	color_real _power;
 };
 

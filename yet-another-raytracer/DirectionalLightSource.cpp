@@ -1,19 +1,29 @@
 #include "DirectionalLightSource.h"
-#include <limits>
 #include "LightingContext.h"
+#include "Scene.h"
+#include "color_functions.hpp"
+#include <limits>
 
 using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
 
-DirectionalLightSource::DirectionalLightSource()
-	: m_direction(vector3::zero())
-	, m_color(color_rgbx::zero()) {}
 
+DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const color_rgbx & color, const Scene & scene) 
+	: _direction(direction)
+	, _color(color)
+{
+	bounding_box3 scene_box;
+	for (const auto & object : scene.objects())
+	{
+		scene_box.Include(object->bounding_box());
+	}
 
-DirectionalLightSource::~DirectionalLightSource(void) {}
+	const auto BoundingSphereRadiusSqr = math::length2(scene_box.max_corner() - scene_box.min_corner());
+	_power = color::get_importance(_color) * BoundingSphereRadiusSqr * math::pi;
+}
 
 void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
 {
-	if (true || math::dot(m_direction, context.getNormal()) >= 0.0f)
+	if (true || math::dot(_direction, context.getNormal()) >= 0.0f)
 	{
 		job(lighting_functional_distribution(
 				1U,
@@ -21,11 +31,11 @@ void DirectionalLightSource::DoWithDistribution(const LightingContext & context,
 				{
 					subJob(math::random_sample<const light_sample, space_real>(
 						light_sample(
-							m_direction,
+							_direction,
 							std::numeric_limits<space_real>::max(),
 							[&]()
 							{
-								return m_color;
+								return _color;
 							}
 						),
 						space_real(1.0),
@@ -35,11 +45,11 @@ void DirectionalLightSource::DoWithDistribution(const LightingContext & context,
 				{
 					return math::random_sample<const light_sample, space_real>(
 						light_sample(
-							m_direction,
+							_direction,
 							std::numeric_limits<space_real>::max(),
 							[=]()
 							{
-								return m_color;
+								return _color;
 							}
 						),
 						space_real(1.0),
@@ -51,4 +61,9 @@ void DirectionalLightSource::DoWithDistribution(const LightingContext & context,
 	{
 		job(lighting_functional_distribution());
 	}
+}
+
+color_real DirectionalLightSource::GetApproximateTotalPower() const
+{
+	return _power;
 }

@@ -4,15 +4,8 @@
 
 class Marcher
 {
-protected:
-	Marcher(void)
-	{
-	}
-
 public:
-	virtual ~Marcher(void)
-	{
-	}
+	virtual ~Marcher() = default;
 
 
 	virtual void Restart(const math::ray<space_real, 3> & ray, space_real near, space_real far) = 0;

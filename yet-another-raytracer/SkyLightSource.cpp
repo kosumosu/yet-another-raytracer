@@ -10,8 +10,6 @@ SkyLightSource::SkyLightSource()
 	, m_color(color_rgbx::fill(0.5)) {}
 
 
-SkyLightSource::~SkyLightSource(void) {}
-
 
 void SkyLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
 {
@@ -47,4 +45,9 @@ void SkyLightSource::DoWithDistribution(const LightingContext & context, math::U
 #endif
 		}
 	));
+}
+
+color_real SkyLightSource::GetApproximateTotalPower() const
+{
+	throw std::exception{};
 }

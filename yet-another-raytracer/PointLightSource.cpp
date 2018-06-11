@@ -1,5 +1,6 @@
 #include "PointLightSource.h"
 #include "LightingContext.h"
+#include "color_functions.hpp"
 
 using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
 
@@ -8,8 +9,6 @@ PointLightSource::PointLightSource()
 	, m_color(color_rgbx::zero())
 	, m_attenuation(1.0f, 0.0f, 0.0f) {}
 
-
-PointLightSource::~PointLightSource(void) {}
 
 void PointLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
 {
@@ -56,4 +55,9 @@ void PointLightSource::DoWithDistribution(const LightingContext & context, math:
 	{
 		job(lighting_functional_distribution());
 	}
+}
+
+color_real PointLightSource::GetApproximateTotalPower() const
+{
+	return color::get_importance(m_color) * color_real(4.0 * math::pi);
 }

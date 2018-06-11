@@ -19,10 +19,6 @@ public:
 	{
 	}
 
-	~Attenuation(void)
-	{
-	}
-
 	space_real quadratic() const { return m_quadratic; }
 	void quadratic(space_real val) { m_quadratic = val; }
 

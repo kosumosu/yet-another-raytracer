@@ -12,15 +12,13 @@ class RayEvaluator;
 
 struct light_sample
 {
-	light_sample(const vector3 & direction, const space_real & distance, const std::function<color_rgbx()> & evaluate)
-		: direction(direction),
-		  distance(distance),
-		  evaluate(evaluate) { }
-
-	light_sample(vector3 && direction, space_real && distance, std::function<color_rgbx()> && evaluate)
-		: direction(std::move(direction)),
-		  distance(std::move(distance)),
-		  evaluate(std::move(evaluate)) { }
+	template <class TDirection, class TDistance, class TEvaluate>
+	light_sample(TDirection&& direction, TDistance&& distance, TEvaluate&& evaluate)
+		: direction(std::forward<TDirection>(direction)),
+		  distance(std::forward<TDistance>(distance)),
+		  evaluate(std::forward<TEvaluate>(evaluate))
+	{
+	}
 
 	vector3 direction;
 	space_real distance;
@@ -28,7 +26,7 @@ struct light_sample
 };
 
 using light_distribution = Distribution<const light_sample, const vector3, space_real>;
-using distibution_func = std::function<void(const light_distribution & job)>;
+using distibution_func = std::function<void(const light_distribution& job)>;
 
 class LightSource
 {
@@ -36,9 +34,12 @@ public:
 
 	LightSource() = default;
 
-	virtual ~LightSource(void) { }
+	virtual ~LightSource() = default;
 
-	virtual void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned int> & randomEngine, const distibution_func & job) const = 0;
+	virtual void DoWithDistribution(const LightingContext& context, math::UniformRandomBitGenerator<unsigned int>& randomEngine,
+	                                const distibution_func& job) const = 0;
+
+	virtual color_real GetApproximateTotalPower() const = 0;
 };
 
 typedef std::vector<std::shared_ptr<LightSource>> LightSourceCollection;

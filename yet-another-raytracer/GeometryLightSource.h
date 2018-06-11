@@ -13,6 +13,8 @@ public:
 	GeometryLightSource(const ObjectCollection & objects);
 
 	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const override;
+
+	color_real GetApproximateTotalPower() const override;
 private:
 	math::discrete_distribution<GeometryObject *, color_real> _distribution;
 	std::vector<GeometryObject *> _objects;

@@ -52,15 +52,11 @@ void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engi
 template <typename TRandomEngine>
 void InsertSkyLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 {
-	color_real intensity_per_light = color_real(5.0) / count;
+	const color_real intensity_per_light = color_real(5.0) / count;
 
 	for (unsigned int i = 0; i < count; i++)
 	{
-		std::shared_ptr<DirectionalLightSource> light_source(new DirectionalLightSource());
-		light_source->direction(math::sphericalRand<space_real>(engine));
-		light_source->color(color_rgbx::fill(intensity_per_light));
-
-		scene.lights().push_back(light_source);
+		scene.lights().push_back(std::make_shared<DirectionalLightSource>(math::sphericalRand<space_real>(engine), color_rgbx::fill(intensity_per_light), scene));
 	}
 }
 
@@ -120,7 +116,7 @@ void InsertCalibrationSpheres(Scene & scene)
 	object1->center(vector3(0.0f, -0.9f, 0.0f));
 	object1->material(material1.get());
 
-	std::shared_ptr<BlinnMaterial> material2(new BlinnMaterial());
+	std::shared_ptr<BlinnMaterial> material2{ new BlinnMaterial{} };
 	material2->diffuse(color_rgbx(0.5f, 0.5f, 0.5f, 0.0f));
 	scene.getMaterials().insert(std::make_pair("InsertCalibrationSpheres()::material2", material2));
 
@@ -129,18 +125,18 @@ void InsertCalibrationSpheres(Scene & scene)
 	object2->center(vector3(0.0f, 0.9f, 0.0f));
 	object2->material(material2.get());
 
-	scene.objects().push_back(object1);
-	scene.objects().push_back(object2);
+	scene.objects().push_back(std::move(object1));
+	scene.objects().push_back(std::move(object2));
 }
 
 void InsertTriangle(Scene & scene)
 {
-	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial());
-	scene.getMaterials().insert(std::make_pair("InsertTriangle()::material1", material1));
+	std::shared_ptr<BlinnMaterial> material1{ new BlinnMaterial{} };
 	material1->diffuse(color_rgbx(0.1f, 0.3f, 0.75f, 1.0f));
 	material1->specular(color_rgbx(0.5f, 0.5f, 0.5f, 1.0f));
 	material1->shininess(100.0f);
 	material1->emission(color_rgbx(0.01f, 0.03f, 0.075f, 1.0f));
+	scene.getMaterials().insert(std::make_pair("InsertTriangle()::material1", material1));
 
 	std::shared_ptr<FlatTriangleObject> object1(new FlatTriangleObject());
 	object1->material(material1.get());
@@ -148,7 +144,7 @@ void InsertTriangle(Scene & scene)
 	object1->vertex1(vector3(0.0f, 2.0f, 0.0f));
 	object1->vertex2(vector3(0.0f, 0.0f, 1.0f));
 
-	scene.objects().push_back(object1);
+	scene.objects().push_back(std::move(object1));
 }
 
 template <typename TRandomEngine>
@@ -156,7 +152,7 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 {
 	for (unsigned int i = 0; i < count; i++)
 	{
-		std::shared_ptr<BlinnMaterial> material(new BlinnMaterial());
+		std::shared_ptr<BlinnMaterial> material{ new BlinnMaterial{} };
 		scene.getMaterials().insert(std::make_pair("InsertTriangle()::material #" + std::to_string(i), material));
 		material->diffuse(math::linearRand(color_rgbx::zero(), color_rgbx::fill(1.0), engine));
 		//material->specular(math::linearRand(zero4, one4));
@@ -168,7 +164,7 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 
 		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), engine);
 
-		std::shared_ptr<FlatTriangleObject> object(new FlatTriangleObject());
+		std::shared_ptr<FlatTriangleObject> object{ new FlatTriangleObject{} };
 		object->material(material.get());
 		object->vertex0(pivot + math::linearRand(min_bound, max_bound, engine));
 		object->vertex1(pivot + math::linearRand(min_bound, max_bound, engine));
@@ -180,26 +176,22 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 
 void InsertPointLight(Scene & scene)
 {
-	std::shared_ptr<PointLightSource> lightSource(new PointLightSource());
+	std::shared_ptr<PointLightSource> lightSource{ new PointLightSource{} };
 	lightSource->position(vector3(2.0, 2.0, 2.0));
 	lightSource->color(color_rgbx(20.0, 20.0, 30.0, 1.0));
 	lightSource->attenuation(Attenuation(1.0, 0.0, 0.0));
 
-	scene.lights().push_back(lightSource);
+	scene.lights().push_back(std::move(lightSource));
 }
 
 void InsertDirectionalLight(Scene & scene)
 {
-	std::shared_ptr<DirectionalLightSource> lightSource(new DirectionalLightSource());
-	lightSource->direction(math::normalize(vector3(1.0, 1.0, 1.0)));
-	lightSource->color(color_rgbx(0.6f, 0.6f, 0.6f, 1.0f));
-
-	scene.lights().push_back(lightSource);
+	scene.lights().push_back(std::make_shared<DirectionalLightSource>(math::normalize(vector3(1.0, 1.0, 1.0)), color_rgbx(0.6f, 0.6f, 0.6f, 1.0f), scene));
 }
 
 void InsertSkyLight(Scene & scene, unsigned int samples)
 {
-	std::shared_ptr<SkyLightSource> lightSource(new SkyLightSource());
+	std::shared_ptr<SkyLightSource> lightSource{ new SkyLightSource{} };
 	lightSource->color(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
 	lightSource->samples(samples);
 
@@ -222,7 +214,7 @@ void InitCamera(Scene & scene, unsigned int width, unsigned int height)
 
 void LoadFromFile(Scene & scene, const std::wstring & filename)
 {
-	std::unique_ptr<SceneLoader> loader(SceneLoader::CreateDefault());
+	const std::unique_ptr<SceneLoader> loader{ SceneLoader::CreateDefault() };
 
 	loader->Load(scene, filename);
 }
@@ -231,48 +223,25 @@ void LoadFromFile(Scene & scene, const std::wstring & filename)
 
 std::wstring GetFileName(const std::wstring & input)
 {
-	auto index = input.rfind('\\');
+	const auto index = input.rfind('\\');
 
-	if (index == std::string::npos)
-	{
-		return input;
-	}
-	else
-	{
-		return input.substr(index + 1);
-	}
+	return index == std::string::npos ? input : input.substr(index + 1);
 }
 
 std::wstring GetFileNameWithoutExtension(const std::wstring & input)
 {
 	auto filename = GetFileName(input);
 
-	auto index = filename.rfind('.');
+	const auto index = filename.rfind('.');
 
-	if (index == std::string::npos)
-	{
-		return filename;
-	}
-	else
-	{
-		auto tmp = filename.substr(0, index);
-		return tmp;
-	}
+	return index == std::string::npos ? filename : filename.substr(0, index);
 }
 
 std::wstring GetPathWithoutExtension(const std::wstring & input)
 {
-	auto index = input.rfind('.');
+	const auto index = input.rfind('.');
 
-	if (index == std::wstring::npos)
-	{
-		return input;
-	}
-	else
-	{
-		auto tmp = input.substr(0, index);
-		return tmp;
-	}
+	return index == std::wstring::npos ? input : input.substr(0, index);
 }
 
 void Render(const std::wstring & scene_file, const std::wstring & output_image_file)
@@ -314,7 +283,7 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 			},
 		[&]()
 			{
-				auto totalElapsed = timer->Sample();
+				const auto totalElapsed = timer->Sample();
 				std::wcout << "Rendering finished : " << totalElapsed - initTime << "sec" << std::endl;
 				std::wcout << "Total time : " << totalElapsed << "sec" << std::endl;
 			},
@@ -336,7 +305,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	Render(std::wstring(argv[1]), image_file);
 
-	ShellExecute(NULL, L"Open", image_file.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(nullptr, L"Open", image_file.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 
 	return 0;
 }

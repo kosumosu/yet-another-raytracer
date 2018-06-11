@@ -7,7 +7,6 @@ class SkyLightSource : public LightSource
 {
 public:
 	SkyLightSource();
-	virtual ~SkyLightSource(void);
 
 	unsigned int samples() const { return m_samples; }
 	void samples(unsigned int val)
@@ -22,6 +21,9 @@ public:
 	}
 
 	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const override;
+
+
+	color_real GetApproximateTotalPower() const override;
 private:
 	unsigned int m_samples;
 	color_rgbx m_color;

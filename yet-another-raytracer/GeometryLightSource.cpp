@@ -9,13 +9,13 @@ GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 	std::vector<std::pair<GeometryObject*, color_real>> objectsWithWeights;
 
 	color_real totalPower = color_real(0);
-	for (const auto object : objects)
+	for (const auto & object : objects)
 	{
 		const auto power = color_real(object->GetOneSidedSurfaceArea()) * object->material()->GetEmissionImportance();
 		totalPower += power;
 		if (power > color_real(0.0))
 		{
-			objectsWithWeights.push_back(std::make_pair(object.get(), power));
+			objectsWithWeights.emplace_back(object.get(), power);
 			_objects.push_back(object.get());
 		}
 	}
@@ -60,7 +60,7 @@ void GeometryLightSource::DoWithDistribution(const LightingContext & context, ma
 		[&](const vector3 & sample)
 		{
 			ray3 ray(context.getPoint(), sample);
-			space_real pdf = space_real(0);
+			space_real pdf = {0};
 			for (const auto & object : _objects)
 			{
 				const auto hit = object->FindHit(ray, context.getBias(), std::numeric_limits<space_real>::max());
@@ -80,4 +80,9 @@ void GeometryLightSource::DoWithDistribution(const LightingContext & context, ma
 			return pdf;
 		}
 	));
+}
+
+color_real GeometryLightSource::GetApproximateTotalPower() const
+{
+	return _totalPower;
 }

@@ -22,7 +22,7 @@ namespace math
 		>
 		discrete_distribution(TIterator begin, TIterator end)
 		{
-			auto size = std::distance(begin, end);
+			const auto size = std::distance(begin, end);
 
 			_cdf.resize(size);
 			TWeight accumulator = begin->second;

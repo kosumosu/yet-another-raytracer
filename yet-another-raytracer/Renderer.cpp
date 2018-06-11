@@ -42,7 +42,7 @@ void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrato
 
 void Renderer::Render(Film & film, const Scene & scene) const
 {
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> randomEngine(std::mt19937{});
+	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> randomEngine{ std::mt19937{} };
 
 
 	PrepareObjects(scene.objects());
@@ -53,7 +53,7 @@ void Renderer::Render(Film & film, const Scene & scene) const
 
 	std::vector<const LightSource*> lights(scene.lights().size());
 	std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights), [](const auto & lightPtr) { return lightPtr.get(); });
-	MonteCarloPathIntegrator integrator(&raytracer, lights, [&](const ray3 & ray) { return scene.getEnvironmentColor(); });
+	const MonteCarloPathIntegrator integrator{ &raytracer, lights, [&](const ray3 & ray) { return scene.getEnvironmentColor(); } };
 
 	const bool isCropped = scene.getCropWidth() > 0 && scene.getCropHeight() > 0;
 
