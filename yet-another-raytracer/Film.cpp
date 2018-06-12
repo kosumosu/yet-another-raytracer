@@ -1,12 +1,12 @@
 #include "Film.h"
 #include <png.hpp>
-#include <iostream>
+#include <fstream>
 
 template <typename T>
 void setToInteger(T & output, const color_real & input)
 {
-	int bits = sizeof(T) * 8;
-	output = static_cast<T>(input * ((1 << bits) - 1));
+	unsigned int bits = sizeof(T) * 8;
+	output = static_cast<T>(input * ((1U << bits) - 1));
 }
 
 void Film::SaveAsPng(const std::wstring & filename)
@@ -17,7 +17,7 @@ void Film::SaveAsPng(const std::wstring & filename)
 		throw std::exception();
 
 	png::image<png::rgb_pixel> image(m_width, m_height);
-	image.set_file_gamma(1.0);
+	image.set_file_gamma(1 / 2.2);
 
 	const color_rgbx color_0(0.0f, 0.0f, 0.0f, 0.0f);
 	const color_rgbx color_1(1.0f, 1.0f, 1.0f, 1.0f);
@@ -26,8 +26,8 @@ void Film::SaveAsPng(const std::wstring & filename)
 	{
 		for (unsigned int x = 0; x < m_width; x++)
 		{
-			auto gammaCorrected = math::pow(getPixel(x, y), color_real(1 / 2.2));
-			auto clamped = math::clamp(gammaCorrected, color_0, color_1);
+			const auto gammaCorrected = math::pow(getPixel(x, y), color_real(1 / 2.2));
+			const auto clamped = math::clamp(gammaCorrected, color_0, color_1);
 
 			setToInteger(image[y][x].red, clamped[0]);
 			setToInteger(image[y][x].green, clamped[1]);
