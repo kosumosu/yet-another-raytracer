@@ -5,7 +5,7 @@
 constexpr space_real EPSILON = std::numeric_limits<space_real>::min() * space_real(16.0);
 
 
-template <size_t... Indices>
+template <std::size_t... Indices>
 uvs_t interpolateUVs_impl(const uvs_t & uvs0, const uvs_t & uvs1, const uvs_t & uvs2, space_real u, space_real v, space_real w, std::index_sequence<Indices...>)
 {
 	return uvs_t{ { (uvs0[Indices] * w + uvs1[Indices] * u + uvs2[Indices] * v)... } };

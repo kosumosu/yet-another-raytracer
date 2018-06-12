@@ -8,10 +8,6 @@ Parser::Parser( std::istream * stream )
 	, _currentLineNumber(1) {}
 
 
-Parser::~Parser(void)
-{
-}
-
 bool Parser::MoveToNextCommand()
 {
 	bool parsing_comment = false;
@@ -57,7 +53,7 @@ bool Parser::MoveToNextCommand()
 
 bool Parser::IsEol( char character ) const
 {
-	for (size_t i = 0; i < sizeof(eol_chars) / sizeof(char); i++)
+	for (std::size_t i = 0; i < sizeof(eol_chars) / sizeof(char); i++)
 	{
 		if (character == eol_chars[i])
 			return true;
@@ -67,7 +63,7 @@ bool Parser::IsEol( char character ) const
 
 bool Parser::IsWhitespace( char character ) const
 {
-	for (size_t i = 0; i < sizeof(whitespace_chars) / sizeof(char); i++)
+	for (std::size_t i = 0; i < sizeof(whitespace_chars) / sizeof(char); i++)
 	{
 		if (character == whitespace_chars[i])
 			return true;

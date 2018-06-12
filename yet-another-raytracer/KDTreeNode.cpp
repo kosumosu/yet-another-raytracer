@@ -66,16 +66,16 @@ unsigned int KDTreeNode::GetSplittingAxis( const bounding_box3 & box, const std:
 	return max_axis;
 #else
 
-	size_t bestAxis = 0;
-	size_t bestSplitCount = objects.size() * 2;
+	std::size_t bestAxis = 0;
+	std::size_t bestSplitCount = objects.size() * 2;
 
-	for (size_t proposedAxis = 0; proposedAxis < 3; proposedAxis++)
+	for (std::size_t proposedAxis = 0; proposedAxis < 3; proposedAxis++)
 	{
 		bounding_box left_box, right_box;
 		box.Split(proposedAxis, FindSplittingPlane(box, proposedAxis, objects), left_box, right_box);
 
-		size_t left_objects = 0;
-		size_t right_objects = 0;
+		std::size_t left_objects = 0;
+		std::size_t right_objects = 0;
 
 		for (auto & object : objects)
 		{

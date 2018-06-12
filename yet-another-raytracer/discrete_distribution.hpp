@@ -3,11 +3,10 @@
 #include "random_sample.hpp"
 #include <vector>
 #include <algorithm>
-#include <random>
 
 namespace math
 {
-	template <typename TElement, typename TWeight, typename TPdf = TWeight>
+	template <class TElement, class TWeight, class TPdf = TWeight>
 	class discrete_distribution
 	{
 	public:
@@ -17,8 +16,8 @@ namespace math
 		}
 
 		template <
-			typename TIterator,
-			class = typename std::enable_if<std::is_assignable<std::pair<TElement, TWeight>, typename TIterator::value_type>::value, void>::type
+			class TIterator,
+			class = std::enable_if_t<std::is_assignable<std::pair<TElement, TWeight>, typename TIterator::value_type>::value>
 		>
 		discrete_distribution(TIterator begin, TIterator end)
 		{

@@ -11,7 +11,7 @@ public:
 
 	virtual ~Distribution() = default;
 
-	virtual size_t delta_components() const = 0;
+	virtual std::size_t delta_components() const = 0;
 	virtual void iterate_over_delta_components(const delta_func & job) const = 0;
 	virtual math::random_sample<TSample, TProbability> generate_delta_component_sample() const = 0;
 	virtual bool has_non_delta_component() const = 0;
@@ -40,7 +40,7 @@ public:
 		  _generateSample(nullptr) { }
 
 	FunctionalDistribution(
-		size_t deltaComponentCount,
+		std::size_t deltaComponentCount,
 		const iterate_over_delta_func & iterateOverDeltaComponents,
 		const generate_sample_func & generateDeltaComponentSample,
 		const generate_sample_func & generateNonDeltaComponentSample,
@@ -67,7 +67,7 @@ public:
 		  _generateSample(generateNonDeltaComponentSample) { }
 
 	FunctionalDistribution(
-		size_t deltaComponentCount,
+		std::size_t deltaComponentCount,
 		const iterate_over_delta_func & iterateOverDeltaComponents,
 		const generate_sample_func & generateDeltaComponentSample
 	)
@@ -80,7 +80,7 @@ public:
 		  _generateSample(generateDeltaComponentSample) { }
 
 
-	size_t delta_components() const override
+	std::size_t delta_components() const override
 	{
 		return _deltaComponentCount;
 	}
@@ -116,7 +116,7 @@ public:
 	}
 
 private:
-	size_t _deltaComponentCount;
+	std::size_t _deltaComponentCount;
 	bool _hasNonDeltaComponents;
 	iterate_over_delta_func _iterateOverDeltaComponents;
 	generate_sample_func _generateDeltaComponentSample;

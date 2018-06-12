@@ -27,7 +27,7 @@ using color_real = float;
 using color_rgb = math::vector<color_real, 3>;
 using color_rgbx = math::vector<color_real, 4>;
 
-constexpr size_t UVS_COUNT = 1;
+constexpr std::size_t UVS_COUNT = 1;
 using uvs_t = std::array<vector2, UVS_COUNT>;
 
 // to workaround upper bound issue with STL PRNG

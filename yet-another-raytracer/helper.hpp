@@ -24,7 +24,7 @@ namespace math
 	using my_make_index_sequence = typename details::my_make_index_sequence_struct<N>::type;
 
 	// helper to unfold index pack into repeating T pack
-	template<size_t, typename T>
+	template<std::size_t, typename T>
 	using get_type = T;
 
 #if ENABLE_TEMPLATE_LOOP

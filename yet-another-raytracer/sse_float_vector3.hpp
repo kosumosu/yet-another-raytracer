@@ -51,7 +51,7 @@ namespace math
 			m_values = _mm_set_ps(float(0), z, y, x);
 		}
 
-		size_t size() const { return 3; }
+		std::size_t size() const { return 3; }
 
 
 		float & operator[](std::size_t index)

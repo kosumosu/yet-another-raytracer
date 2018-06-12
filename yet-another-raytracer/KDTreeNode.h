@@ -47,7 +47,7 @@ public:
 	{
 		bool isNear = kind == NodeKind::Near;
 		bool isTowardsPositive = direction[m_split_axis] >= space_real(0.0);
-		size_t nodeIndex = (isNear ^ isTowardsPositive) ? 1 : 0;
+		std::size_t nodeIndex = (isNear ^ isTowardsPositive) ? 1 : 0;
 		return m_subnodes[nodeIndex];
 	}
 

@@ -4,7 +4,7 @@
 
 namespace math
 {
-	template <typename TSpace, size_t DIMENSIONS>
+	template <typename TSpace, std::size_t DIMENSIONS>
 	class ray
 	{
 	public:

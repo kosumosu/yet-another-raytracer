@@ -28,8 +28,6 @@ public:
 		, _environmentColor(color_rgbx::zero())
 		, _samplesPerPixel(1) { }
 
-	~Scene(void) { }
-
 
 	unsigned int viewport_width() const { return _viewport_width; }
 	void viewport_width(unsigned int value) { _viewport_width = value; }
@@ -55,8 +53,8 @@ public:
 	color_rgbx getEnvironmentColor() const { return _environmentColor; }
 	void setEnvironmentColor(const color_rgbx & color) { _environmentColor = color; }
 
-	size_t getSamplesPerPixel() const { return _samplesPerPixel; }
-	void setSamplesPerPixel(size_t samplesPerPixel) { _samplesPerPixel = samplesPerPixel; }
+	std::size_t getSamplesPerPixel() const { return _samplesPerPixel; }
+	void setSamplesPerPixel(std::size_t samplesPerPixel) { _samplesPerPixel = samplesPerPixel; }
 
 
 	unsigned getCropX() const { return _cropX; }
@@ -97,5 +95,5 @@ private:
 	MapCollection _maps;
 
 	color_rgbx _environmentColor;
-	size_t _samplesPerPixel;
+	std::size_t _samplesPerPixel;
 };

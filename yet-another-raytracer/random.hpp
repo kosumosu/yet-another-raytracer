@@ -8,13 +8,13 @@
 namespace math
 {
 	
-	template <typename TValue, size_t N, typename TRandomEngine>
+	template <typename TValue, std::size_t N, typename TRandomEngine>
 	vector<TValue, N> inline linearRand( const vector<TValue, N> & low, const vector<TValue, N> & high, TRandomEngine & engine)
 	{
 		std::uniform_real_distribution<TValue> distr;
 
 		vector<TValue, N> rand = vector<TValue, N>::zero();
-		iterate<0, N - 1>([&](size_t i)
+		iterate<0, N - 1>([&](std::size_t i)
 		{
 			rand[i] = distr(engine);
 		});

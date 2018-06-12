@@ -28,7 +28,7 @@ void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrato
 	vector2 pixelLeftBottomCoord(x, y);
 	vector2 sizeNormalizationFactor(1.0 / film.width(), 1.0 / film.height());
 
-	for (size_t i = 0; i < scene.getSamplesPerPixel(); i++)
+	for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++)
 	{
 		auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), pixelPersonalRandomEngine) : vector2(0.5, 0.5);
 		auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;

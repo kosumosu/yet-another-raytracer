@@ -4,13 +4,13 @@
 
 namespace math
 {
-	template <typename T, size_t COLS, size_t ROWS>
+	template <typename T, std::size_t COLS, std::size_t ROWS>
 	class base_matrix
 	{
 	public:
 
-		constexpr static size_t columns() { return COLS; }
-		constexpr static size_t rows() { return ROWS; }
+		constexpr static std::size_t columns() { return COLS; }
+		constexpr static std::size_t rows() { return ROWS; }
 
 		constexpr static base_matrix<T, COLS, ROWS> uniform_scale(const T & scale) { return generate_matrix(scale, std::make_index_sequence<ROWS>()); }
 		constexpr static base_matrix<T, COLS, ROWS> identity() { return uniform_scale(1); }
@@ -20,9 +20,9 @@ namespace math
 		// Constructs identity matrix
 		//base_matrix()
 		//{
-		//	for (size_t j = 0; j < ROWS; j++)
+		//	for (std::size_t j = 0; j < ROWS; j++)
 		//	{
-		//		iterate<0, COLS - 1>([&](size_t i)
+		//		iterate<0, COLS - 1>([&](std::size_t i)
 		//		{
 		//			m_rows[j][i] = i == j ? T(1) : T(0);
 		//		});

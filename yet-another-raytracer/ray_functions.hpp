@@ -6,7 +6,7 @@
 
 namespace math
 {
-	template <typename TSpace, size_t ROWS, size_t COLUMNS>
+	template <typename TSpace, std::size_t ROWS, std::size_t COLUMNS>
 	ray<TSpace, ROWS> transform(const ray<TSpace, COLUMNS> & inputRay, const base_matrix<TSpace, COLUMNS, ROWS> & matrix)
 	{
 		auto origin = matrix * inputRay.origin();
@@ -22,7 +22,7 @@ namespace math
 		return ray<TSpace, 3>(origin, direction);
 	}
 
-	template <typename TSpace, size_t DIMENSIONS>
+	template <typename TSpace, std::size_t DIMENSIONS>
 	ray<TSpace, DIMENSIONS> MoveOriginAlongDirection(const ray<TSpace, DIMENSIONS> & inputRay, const TSpace & distance)
 	{
 		return ray<TSpace, DIMENSIONS>(inputRay.origin() + inputRay.direction() * distance, inputRay.direction(), inputRay.inversed_direction());

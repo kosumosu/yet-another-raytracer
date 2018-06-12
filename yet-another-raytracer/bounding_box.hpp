@@ -7,7 +7,7 @@
 
 namespace math
 {
-	template <typename TSpace, size_t DIMENSIONS>
+	template <typename TSpace, std::size_t DIMENSIONS>
 	class bounding_box
 	{
 	public:
@@ -125,7 +125,7 @@ namespace math
 			return isInside;
 		}
 
-		void Split(size_t axis, const TSpace & coord, bounding_box & box_left, bounding_box & box_right) const
+		void Split(std::size_t axis, const TSpace & coord, bounding_box & box_left, bounding_box & box_right) const
 		{
 			vector<TSpace, DIMENSIONS> max_corner_left = m_max_corner;
 			vector<TSpace, DIMENSIONS> min_corner_right = m_min_corner;

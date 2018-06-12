@@ -69,7 +69,7 @@ namespace math
 			m_values = _mm_set_ps(w, z, y, x);
 		}
 
-		size_t size() const { return 4; }
+		std::size_t size() const { return 4; }
 
 		float & operator[](std::size_t index)
 		{

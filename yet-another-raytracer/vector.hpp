@@ -7,11 +7,11 @@
 
 namespace math
 {
-	template<typename TSpace, size_t DIMENSIONS, class Enable = void/*, typename TIndexSeq = my_make_index_sequence<DIMENSIONS>*/>
+	template<typename TSpace, std::size_t DIMENSIONS, class Enable = void/*, typename TIndexSeq = my_make_index_sequence<DIMENSIONS>*/>
 	class vector {};
 
 	// Represents vector in space of TSpace^DIMENSIONS.
-	template<typename TSpace, size_t DIMENSIONS/*, std::size_t... Indices2*/>
+	template<typename TSpace, std::size_t DIMENSIONS/*, std::size_t... Indices2*/>
 	class vector<TSpace, DIMENSIONS, std::enable_if_t<(DIMENSIONS > 0)>/*, std::index_sequence<Indices2...>*/>
 	{
 	public:
@@ -21,7 +21,7 @@ namespace math
 		constexpr static _Myt fill(const TSpace & value) { return vector<TSpace, DIMENSIONS>(value, std::make_index_sequence<DIMENSIONS>()); }
 		constexpr static _Myt zero() { return fill(0); }
 
-		constexpr static size_t dimensions() { return DIMENSIONS; }
+		constexpr static std::size_t dimensions() { return DIMENSIONS; }
 
 		constexpr vector(const _Myt & other) //noexcept(noexcept(vector(other, std::make_index_sequence<DIMENSIONS>())))
 			: vector(other, std::make_index_sequence<DIMENSIONS>())
