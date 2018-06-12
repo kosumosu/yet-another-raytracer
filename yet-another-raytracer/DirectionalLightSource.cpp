@@ -18,7 +18,7 @@ DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const 
 	}
 
 	const auto BoundingSphereRadiusSqr = math::length2(scene_box.max_corner() - scene_box.min_corner());
-	_power = color::get_importance(_color) * BoundingSphereRadiusSqr * math::pi;
+	_power = color::get_importance(_color) * color_real(BoundingSphereRadiusSqr * math::pi);
 }
 
 void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const

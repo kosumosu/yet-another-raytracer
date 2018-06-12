@@ -110,7 +110,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(const ray3 & ray, unsigned boun
 
 					const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
 
-					std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+					const std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 					if (importance < color_real(1.0) && distr(randomEngine) >= importance)
 					{
 						earlyExit = true;
