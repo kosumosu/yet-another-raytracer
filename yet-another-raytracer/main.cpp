@@ -16,12 +16,13 @@
 #include "SceneLoader.h"
 
 #include "Types.h"
+
+#include "OSAbstraction.h"
+
 #include <iostream>
 #include <iomanip>
 #include <memory>
 #include <tchar.h>
-#define NOGDI
-#include <Windows.h>
 
 
 void reportProgress(float progress)
@@ -270,20 +271,20 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 	//InsertSkyLight(scene, 128);
 #endif
 
-	std::unique_ptr<Stopwatch> timer(new ProcessTimeStopwatch());
-	timer->Restart();
+	ProcessTimeStopwatch timer;
+	timer.Restart();
 
 	Film film(scene.viewport_width(), scene.viewport_height());
 	float initTime;
 	Renderer renderer(
 		[&]() 
 			{
-				initTime = timer->Sample();
+				initTime = timer.Sample();
 				std::wcout << "Initialization finished : " << initTime << std::endl;
 			},
 		[&]()
 			{
-				const auto totalElapsed = timer->Sample();
+				const auto totalElapsed = timer.Sample();
 				std::wcout << "Rendering finished : " << totalElapsed - initTime << "sec" << std::endl;
 				std::wcout << "Total time : " << totalElapsed << "sec" << std::endl;
 			},
@@ -305,7 +306,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	Render(std::wstring(argv[1]), image_file);
 
-	ShellExecute(nullptr, L"Open", image_file.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+	openImageFileForDisplay(image_file.c_str());
 
 	return 0;
 }

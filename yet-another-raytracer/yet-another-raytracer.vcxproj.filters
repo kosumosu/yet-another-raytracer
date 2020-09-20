@@ -322,6 +322,7 @@
     <ClInclude Include="TextureCommandFactory.h">
       <Filter>Engine\Scene\Loading</Filter>
     </ClInclude>
+    <ClInclude Include="OSAbstraction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Renderer.cpp">
@@ -429,5 +430,6 @@
     <ClCompile Include="TextureCommandFactory.cpp">
       <Filter>Engine\Scene\Loading</Filter>
     </ClCompile>
+    <ClCompile Include="OSAbstraction.cpp" />
   </ItemGroup>
 </Project>

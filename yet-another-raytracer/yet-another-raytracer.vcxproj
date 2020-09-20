@@ -191,6 +191,7 @@
     <ClInclude Include="Distribution.h" />
     <ClInclude Include="GeometryLightSource.h" />
     <ClInclude Include="LightingContext.h" />
+    <ClInclude Include="OSAbstraction.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureCommandFactory.h" />
     <ClInclude Include="TextureCommandProcessor.h" />
@@ -276,6 +277,7 @@
     <ClCompile Include="Film.cpp" />
     <ClCompile Include="FlatTriangleObject.cpp" />
     <ClCompile Include="GeometryLightSource.cpp" />
+    <ClCompile Include="OSAbstraction.cpp" />
     <ClCompile Include="TextureCommandFactory.cpp" />
     <ClCompile Include="TextureCommandProcessor.cpp" />
     <ClCompile Include="MonteCarloPathIntegrator.cpp" />
