@@ -154,6 +154,8 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+# custom
 /berkeley-test-scenes
 yet-another-raytracer.VC.db
 *.db
@@ -163,5 +165,4 @@ yet-another-raytracer.VC.db
 *.png
 *.jpg
 /_scenes/deus-ex/02_NYC_Street.dx.scene
-/.vs/yet-another-raytracer/v15/Solution.VC.db-wal
-/.vs/yet-another-raytracer/v15/Solution.VC.db-shm
+/.vs
