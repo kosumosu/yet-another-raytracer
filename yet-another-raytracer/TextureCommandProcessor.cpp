@@ -6,7 +6,7 @@
 
 #include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 fs::path getPathRelativeToScene(const fs::path & sceneFilePath, const fs::path & relative)
 {
@@ -30,6 +30,7 @@ void TextureCommandProcessor::ProcessCommand(LoadingContext & context, const std
 	else if (command == "bitmapTexture")
 	{
 		const auto id = ParserHelper::ReadId(stream);
+		//ParserHelper::Read<std::string>(stream); // This is a workaround for the bug "std::quoted broken in 15.8, fails to properly extract characters from input stream after encountering delimiter" https://developercommunity.visualstudio.com/content/problem/314993/stdquoted-broken-in-158-fails-to-properly-extract.html
 		const auto fileName = getPathRelativeToScene(_sceneFileName, ParserHelper::ReadFileName(stream));
 
 		context.scene()->getMaps().insert(std::make_pair(id, std::make_shared<BitmapTexture>(fileName.string())));

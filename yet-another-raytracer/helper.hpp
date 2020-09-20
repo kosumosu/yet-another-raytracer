@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 
 #define ENABLE_TEMPLATE_LOOP false
 

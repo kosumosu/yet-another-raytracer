@@ -8,7 +8,7 @@ GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 {
 	std::vector<std::pair<GeometryObject*, color_real>> objectsWithWeights;
 
-	color_real totalPower = color_real(0);
+	color_real totalPower = { 0 };
 	for (const auto & object : objects)
 	{
 		const auto power = color_real(object->GetOneSidedSurfaceArea()) * object->material()->GetEmissionImportance();

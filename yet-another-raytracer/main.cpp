@@ -21,7 +21,7 @@
 #include <memory>
 #include <tchar.h>
 #define NOGDI
-#include <windows.h>
+#include <Windows.h>
 
 
 void reportProgress(float progress)
