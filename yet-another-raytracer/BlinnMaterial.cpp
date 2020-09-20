@@ -1,5 +1,4 @@
 #include "BlinnMaterial.h"
-#include "LightingContext.h"
 #include "Texture.h"
 #include "color_functions.hpp"
 
@@ -37,7 +36,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 	bsdf_functional_distribution::generate_sample_func generateDiffuseFuncImpl = [&]()
 		{
 			const bool isEntering = math::is_obtuse_angle(incidentDirection, normal);
-			std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+			const std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 			const auto translucenceProbability = color::get_importance(_translucency);
 			const bool isTranslucent = translucenceProbability > color_real(0.0) && translucenceProbability >= distr(randomEngine);
 
@@ -55,11 +54,11 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(direction,
-						[=]()
+						[=, this]()
 						{
 							return _translucency * (color_rgbx::fill(1.0) - _specular);
 						}),
-					pdf * (1.0 - GetReflectionProbability()) * translucenceProbability,
+					pdf * (color_real(1.0) - GetReflectionProbability()) * translucenceProbability,
 					false
 				);
 			}
@@ -67,11 +66,11 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(direction,
-						[=]()
+						[=, this]()
 						{
 							return diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency);
 						}),
-					pdf * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability),
+					pdf * (color_real(1.0) - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability),
 					false
 				);
 			}
@@ -90,8 +89,8 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 				const auto translucenceProbability = color::get_importance(_translucency);
 #if ENABLE_IMPORTANCE_SAMPLING
 				return math::is_obtuse_angle(direction, normal)
-					       ? color_real(math::dot(direction, normal) * space_real(math::oneOverPi)) * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability)
-					       : color_real(math::dot(direction, -normal) * space_real(math::oneOverPi)) * (1.0 - GetReflectionProbability()) * translucenceProbability;
+					       ? color_real(math::dot(direction, normal) * space_real(math::oneOverPi)) * (color_real(1.0) - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability)
+					       : color_real(math::dot(direction, -normal) * space_real(math::oneOverPi)) * (color_real(1.0) - GetReflectionProbability()) * translucenceProbability;
 #else
 				return math::is_obtuse_angle(direction, normal)
 					? color_real(0.5 * math::oneOverPi) * (1.0 - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability)
@@ -105,7 +104,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * cosTheta);
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(reflected_direction,
-					[=]()
+					[=, this]()
 					{
 						return _specular / color_real(std::abs(cosTheta));
 					}),
@@ -133,7 +132,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			: [&]()
 			{
 				const color_real reflectionPobability = GetReflectionProbability();
-				std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+				std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 				if (distr(randomEngine) < reflectionPobability)
 					return generateReflectionFuncImpl();
 				else

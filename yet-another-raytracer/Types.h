@@ -4,7 +4,7 @@
 #include "ray.hpp"
 #include "bounding_box.hpp"
 
-#define DOUBLE_PRECISION
+//#define DOUBLE_PRECISION
 
 #if defined (DOUBLE_PRECISION)
 
@@ -32,4 +32,4 @@ using uvs_t = std::array<vector2, UVS_COUNT>;
 
 // to workaround upper bound issue with STL PRNG
 template <typename T>
-constexpr T upperRandomBound() { return std::nextafter(T(1.0), T(0.0)); } // made it a func to pleasure resharper.
+constexpr T upperRandomBound = std::nextafter(T(1.0), T(0.0));

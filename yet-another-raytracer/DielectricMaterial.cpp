@@ -128,7 +128,7 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			//const auto transmission = std::max(color_real(1.0), color_real(1.0) - reflectance);
 			const auto transmission = color_real(1.0) - reflectance;
 
-			std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+			std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 			const auto randomNumber = distr(randomEngine);
 			const bool doReflectance = randomNumber < reflectance;
 

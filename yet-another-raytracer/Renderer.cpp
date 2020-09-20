@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include <utility>
+
 #include "Film.h"
 #include "Scene.h"
 #include "NullAccelerator.h"
@@ -10,17 +12,18 @@
 #include "MonteCarloPathIntegrator.h"
 
 
-Renderer::Renderer(const initialization_finished_callback & initializationFinishedCallback, const rendering_finished_callback & renderingFinishedCallback, const progress_callback & progressCallback)
-	: m_progressCallback(progressCallback)
-	, m_initializationFinishedCallback(initializationFinishedCallback)
-	, m_renderingFinishedCallback(renderingFinishedCallback)
+Renderer::Renderer(initialization_finished_callback initializationFinishedCallback, rendering_finished_callback renderingFinishedCallback,
+	progress_callback progressCallback)
+	: progressCallback_(std::move(progressCallback))
+	, initializationFinishedCallback_(std::move(initializationFinishedCallback))
+	, renderingFinishedCallback_(std::move(renderingFinishedCallback))
 {
 }
 
-void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrator & rayIntegrator, math::UniformRandomBitGenerator<unsigned> & randomEngine, unsigned x, unsigned y) const
+void Renderer::ProcessPixel(Film& film, const Scene& scene, const RayIntegrator& rayIntegrator, unsigned int x, unsigned int y) const
 {
 	const unsigned seed = x | (y << 16);
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::mt19937{ seed });
+	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::mt19937{seed});
 
 	bool doJitter = scene.getSamplesPerPixel() > 1;
 	color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
@@ -40,30 +43,27 @@ void Renderer::ProcessPixel(Film & film, const Scene & scene, const RayIntegrato
 	film.setPixel(x, y, averageColor);
 }
 
-void Renderer::Render(Film & film, const Scene & scene) const
+void Renderer::Render(Film& film, const Scene& scene) const
 {
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> randomEngine{ std::mt19937{} };
-
-
-	PrepareObjects(scene.objects());
+	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> randomEngine{std::mt19937{}};
 
 	//NullAccelerator accelerator(scene.objects());
 	KDTreeAccelerator accelerator(scene.objects());
 	Raytracer raytracer(std::unique_ptr<Marcher>(accelerator.CreateMarcher()));
 
 	std::vector<const LightSource*> lights(scene.lights().size());
-	std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights), [](const auto & lightPtr) { return lightPtr.get(); });
-	const MonteCarloPathIntegrator integrator{ &raytracer, lights, [&](const ray3 & ray) { return scene.getEnvironmentColor(); } };
+	std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights), [](const auto& lightPtr) { return lightPtr.get(); });
+	const MonteCarloPathIntegrator integrator{&raytracer, lights, [&](const ray3& ray) { return scene.getEnvironmentColor(); }};
 
 	const bool isCropped = scene.getCropWidth() > 0 && scene.getCropHeight() > 0;
 
-	const unsigned startX = isCropped ? scene.getCropX() : 0U;
-	const unsigned startY = isCropped ? scene.getCropY() : 0U;
-	const unsigned endX = isCropped ? std::min(film.width(), scene.getCropX() + scene.getCropWidth()) : film.width();
-	const unsigned endY = isCropped ? std::min(film.height(), scene.getCropY() + scene.getCropHeight()) : film.height();
-	float total_pixels = float(endX - startX) * float(endY - startY); // for timer
+	const unsigned int startX = isCropped ? scene.getCropX() : 0U;
+	const unsigned int startY = isCropped ? scene.getCropY() : 0U;
+	const unsigned int endX = isCropped ? std::min(film.width(), scene.getCropX() + scene.getCropWidth()) : film.width();
+	const unsigned int endY = isCropped ? std::min(film.height(), scene.getCropY() + scene.getCropHeight()) : film.height();
+	const float oneOverTotalPixels = 1.0f /  float(endX - startX) * float(endY - startY); // for timer
 
-	m_initializationFinishedCallback();
+	initializationFinishedCallback_();
 
 	StdHigheResolutionClockStopwatch timer;
 
@@ -73,22 +73,14 @@ void Renderer::Render(Film & film, const Scene & scene) const
 	{
 		for (unsigned int x = startX; x < endX; ++x)
 		{
-			ProcessPixel(film, scene, integrator, randomEngine, x, y);
+			ProcessPixel(film, scene, integrator, x, y);
 
 			if (timer.Sample() > 2.0f)
 			{
 				timer.Restart();
-				m_progressCallback(((y - startY) * (endX - startX) + x - startX) / total_pixels);
+				progressCallback_(float((y - startY) * (endX - startX) + x - startX) * oneOverTotalPixels);
 			}
 		}
 	}
-	m_renderingFinishedCallback();
-}
-
-void Renderer::PrepareObjects(const ObjectCollection & objects) const
-{
-	for (auto & object : objects)
-	{
-		object->PrepareForRendering();
-	}
+	renderingFinishedCallback_();
 }

@@ -1,13 +1,14 @@
 #pragma once
 
-#include "GeometryObject.h"
 #include "Camera.h"
+#include "GeometryObject.h"
 #include "LightSource.h"
-#include <vector>
+#include "Texture.h"
+
+#include <map>
 #include <memory>
 #include <string>
-#include <map>
-#include "Texture.h"
+#include <vector>
 
 using MaterialCollection = std::map<std::string, std::shared_ptr<Material>>;
 using MapCollection = std::map<std::string, std::shared_ptr<Texture>>;
@@ -16,84 +17,93 @@ class Scene
 {
 public:
 
-	Scene(void)
-		: _viewport_width(640)
-		, _viewport_height(480)
-		, _cropX(0)
-		, _cropY(0)
-		, _cropWidth(0)
-		, _cropHeight(0)
-		, _max_trace_depth(4)
-		, _camera(std::make_shared<Camera>())
-		, _environmentColor(color_rgbx::zero())
-		, _samplesPerPixel(1) { }
+	Scene()
+		: viewportWidth_(640)
+		, viewportHeight_(480)
+		, cropX_(0)
+		, cropY_(0)
+		, cropWidth_(0)
+		, cropHeight_(0)
+		, maxTraceDepth_(4)
+		, camera_(std::make_shared<Camera>())
+		, environmentColor_(color_rgbx::zero())
+		, samplesPerPixel_(1)
+	{
+	}
+
+	[[nodiscard]] unsigned int viewport_width() const { return viewportWidth_; }
+	void viewport_width(unsigned int value) { viewportWidth_ = value; }
+
+	[[nodiscard]] unsigned int viewport_height() const { return viewportHeight_; }
+	void viewport_height(unsigned int value) { viewportHeight_ = value; }
+
+	[[nodiscard]] unsigned int max_trace_depth() const { return maxTraceDepth_; }
+	void max_trace_depth(unsigned int val) { maxTraceDepth_ = val; }
+
+	[[nodiscard]] const std::string& output_filename() const { return outputFilename_; }
+	void output_filename(const std::string& val) { outputFilename_ = val; }
+
+	[[nodiscard]] const std::shared_ptr<Camera>& camera() const { return camera_; }
+	void camera(const std::shared_ptr<Camera>& value) { camera_ = value; }
+
+	ObjectCollection& objects() { return objects_; }
+	[[nodiscard]] const ObjectCollection& objects() const { return objects_; }
+
+	[[nodiscard]] const LightSourceCollection& lights() const { return lights_; }
+	LightSourceCollection& lights() { return lights_; }
+
+	[[nodiscard]] color_rgbx getEnvironmentColor() const { return environmentColor_; }
+	void setEnvironmentColor(const color_rgbx& color) { environmentColor_ = color; }
+
+	[[nodiscard]] std::size_t getSamplesPerPixel() const { return samplesPerPixel_; }
+	void setSamplesPerPixel(std::size_t samplesPerPixel) { samplesPerPixel_ = samplesPerPixel; }
 
 
-	unsigned int viewport_width() const { return _viewport_width; }
-	void viewport_width(unsigned int value) { _viewport_width = value; }
+	[[nodiscard]] unsigned getCropX() const { return cropX_; }
+	void setCropX(const unsigned cropX) { cropX_ = cropX; }
 
-	unsigned int viewport_height() const { return _viewport_height; }
-	void viewport_height(unsigned int value) { _viewport_height = value; }
+	[[nodiscard]] unsigned getCropY() const { return cropY_; }
+	void setCropY(const unsigned cropY) { cropY_ = cropY; }
 
-	unsigned int max_trace_depth() const { return _max_trace_depth; }
-	void max_trace_depth(unsigned int val) { _max_trace_depth = val; }
+	[[nodiscard]] unsigned getCropWidth() const { return cropWidth_; }
+	void setCropWidth(const unsigned cropWidth) { cropWidth_ = cropWidth; }
 
-	const std::string & output_filename() const { return _output_filename; }
-	void output_filename(const std::string & val) { _output_filename = val; }
+	[[nodiscard]] unsigned getCropHeight() const { return cropHeight_; }
+	void setCropHeight(const unsigned cropHeight) { cropHeight_ = cropHeight; }
 
-	const std::shared_ptr<Camera> & camera() const { return _camera; }
-	void camera(const std::shared_ptr<Camera> & value) { _camera = value; }
+	MaterialCollection& getMaterials() { return materials_; }
+	[[nodiscard]] const MaterialCollection& getMaterials() const { return materials_; }
 
-	ObjectCollection & objects() { return _objects; }
-	const ObjectCollection & objects() const { return _objects; }
+	MapCollection& getMaps() { return maps_; }
+	[[nodiscard]] const MapCollection& getMaps() const { return maps_; }
 
-	const LightSourceCollection & lights() const { return _lights; }
-	LightSourceCollection & lights() { return _lights; }
-
-	color_rgbx getEnvironmentColor() const { return _environmentColor; }
-	void setEnvironmentColor(const color_rgbx & color) { _environmentColor = color; }
-
-	std::size_t getSamplesPerPixel() const { return _samplesPerPixel; }
-	void setSamplesPerPixel(std::size_t samplesPerPixel) { _samplesPerPixel = samplesPerPixel; }
-
-
-	unsigned getCropX() const { return _cropX; }
-	void setCropX(const unsigned cropX) { _cropX = cropX; }
-
-	unsigned getCropY() const { return _cropY; }
-	void setCropY(const unsigned cropY) { _cropY = cropY; }
-
-	unsigned getCropWidth() const { return _cropWidth; }
-	void setCropWidth(const unsigned cropWidth) { _cropWidth = cropWidth; }
-
-	unsigned getCropHeight() const { return _cropHeight; }
-	void setCropHeight(const unsigned cropHeight) { _cropHeight = cropHeight; }
-
-	MaterialCollection & getMaterials() { return _materials; }
-	const MaterialCollection & getMaterials() const { return _materials; }
-
-	MapCollection & getMaps() { return _maps; }
-	const MapCollection & getMaps() const { return _maps; }
+	void PrepareForRendering()
+	{
+		for (const auto& object : objects_)
+		{
+			object->PrepareForRendering();
+		}
+	}
 
 private:
-	unsigned int _viewport_width;
-	unsigned int _viewport_height;
-	unsigned int _cropX;
-	unsigned int _cropY;
-	unsigned int _cropWidth;
-	unsigned int _cropHeight;
+	unsigned int viewportWidth_;
+	unsigned int viewportHeight_;
+	unsigned int cropX_;
+	unsigned int cropY_;
+	unsigned int cropWidth_;
+	unsigned int cropHeight_;
 
-	unsigned int _max_trace_depth;
+	unsigned int maxTraceDepth_;
 
-	std::string _output_filename; // it's not good place for it.
+	std::string outputFilename_; // it's not good place for it.
 
-	std::shared_ptr<Camera> _camera;
+	std::shared_ptr<Camera> camera_;
 
-	ObjectCollection _objects;
-	LightSourceCollection _lights;
-	MaterialCollection _materials;
-	MapCollection _maps;
+	ObjectCollection objects_;
+	LightSourceCollection lights_;
+	MaterialCollection materials_;
+	MapCollection maps_;
 
-	color_rgbx _environmentColor;
-	std::size_t _samplesPerPixel;
+	color_rgbx environmentColor_;
+	std::size_t samplesPerPixel_;
 };

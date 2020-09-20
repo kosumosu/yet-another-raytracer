@@ -6,5 +6,5 @@ public:
 	virtual ~Stopwatch() = default;
 
 	virtual void Restart() = 0;
-	virtual float Sample() const = 0;
+	[[nodiscard]] virtual float Sample() const = 0;
 };

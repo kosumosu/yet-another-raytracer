@@ -291,6 +291,8 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 		reportProgress
 		);
 
+	scene.PrepareForRendering();
+
 	renderer.Render(film, scene);
 
 	film.SaveAsPng(output_image_file);
