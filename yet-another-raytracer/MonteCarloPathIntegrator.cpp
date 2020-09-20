@@ -1,13 +1,17 @@
 #include "MonteCarloPathIntegrator.h"
-#include "Raytracer.h"
+
 #include "GeometryObject.h"
+#include "LightingContext.h"
 #include "LightSource.h"
 #include "Material.h"
-#include "LightingContext.h"
+#include "Raytracer.h"
+
 #include "color_functions.hpp"
-#include <iostream>
-#include <iomanip>
 #include "discrete_distribution.hpp"
+
+#include <iomanip>
+#include <iostream>
+#include <random>
 
 constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 //constexpr space_real BIAS = space_real(0); // std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
@@ -18,16 +22,33 @@ MonteCarloPathIntegrator::MonteCarloPathIntegrator(const Raytracer * raytracer, 
 	  _lights(lights),
 	  _infinityEvaluator(infinityEvaluator)
 {
-	_lightDistribution = math::discrete_distribution<LightSource*, color_real>();
+	std::vector<std::pair<const LightSource*, color_real>> lightsWithWeights;
+	lightsWithWeights.reserve(lights.size());
+
+	color_real totalPower = { 0 };
+	for (const auto & light : lights)
+	{
+		const auto power = light->GetApproximateTotalPower();
+		totalPower += power;
+		if (power > color_real(0.0))
+		{
+			lightsWithWeights.emplace_back(light, power);
+		}
+	}
+
+	_oneOverTotalPower = color_real(1.0) / totalPower;
+
+	_lightDistribution = math::discrete_distribution<const LightSource*, color_real>{ std::begin(lightsWithWeights), std::end(lightsWithWeights) };
 	// TODO
 }
 
 
 color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3 & currentRay, const Hit & hit, bool entering, const bsdf_distribution & bsdfDistribution, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
 {
-	color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
+	color_rgbx radianceAtCurrentPathVertex{ color_rgbx::zero() };
 	const LightingContext context(hit.point(), hit.normal(), BIAS, 1, false);
 
+#if false
 	for (const auto & light : _lights)
 	{
 		light->DoWithDistribution(context, randomEngine,
@@ -57,6 +78,41 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(const ray3
 				}
 			});
 	}
+#else
+	std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>()); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+	const auto randomFunc = [&]()
+	{
+		return color_real(distr(randomEngine));
+	};
+	const auto sampledLight = _lightDistribution.GetRandomElement(randomFunc);
+	const auto light = sampledLight.getValue();
+	light->DoWithDistribution(context, randomEngine,
+		[&](const light_distribution & lightDistribution)
+	{
+		if (lightDistribution.delta_components() != 0 || lightDistribution.has_non_delta_component())
+		{
+			const auto lightSample = lightDistribution.generate_sample();
+
+			const bool isOccluded = _raytracer->DoesIntersect(ray3(hit.point(), lightSample.getValue().direction), BIAS, lightSample.getValue().distance - BIAS * lightSample.getValue().distance, hit.object(), hit.normal());
+
+			if (!isOccluded)
+			{
+				const auto geometricTerm = color_real(std::abs(math::dot(lightSample.getValue().direction, hit.normal())));
+				const auto radianceByLight =
+					lightSample.getValue().evaluate()
+					* hit.object()->material()->EvaluateNonDeltaScattering(*hit.object(), hit.point(), hit.normal(), hit.uvs(), currentRay.direction(), lightSample.getValue().direction, randomEngine)
+					* geometricTerm
+					* color_real(math::oneOverPi)
+					/ color_real(lightSample.getPdf());
+
+				//if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
+				//	throw std::exception();
+
+				radianceAtCurrentPathVertex = radianceByLight / sampledLight.getPdf();
+			}
+		}
+	});
+#endif
 
 	return radianceAtCurrentPathVertex;
 }
