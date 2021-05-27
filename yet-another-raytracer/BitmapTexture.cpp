@@ -43,11 +43,11 @@ color_rgbx BitmapTexture::Sample(const TextureCoords & coords) const
 	const space_real finalU = coords.uvs[0][0] - std::floor(coords.uvs[0][0]);
 	const space_real finalV = coords.uvs[0][1] - std::floor(coords.uvs[0][1]);
 
-	const auto floatX = finalU * _width;
-	const auto floatY = finalV * _height;
+	const auto floatX = finalU * float(_width - 1);
+	const auto floatY = finalV * float(_height - 1);
 
-	const unsigned int x0 = static_cast<unsigned int>(floatX);
-	const unsigned int y0 = static_cast<unsigned int>(floatY);
+	const auto x0 = static_cast<unsigned int>(floatX);
+	const auto y0 = static_cast<unsigned int>(floatY);
 
 	const auto x1 = (x0 + 1) % _width;
 	const auto y1 = (y0 + 1) % _height;
@@ -60,10 +60,11 @@ color_rgbx BitmapTexture::Sample(const TextureCoords & coords) const
 	const auto weight_s1t0 = color_real(s * (space_real(1) - t));
 	const auto weight_s1t1 = color_real(s * t);
 
+	const auto width = std::size_t(_width);
 	return 
-		_texels[y0 * _width + x0] * weight_s0t0
-		+ _texels[y0 * _width + x1] * weight_s1t0
-		+ _texels[y1 * _width + x0] * weight_s0t1
-		+ _texels[y1 * _width + x1] * weight_s1t1
+		_texels[y0 * width + x0] * weight_s0t0
+		+ _texels[y0 * width + x1] * weight_s1t0
+		+ _texels[y1 * width + x0] * weight_s0t1
+		+ _texels[y1 * width + x1] * weight_s1t1
 		;
 }
