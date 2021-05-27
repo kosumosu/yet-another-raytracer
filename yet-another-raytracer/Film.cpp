@@ -16,15 +16,15 @@ void Film::SaveAsPng(const std::wstring & filename)
 	if (!stream.is_open())
 		throw std::exception();
 
-	png::image<png::rgb_pixel> image(m_width, m_height);
+	png::image<png::rgb_pixel> image(width_, height_);
 	image.set_file_gamma(1 / 2.2);
 
 	const color_rgbx color_0(0.0f, 0.0f, 0.0f, 0.0f);
 	const color_rgbx color_1(1.0f, 1.0f, 1.0f, 1.0f);
 
-	for (unsigned int y = 0; y < m_height; y++)
+	for (unsigned int y = 0; y < height_; y++)
 	{
-		for (unsigned int x = 0; x < m_width; x++)
+		for (unsigned int x = 0; x < width_; x++)
 		{
 			const auto gammaCorrected = math::pow(getPixel(x, y), color_real(1 / 2.2));
 			const auto clamped = math::clamp(gammaCorrected, color_0, color_1);

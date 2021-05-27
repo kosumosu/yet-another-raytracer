@@ -6,31 +6,39 @@ class Film
 {
 public:
 	Film(unsigned int width, unsigned int height)
-		: m_width(width)
-		, m_height(height)
-		, m_pixels(width * height, color_rgbx::zero())
+		: width_(width)
+		, height_(height)
+		, pixels_(width * height, color_rgbx::zero())
 	{
-
 	}
 
-	unsigned int width() const { return m_width; }
-	void width(unsigned int val) { m_width = val; }
+	[[nodiscard]] unsigned int width() const { return width_; }
+	void width(unsigned int val) { width_ = val; }
 
-	unsigned int height() const { return m_height; }
-	void height(unsigned int val) { m_height = val; }
+	[[nodiscard]] unsigned int height() const { return height_; }
+	void height(unsigned int val) { height_ = val; }
 
-	const std::vector<color_rgbx> & pixels() const { return m_pixels; }
+	[[nodiscard]] const std::vector<color_rgbx>& pixels() const { return pixels_; }
 
-	const color_rgbx & getPixel(unsigned int x, unsigned int y) const { return m_pixels[y * m_width + x]; }
-	void setPixel(unsigned int x, unsigned int y, const color_rgbx & value) { m_pixels[y * m_width + x] = value; }
+	[[nodiscard]] const color_rgbx& getPixel(unsigned int x, unsigned int y) const { return pixels_[y * width_ + x]; }
+	void setPixel(unsigned int x, unsigned int y, const color_rgbx& value) { pixels_[y * width_ + x] = value; }
 
-	void SaveAsPng(const std::wstring & filename);
+	void transferFilm(uint_vector2 minCoord, const Film& film)
+	{
+		for (unsigned int y = minCoord[1]; y < minCoord[1] + film.height(); ++y)
+		{
+			for (unsigned int x = minCoord[0]; x < minCoord[0] + film.width(); ++x)
+			{
+				pixels_[y * width_ + x] = film.getPixel(x, y);
+			}
+		}
+	}
+
+	void SaveAsPng(const std::wstring& filename);
 
 private:
-	unsigned int m_width;
-	unsigned int m_height;
+	unsigned int width_;
+	unsigned int height_;
 
-	std::vector<color_rgbx> m_pixels;
-
+	std::vector<color_rgbx> pixels_;
 };
-
