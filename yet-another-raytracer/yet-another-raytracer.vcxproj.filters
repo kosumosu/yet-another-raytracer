@@ -464,5 +464,8 @@
     <ClCompile Include="BucketRenderer.cpp">
       <Filter>Engine\Renderers\Bucket</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadBarrier.hpp">
+      <Filter>Engine\Renderers\Bucket</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

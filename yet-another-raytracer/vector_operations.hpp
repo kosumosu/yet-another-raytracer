@@ -81,14 +81,15 @@ namespace math
 		return res;
 	}
 
-	template <typename T, std::size_t N>
-	vector<T, N> operator *( const vector<T, N> & one, const vector<T, N> & another)
+	template <typename T1, typename T2, std::size_t N>
+	auto operator *(const vector<T1, N>& one, const vector<T2, N>& another)
 	{
-		vector<T, N> res = vector<T, N>::zero();
+		using TResult = decltype(T1{} * T2{});
+		auto res = vector<TResult, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
-		{
-			res[i] = one[i] * another[i];
-		});
+			{
+				res[i] = one[i] * another[i];
+			});
 		return res;
 	}
 
@@ -126,19 +127,14 @@ namespace math
 	template <typename T, std::size_t N>
 	vector<T, N> operator *( const T & scalar, const vector<T, N> & another)
 	{
-		return another * scalar;
+		vector<T, N> res = vector<T, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+			{
+				res[i] = scalar * another[i];
+			});
+		return res;
 	}
 
-	//template <typename T, std::size_t N>
-	//vector<T, N> operator /( const vector<T, N> & one, const vector<T, N> & another)
-	//{
-	//	vector<T, N> res = vector<T, N>::zero();
-	//	iterate<0, N - 1>([&](std::size_t i)
-	//	{
-	//		res[i] = one[i] / another[i];
-	//	});
-	//	return res;
-	//}
 
 	template <typename T1, typename T2, std::size_t N>
 	auto operator /(const vector<T1, N>& one, const vector<T2, N>& another)

@@ -15,7 +15,9 @@ public:
 	using initialization_finished_callback = std::function<void()>;
 	using rendering_finished_callback = std::function<void()>;
 
-	SingleThreadedScanlineRenderer(initialization_finished_callback initializationFinishedCallback, rendering_finished_callback renderingFinishedCallback,
+	SingleThreadedScanlineRenderer(
+		initialization_finished_callback initializationFinishedCallback,
+		rendering_finished_callback renderingFinishedCallback,
 		progress_callback progressCallback);
 	void Render(Film& film, const Scene& scene) const override;
 

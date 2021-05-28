@@ -11,7 +11,9 @@
 
 #include <utility>
 
-SingleThreadedScanlineRenderer::SingleThreadedScanlineRenderer(initialization_finished_callback initializationFinishedCallback, rendering_finished_callback renderingFinishedCallback,
+SingleThreadedScanlineRenderer::SingleThreadedScanlineRenderer(
+	initialization_finished_callback initializationFinishedCallback,
+	rendering_finished_callback renderingFinishedCallback,
 	progress_callback progressCallback)
 	: progressCallback_(std::move(progressCallback))
 	, initializationFinishedCallback_(std::move(initializationFinishedCallback))
@@ -39,7 +41,7 @@ void SingleThreadedScanlineRenderer::ProcessPixel(Film& film, const Scene& scene
 		averageColor += rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
 	}
 
-	film.setPixel({ x, y }, averageColor);
+	film.setPixel({x, y}, averageColor);
 }
 
 void SingleThreadedScanlineRenderer::Render(Film& film, const Scene& scene) const

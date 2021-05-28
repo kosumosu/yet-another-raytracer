@@ -25,13 +25,9 @@
 #include <iostream>
 #include <iomanip>
 #include <memory>
+#include <mutex>
 #include <tchar.h>
 
-
-void reportProgress(float progress)
-{
-	std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
-}
 
 template <typename TRandomEngine>
 void InsertRandomSpheres(Scene& scene, unsigned int count, TRandomEngine& engine)
@@ -60,14 +56,14 @@ void InsertSkyLights(Scene& scene, unsigned int count, TRandomEngine& engine)
 
 	for (unsigned int i = 0; i < count; i++)
 	{
-		scene.lights().push_back(std::make_shared<DirectionalLightSource>(math::sphericalRand<space_real>(engine), color_rgbx::fill(intensity_per_light), scene));
+		scene.lights().push_back(
+			std::make_shared<DirectionalLightSource>(math::sphericalRand<space_real>(engine), color_rgbx::fill(intensity_per_light), scene));
 	}
 }
 
 template <typename TRandomEngine>
 void InsertRandomPointLights(Scene& scene, unsigned int count, TRandomEngine& engine)
 {
-
 	color_real intensity_per_light = color_real(60.0) / count;
 
 	for (unsigned int i = 0; i < count; i++)
@@ -82,7 +78,15 @@ void InsertRandomPointLights(Scene& scene, unsigned int count, TRandomEngine& en
 
 void InsertTwoSpheres(Scene& scene)
 {
-	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial{ color_rgbx(0.1f, 0.05f, 0.15f, 1.0f), nullptr, color_rgbx(0.75f, 0.3f, 0.0f, 1.0f), color_rgbx(0.6f, 0.6f, 0.6f, 1.0f), 200.0f, color_rgbx::zero() });
+	std::shared_ptr<BlinnMaterial> material1(
+		new BlinnMaterial{
+			color_rgbx(0.1f, 0.05f, 0.15f, 1.0f),
+			nullptr,
+			color_rgbx(0.75f, 0.3f, 0.0f, 1.0f),
+			color_rgbx(0.6f, 0.6f, 0.6f, 1.0f),
+			200.0f,
+			color_rgbx::zero()
+		});
 
 	scene.getMaterials().insert(std::make_pair("InsertTwoSpheres()::material1", material1));
 
@@ -120,7 +124,7 @@ void InsertCalibrationSpheres(Scene& scene)
 	object1->center(vector3(0.0f, -0.9f, 0.0f));
 	object1->material(material1.get());
 
-	std::shared_ptr<BlinnMaterial> material2{ new BlinnMaterial{} };
+	std::shared_ptr<BlinnMaterial> material2{new BlinnMaterial{}};
 	material2->diffuse(color_rgbx(0.5f, 0.5f, 0.5f, 0.0f));
 	scene.getMaterials().insert(std::make_pair("InsertCalibrationSpheres()::material2", material2));
 
@@ -135,7 +139,7 @@ void InsertCalibrationSpheres(Scene& scene)
 
 void InsertTriangle(Scene& scene)
 {
-	std::shared_ptr<BlinnMaterial> material1{ new BlinnMaterial{} };
+	std::shared_ptr<BlinnMaterial> material1{new BlinnMaterial{}};
 	material1->diffuse(color_rgbx(0.1f, 0.3f, 0.75f, 1.0f));
 	material1->specular(color_rgbx(0.5f, 0.5f, 0.5f, 1.0f));
 	material1->shininess(100.0f);
@@ -156,7 +160,7 @@ void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& s
 {
 	for (unsigned int i = 0; i < count; i++)
 	{
-		std::shared_ptr<BlinnMaterial> material{ new BlinnMaterial{} };
+		std::shared_ptr<BlinnMaterial> material{new BlinnMaterial{}};
 		scene.getMaterials().insert(std::make_pair("InsertTriangle()::material #" + std::to_string(i), material));
 		material->diffuse(math::linearRand(color_rgbx::zero(), color_rgbx::fill(1.0), engine));
 		//material->specular(math::linearRand(zero4, one4));
@@ -168,7 +172,7 @@ void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& s
 
 		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), engine);
 
-		std::shared_ptr<FlatTriangleObject> object{ new FlatTriangleObject{} };
+		std::shared_ptr<FlatTriangleObject> object{new FlatTriangleObject{}};
 		object->material(material.get());
 		object->vertex0(pivot + math::linearRand(min_bound, max_bound, engine));
 		object->vertex1(pivot + math::linearRand(min_bound, max_bound, engine));
@@ -180,7 +184,7 @@ void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& s
 
 void InsertPointLight(Scene& scene)
 {
-	std::shared_ptr<PointLightSource> lightSource{ new PointLightSource{} };
+	std::shared_ptr<PointLightSource> lightSource{new PointLightSource{}};
 	lightSource->position(vector3(2.0, 2.0, 2.0));
 	lightSource->color(color_rgbx(20.0, 20.0, 30.0, 1.0));
 	lightSource->attenuation(Attenuation(1.0, 0.0, 0.0));
@@ -195,7 +199,7 @@ void InsertDirectionalLight(Scene& scene)
 
 void InsertSkyLight(Scene& scene, unsigned int samples)
 {
-	std::shared_ptr<SkyLightSource> lightSource{ new SkyLightSource{} };
+	std::shared_ptr<SkyLightSource> lightSource{new SkyLightSource{}};
 	lightSource->color(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
 	lightSource->samples(samples);
 
@@ -213,12 +217,11 @@ void InitCamera(Scene& scene, unsigned int width, unsigned int height)
 }
 
 
-
 //////////////////////////////////////////////////////////////////////////
 
 void LoadFromFile(Scene& scene, const std::wstring& filename)
 {
-	const std::unique_ptr<SceneLoader> loader{ SceneLoader::CreateDefault() };
+	const std::unique_ptr<SceneLoader> loader{SceneLoader::CreateDefault()};
 
 	loader->Load(scene, filename);
 }
@@ -274,27 +277,39 @@ void Render(const std::wstring& scene_file, const std::wstring& output_image_fil
 	//InsertSkyLight(scene, 128);
 #endif
 
-	ProcessTimeStopwatch timer;
-	timer.Restart();
+	std::mutex coutMutex;
+	ProcessTimeStopwatch processTimeStopwatch;
+	StdHigheResolutionClockStopwatch realTimeStopwatch;
+	processTimeStopwatch.Restart();
+	realTimeStopwatch.Restart();
 
-	Film film({ scene.viewport_width(), scene.viewport_height() });
-	float initTime;
+	Film film({scene.viewport_width(), scene.viewport_height()});
+	float processInitTime;
+	float realInitTime;
 	const BucketRenderer renderer(
-		{ 32, 32 },
+		{32, 32},
 		std::make_unique<TopDownSequencer>(),
 		[&]()
 		{
-			initTime = timer.Sample();
-			std::wcout << "Initialization finished : " << initTime << std::endl;
+			processInitTime = processTimeStopwatch.Sample();
+			realInitTime = realTimeStopwatch.Sample();
+			std::wcout << "Initialization finished. Real time=" << processInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
 		},
 		[&]()
 		{
-			const auto totalElapsed = timer.Sample();
-			std::wcout << "Rendering finished : " << totalElapsed - initTime << "sec" << std::endl;
-			std::wcout << "Total time : " << totalElapsed << "sec" << std::endl;
+			const auto processTotalElapsed = processTimeStopwatch.Sample();
+			const auto realTotalElapsed = realTimeStopwatch.Sample();
+			std::wcout << "Rendering finished." << std::endl;
+			std::wcout << "Real time : " << realTotalElapsed - realInitTime << "sec" << std::endl;
+			std::wcout << "Total real time : " << realTotalElapsed << "sec" << std::endl;
+			std::wcout << "Process time : " << processTotalElapsed - processInitTime << "sec" << std::endl;
+			std::wcout << "Total process time : " << processTotalElapsed << "sec" << std::endl;
 		},
-			reportProgress
-			);
+		[&coutMutex] (float progress)
+		{
+			std::lock_guard guard{ coutMutex };
+			std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
+		});
 
 	scene.PrepareForRendering();
 
@@ -309,7 +324,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (argc < 2)
 		return 0;
 
-	std::wstring image_file = GetPathWithoutExtension(argv[1]) + L".png";
+	const std::wstring image_file = GetPathWithoutExtension(argv[1]) + L".png";
 
 	Render(std::wstring(argv[1]), image_file);
 
@@ -317,4 +332,3 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	return 0;
 }
-

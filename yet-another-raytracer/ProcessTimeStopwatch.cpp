@@ -33,5 +33,5 @@ float ProcessTimeStopwatch::Sample() const
 	const auto kernelTime = FromFileTime(processKernelTime) - _kernelStartTime;
 	const auto userTime = FromFileTime(processUserTime) - _userStartTime;
 
-	return (kernelTime + userTime) * 0.000'000'1f;
+	return float(kernelTime + userTime) * 0.000'000'1f;
 }
