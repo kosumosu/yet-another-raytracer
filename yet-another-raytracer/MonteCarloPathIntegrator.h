@@ -25,7 +25,7 @@ private:
 	color_real oneOverTotalPower_;
 
 public:
-	MonteCarloPathIntegrator(const Raytracer* raytracer, const std::vector<const LightSource*>& lights, infinity_func infinityEvaluator);
+	MonteCarloPathIntegrator(const Raytracer* raytracer, std::vector<const LightSource*> lights, infinity_func infinityEvaluator);
 
 	color_rgbx EvaluateRay(const ray3& ray, unsigned bounceLimit, space_real bias, math::UniformRandomBitGenerator<unsigned>& randomEngine) const override;
 

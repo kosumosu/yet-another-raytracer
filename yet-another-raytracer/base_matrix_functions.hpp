@@ -83,7 +83,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS, std::size_t EXCLUDE_COL, std::size_t EXCLUDE_ROW>
-	base_matrix<T, COLS - 1, ROWS - 1> submatrix(const base_matrix<T, COLS, ROWS> & mat)
+	constexpr base_matrix<T, COLS - 1, ROWS - 1> submatrix(const base_matrix<T, COLS, ROWS> & mat)
 	{
 		static_assert(EXCLUDE_COL >= 0, "EXCLUDE_COL can't be negative");
 		static_assert(EXCLUDE_ROW >= 0, "EXCLUDE_ROW can't be negative");

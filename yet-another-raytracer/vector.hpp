@@ -18,14 +18,14 @@ namespace math
 	{
 	public:
 
-		using _Myt = vector<TSpace, DIMENSIONS, void>;
+		using MyT = vector<TSpace, DIMENSIONS, void>;
 
-		constexpr static _Myt fill(const TSpace& value) { return vector<TSpace, DIMENSIONS>(value, std::make_index_sequence<DIMENSIONS>()); }
-		constexpr static _Myt zero() { return fill(0); }
+		constexpr static MyT fill(const TSpace& value) { return vector<TSpace, DIMENSIONS>(value, std::make_index_sequence<DIMENSIONS>()); }
+		constexpr static MyT zero() { return fill(0); }
 
 		constexpr static std::size_t dimensions() { return DIMENSIONS; }
 
-		constexpr vector(const _Myt& other) //noexcept(noexcept(vector(other, std::make_index_sequence<DIMENSIONS>())))
+		constexpr vector(const MyT& other) //noexcept(noexcept(vector(other, std::make_index_sequence<DIMENSIONS>())))
 			: vector(other, std::make_index_sequence<DIMENSIONS>())
 		{
 		}
@@ -36,7 +36,7 @@ namespace math
 		{
 		}
 
-		_Myt& operator=(const _Myt& other)
+		constexpr MyT& operator=(const MyT& other)
 		{
 			if (this == &other)
 				return *this;
@@ -46,17 +46,17 @@ namespace math
 			return *this;
 		}
 
-		constexpr vector(_Myt&& other) //noexcept(noexcept(vector(std::move(other), std::make_index_sequence<DIMENSIONS>())))
+		constexpr vector(MyT&& other) noexcept //noexcept(noexcept(vector(std::move(other), std::make_index_sequence<DIMENSIONS>())))
 			: vector(std::move(other), std::make_index_sequence<DIMENSIONS>())
 		{
 		}
 
-		_Myt& operator=(_Myt&& other) noexcept(noexcept(std::swap(m_elements, other.m_elements)))
+		constexpr MyT& operator=(MyT&& other) noexcept(noexcept(std::move(other.m_elements)))
 		{
 			if (this == &other)
 				return *this;
 
-			std::swap(m_elements, other.m_elements);
+			m_elements = std::move(other.m_elements);
 
 			return *this;
 		}
@@ -90,6 +90,8 @@ namespace math
 		{
 		}
 
+		~vector() = default;
+
 		constexpr const TSpace& operator[](std::size_t index) const
 		{
 			return m_elements[index];
@@ -115,7 +117,7 @@ namespace math
 		}
 
 		template <std::size_t... Indices>
-		constexpr vector(_Myt&& other, std::index_sequence<Indices...>) //noexcept(std::is_nothrow_move_constructible<TSpace>::value)
+		constexpr vector(MyT&& other, std::index_sequence<Indices...>) //noexcept(std::is_nothrow_move_constructible<TSpace>::value)
 			: m_elements{{std::move(other[Indices])...}}
 		{
 		}

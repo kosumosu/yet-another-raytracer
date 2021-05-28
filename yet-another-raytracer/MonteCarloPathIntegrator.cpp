@@ -17,9 +17,9 @@ constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_r
 //constexpr space_real BIAS = space_real(0); // std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 
 
-MonteCarloPathIntegrator::MonteCarloPathIntegrator(const Raytracer * raytracer, const std::vector<const LightSource *> & lights, infinity_func infinityEvaluator)
+MonteCarloPathIntegrator::MonteCarloPathIntegrator(const Raytracer * raytracer, std::vector<const LightSource *> lights, infinity_func infinityEvaluator)
 	: raytracer_(raytracer),
-	  lights_(lights),
+	  lights_(std::move(lights)),
 	  infinityEvaluator_(std::move(infinityEvaluator))
 {
 	std::vector<std::pair<const LightSource*, color_real>> lightsWithWeights;

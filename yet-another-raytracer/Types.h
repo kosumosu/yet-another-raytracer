@@ -16,6 +16,8 @@ using space_real = float;
 
 #endif
 
+using uint_vector2 = math::vector<unsigned int, 2>;
+
 using vector2 = math::vector<space_real, 2>;
 using vector3 = math::vector<space_real, 3>;
 using vector4 = math::vector<space_real, 4>;
@@ -32,4 +34,10 @@ using uvs_t = std::array<vector2, UVS_COUNT>;
 
 // to workaround upper bound issue with STL PRNG
 template <typename T>
-constexpr T upperRandomBound = std::nextafter(T(1.0), T(0.0));
+constexpr T upperRandomBound; // = std::nextafter(T(1.0), T(0.0)); // this requires constexpr cmath.
+
+template <>
+constexpr float upperRandomBound<float> = 0.99999994039535522461;
+
+template <>
+constexpr double upperRandomBound<double> = 0.99999999999999988898;

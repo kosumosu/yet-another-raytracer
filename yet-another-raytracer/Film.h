@@ -6,9 +6,9 @@ class Film
 {
 public:
 	Film(unsigned int width, unsigned int height)
-		: width_(width)
-		, height_(height)
-		, pixels_(width * height, color_rgbx::zero())
+		: width_{ width }
+		, height_{ height }
+		, pixels_{ std::size_t(width) * height, color_rgbx::zero() }
 	{
 	}
 
@@ -20,8 +20,8 @@ public:
 
 	[[nodiscard]] const std::vector<color_rgbx>& pixels() const { return pixels_; }
 
-	[[nodiscard]] const color_rgbx& getPixel(unsigned int x, unsigned int y) const { return pixels_[y * width_ + x]; }
-	void setPixel(unsigned int x, unsigned int y, const color_rgbx& value) { pixels_[y * width_ + x] = value; }
+	[[nodiscard]] const color_rgbx& getPixel(unsigned int x, unsigned int y) const { return pixels_[std::size_t(y) * width_ + x]; }
+	void setPixel(unsigned int x, unsigned int y, const color_rgbx& value) { pixels_[std::size_t(y) * width_ + x] = value; }
 
 	void transferFilm(uint_vector2 minCoord, const Film& film)
 	{
@@ -29,7 +29,7 @@ public:
 		{
 			for (unsigned int x = minCoord[0]; x < minCoord[0] + film.width(); ++x)
 			{
-				pixels_[y * width_ + x] = film.getPixel(x, y);
+				pixels_[std::size_t(y) * width_ + x] = film.getPixel(x, y);
 			}
 		}
 	}

@@ -61,7 +61,7 @@ namespace math
 	}
 #else
 	template<int FIRST, int LAST, typename T>
-	void iterate(const T & func)
+	constexpr void iterate(const T & func)
 	{
 		for (int i = FIRST; i <= LAST; ++i)
 		{

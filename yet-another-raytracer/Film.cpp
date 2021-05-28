@@ -1,15 +1,16 @@
 #include "Film.h"
+
 #include <png.hpp>
 #include <fstream>
+#include <limits>
 
 template <typename T>
-void setToInteger(T & output, const color_real & input)
+void setToInteger(T& output, const color_real& input)
 {
-	unsigned int bits = sizeof(T) * 8;
-	output = static_cast<T>(input * ((1U << bits) - 1));
+	output = T(input * std::numeric_limits<T>::max());
 }
 
-void Film::SaveAsPng(const std::wstring & filename)
+void Film::SaveAsPng(const std::wstring& filename)
 {
 	std::ofstream stream(filename, std::ios::binary);
 
@@ -19,8 +20,8 @@ void Film::SaveAsPng(const std::wstring & filename)
 	png::image<png::rgb_pixel> image(width_, height_);
 	image.set_file_gamma(1 / 2.2);
 
-	const color_rgbx color_0(0.0f, 0.0f, 0.0f, 0.0f);
-	const color_rgbx color_1(1.0f, 1.0f, 1.0f, 1.0f);
+	constexpr color_rgbx color_0(0.0f, 0.0f, 0.0f, 0.0f);
+	constexpr color_rgbx color_1(1.0f, 1.0f, 1.0f, 1.0f);
 
 	for (unsigned int y = 0; y < height_; y++)
 	{
