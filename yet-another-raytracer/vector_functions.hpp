@@ -238,4 +238,15 @@ namespace math
 		});
 		return res;
 	}
+
+	template <typename T, std::size_t N>
+	vector<T, N> intDivideRoundUp(const vector<T, N> & one, const vector<T, N> & another)
+	{
+		vector<T, N> res = vector<T, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+		{
+			res[i] = (one[i] + another[i] - 1) / another[i];
+		});
+		return res;
+	}
 }

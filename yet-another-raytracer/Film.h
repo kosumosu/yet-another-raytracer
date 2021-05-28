@@ -5,40 +5,42 @@
 class Film
 {
 public:
-	Film(unsigned int width, unsigned int height)
-		: width_{ width }
-		, height_{ height }
-		, pixels_{ std::size_t(width) * height, color_rgbx::zero() }
+	Film(uint_vector2 size)
+		: size_{ std::move(size) }
+		, pixels_{ std::size_t(size_[0]) * size_[1], color_rgbx::zero() }
 	{
 	}
 
-	[[nodiscard]] unsigned int width() const { return width_; }
-	void width(unsigned int val) { width_ = val; }
-
-	[[nodiscard]] unsigned int height() const { return height_; }
-	void height(unsigned int val) { height_ = val; }
+	[[nodiscard]] unsigned int width() const { return size_[0]; }
+	[[nodiscard]] unsigned int height() const { return size_[1]; }
 
 	[[nodiscard]] const std::vector<color_rgbx>& pixels() const { return pixels_; }
 
-	[[nodiscard]] const color_rgbx& getPixel(unsigned int x, unsigned int y) const { return pixels_[std::size_t(y) * width_ + x]; }
-	void setPixel(unsigned int x, unsigned int y, const color_rgbx& value) { pixels_[std::size_t(y) * width_ + x] = value; }
+	[[nodiscard]] const color_rgbx& getPixel(unsigned int x, unsigned int y) const { return pixels_[std::size_t(y) * width() + x]; }
+	void setPixel(uint_vector2 coord, const color_rgbx& value) { pixels_[std::size_t(coord[1]) * width() + coord[0]] = value; }
 
-	void transferFilm(uint_vector2 minCoord, const Film& film)
+	void transferFilm(const Film& sourceFilm, const uint_vector2& destinationMinCoord, const uint_vector2& blockSize)
 	{
-		for (unsigned int y = minCoord[1]; y < minCoord[1] + film.height(); ++y)
+		for (unsigned int y = 0; y < sourceFilm.height(); ++y)
 		{
-			for (unsigned int x = minCoord[0]; x < minCoord[0] + film.width(); ++x)
+			const auto destY = y + destinationMinCoord[1];
+
+			for (unsigned int x = 0; x < sourceFilm.width(); ++x)
 			{
-				pixels_[std::size_t(y) * width_ + x] = film.getPixel(x, y);
+				setPixel({ x + destinationMinCoord[0], destY }, sourceFilm.getPixel(x, y));
 			}
 		}
 	}
 
 	void SaveAsPng(const std::wstring& filename);
 
+	[[nodiscard]] uint_vector2 size() const
+	{
+		return size_;
+	}
+
 private:
-	unsigned int width_;
-	unsigned int height_;
+	uint_vector2 size_;
 
 	std::vector<color_rgbx> pixels_;
 };

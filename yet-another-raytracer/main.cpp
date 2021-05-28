@@ -6,7 +6,7 @@
 #include "SphereObject.h"
 #include "FlatTriangleObject.h"
 #include "BlinnMaterial.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 #include "StdHigheResolutionClockStopwatch.h"
 #include "ProcessTimeStopwatch.h"
 #include "DirectionalLightSource.h"
@@ -18,6 +18,9 @@
 #include "Types.h"
 
 #include "OSAbstraction.h"
+#include "SingleThreadedScanlineRenderer.h"
+#include "BucketRenderer.h"
+#include "TopDownSequencer.h"
 
 #include <iostream>
 #include <iomanip>
@@ -31,7 +34,7 @@ void reportProgress(float progress)
 }
 
 template <typename TRandomEngine>
-void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engine)
+void InsertRandomSpheres(Scene& scene, unsigned int count, TRandomEngine& engine)
 {
 	for (unsigned int i = 0; i < count; i++)
 	{
@@ -51,7 +54,7 @@ void InsertRandomSpheres(Scene & scene, unsigned int count, TRandomEngine & engi
 }
 
 template <typename TRandomEngine>
-void InsertSkyLights(Scene & scene, unsigned int count, TRandomEngine & engine)
+void InsertSkyLights(Scene& scene, unsigned int count, TRandomEngine& engine)
 {
 	const color_real intensity_per_light = color_real(5.0) / count;
 
@@ -62,7 +65,7 @@ void InsertSkyLights(Scene & scene, unsigned int count, TRandomEngine & engine)
 }
 
 template <typename TRandomEngine>
-void InsertRandomPointLights(Scene & scene, unsigned int count, TRandomEngine & engine)
+void InsertRandomPointLights(Scene& scene, unsigned int count, TRandomEngine& engine)
 {
 
 	color_real intensity_per_light = color_real(60.0) / count;
@@ -77,9 +80,9 @@ void InsertRandomPointLights(Scene & scene, unsigned int count, TRandomEngine & 
 	}
 }
 
-void InsertTwoSpheres(Scene & scene)
+void InsertTwoSpheres(Scene& scene)
 {
-	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial{color_rgbx(0.1f, 0.05f, 0.15f, 1.0f), nullptr, color_rgbx(0.75f, 0.3f, 0.0f, 1.0f), color_rgbx(0.6f, 0.6f, 0.6f, 1.0f), 200.0f, color_rgbx::zero() });
+	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial{ color_rgbx(0.1f, 0.05f, 0.15f, 1.0f), nullptr, color_rgbx(0.75f, 0.3f, 0.0f, 1.0f), color_rgbx(0.6f, 0.6f, 0.6f, 1.0f), 200.0f, color_rgbx::zero() });
 
 	scene.getMaterials().insert(std::make_pair("InsertTwoSpheres()::material1", material1));
 
@@ -106,7 +109,7 @@ void InsertTwoSpheres(Scene & scene)
 	scene.objects().push_back(object2);
 }
 
-void InsertCalibrationSpheres(Scene & scene)
+void InsertCalibrationSpheres(Scene& scene)
 {
 	std::shared_ptr<BlinnMaterial> material1(new BlinnMaterial());
 	material1->diffuse(color_rgbx(1.0f, 1.0f, 1.0f, 0.0f));
@@ -130,7 +133,7 @@ void InsertCalibrationSpheres(Scene & scene)
 	scene.objects().push_back(std::move(object2));
 }
 
-void InsertTriangle(Scene & scene)
+void InsertTriangle(Scene& scene)
 {
 	std::shared_ptr<BlinnMaterial> material1{ new BlinnMaterial{} };
 	material1->diffuse(color_rgbx(0.1f, 0.3f, 0.75f, 1.0f));
@@ -149,7 +152,7 @@ void InsertTriangle(Scene & scene)
 }
 
 template <typename TRandomEngine>
-void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real & size, TRandomEngine & engine)
+void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& size, TRandomEngine& engine)
 {
 	for (unsigned int i = 0; i < count; i++)
 	{
@@ -175,7 +178,7 @@ void InsertRandomTriangles(Scene & scene, unsigned int count, const space_real &
 	}
 }
 
-void InsertPointLight(Scene & scene)
+void InsertPointLight(Scene& scene)
 {
 	std::shared_ptr<PointLightSource> lightSource{ new PointLightSource{} };
 	lightSource->position(vector3(2.0, 2.0, 2.0));
@@ -185,12 +188,12 @@ void InsertPointLight(Scene & scene)
 	scene.lights().push_back(std::move(lightSource));
 }
 
-void InsertDirectionalLight(Scene & scene)
+void InsertDirectionalLight(Scene& scene)
 {
 	scene.lights().push_back(std::make_shared<DirectionalLightSource>(math::normalize(vector3(1.0, 1.0, 1.0)), color_rgbx(0.6f, 0.6f, 0.6f, 1.0f), scene));
 }
 
-void InsertSkyLight(Scene & scene, unsigned int samples)
+void InsertSkyLight(Scene& scene, unsigned int samples)
 {
 	std::shared_ptr<SkyLightSource> lightSource{ new SkyLightSource{} };
 	lightSource->color(color_rgbx(0.5f, 0.64f, 0.82f, 0.0f));
@@ -199,7 +202,7 @@ void InsertSkyLight(Scene & scene, unsigned int samples)
 	scene.lights().push_back(lightSource);
 }
 
-void InitCamera(Scene & scene, unsigned int width, unsigned int height)
+void InitCamera(Scene& scene, unsigned int width, unsigned int height)
 {
 	scene.camera()->fovy(90.0);
 	scene.camera()->position(vector3(4.0, 0.0, 0.0));
@@ -213,7 +216,7 @@ void InitCamera(Scene & scene, unsigned int width, unsigned int height)
 
 //////////////////////////////////////////////////////////////////////////
 
-void LoadFromFile(Scene & scene, const std::wstring & filename)
+void LoadFromFile(Scene& scene, const std::wstring& filename)
 {
 	const std::unique_ptr<SceneLoader> loader{ SceneLoader::CreateDefault() };
 
@@ -222,14 +225,14 @@ void LoadFromFile(Scene & scene, const std::wstring & filename)
 
 //////////////////////////////////////////////////////////////////////////
 
-std::wstring GetFileName(const std::wstring & input)
+std::wstring GetFileName(const std::wstring& input)
 {
 	const auto index = input.rfind('\\');
 
 	return index == std::string::npos ? input : input.substr(index + 1);
 }
 
-std::wstring GetFileNameWithoutExtension(const std::wstring & input)
+std::wstring GetFileNameWithoutExtension(const std::wstring& input)
 {
 	auto filename = GetFileName(input);
 
@@ -238,14 +241,14 @@ std::wstring GetFileNameWithoutExtension(const std::wstring & input)
 	return index == std::string::npos ? filename : filename.substr(0, index);
 }
 
-std::wstring GetPathWithoutExtension(const std::wstring & input)
+std::wstring GetPathWithoutExtension(const std::wstring& input)
 {
 	const auto index = input.rfind('.');
 
 	return index == std::wstring::npos ? input : input.substr(0, index);
 }
 
-void Render(const std::wstring & scene_file, const std::wstring & output_image_file)
+void Render(const std::wstring& scene_file, const std::wstring& output_image_file)
 {
 	Scene scene;
 
@@ -274,22 +277,24 @@ void Render(const std::wstring & scene_file, const std::wstring & output_image_f
 	ProcessTimeStopwatch timer;
 	timer.Restart();
 
-	Film film(scene.viewport_width(), scene.viewport_height());
+	Film film({ scene.viewport_width(), scene.viewport_height() });
 	float initTime;
-	Renderer renderer(
-		[&]() 
-			{
-				initTime = timer.Sample();
-				std::wcout << "Initialization finished : " << initTime << std::endl;
-			},
+	const BucketRenderer renderer(
+		{ 32, 32 },
+		std::make_unique<TopDownSequencer>(),
 		[&]()
-			{
-				const auto totalElapsed = timer.Sample();
-				std::wcout << "Rendering finished : " << totalElapsed - initTime << "sec" << std::endl;
-				std::wcout << "Total time : " << totalElapsed << "sec" << std::endl;
-			},
-		reportProgress
-		);
+		{
+			initTime = timer.Sample();
+			std::wcout << "Initialization finished : " << initTime << std::endl;
+		},
+		[&]()
+		{
+			const auto totalElapsed = timer.Sample();
+			std::wcout << "Rendering finished : " << totalElapsed - initTime << "sec" << std::endl;
+			std::wcout << "Total time : " << totalElapsed << "sec" << std::endl;
+		},
+			reportProgress
+			);
 
 	scene.PrepareForRendering();
 

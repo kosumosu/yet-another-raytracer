@@ -61,6 +61,21 @@
     <Filter Include="Engine\Maps">
       <UniqueIdentifier>{ccd554f0-a05e-4f5f-881a-d191ba709b3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Renderers">
+      <UniqueIdentifier>{f26a5976-f209-40ed-9d61-610decc7f34c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Renderers\SingleThreadedScanline">
+      <UniqueIdentifier>{627066cc-0d27-48a5-ac3a-f9742c3778e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Renderers\Bucket">
+      <UniqueIdentifier>{3342dbbc-3d9c-422c-a73d-673d5dc2d78d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Renderers\Bucket\BucketSequencers">
+      <UniqueIdentifier>{e0fa5ad4-9a10-478d-b93f-2d2385e0aa0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Renderers\Bucket\Executors">
+      <UniqueIdentifier>{e3a032db-ea7c-46a2-9261-0a959534bc18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Film.h">
@@ -86,9 +101,6 @@
     </ClInclude>
     <ClInclude Include="SphereObject.h">
       <Filter>Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Accelerator.h">
       <Filter>Engine\Raytracer\Accelerators</Filter>
@@ -323,11 +335,26 @@
       <Filter>Engine\Scene\Loading</Filter>
     </ClInclude>
     <ClInclude Include="OSAbstraction.h" />
+    <ClInclude Include="IRenderer.h">
+      <Filter>Engine\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleThreadedScanlineRenderer.h">
+      <Filter>Engine\Renderers\SingleThreadedScanline</Filter>
+    </ClInclude>
+    <ClInclude Include="BucketRenderer.h">
+      <Filter>Engine\Renderers\Bucket</Filter>
+    </ClInclude>
+    <ClInclude Include="IBucketSequencer.h">
+      <Filter>Engine\Renderers\Bucket\BucketSequencers</Filter>
+    </ClInclude>
+    <ClInclude Include="TopDownSequencer.h">
+      <Filter>Engine\Renderers\Bucket\BucketSequencers</Filter>
+    </ClInclude>
+    <ClInclude Include="IExecutor.h">
+      <Filter>Engine\Renderers\Bucket\Executors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Film.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -431,5 +458,11 @@
       <Filter>Engine\Scene\Loading</Filter>
     </ClCompile>
     <ClCompile Include="OSAbstraction.cpp" />
+    <ClCompile Include="SingleThreadedScanlineRenderer.cpp">
+      <Filter>Engine\Renderers\SingleThreadedScanline</Filter>
+    </ClCompile>
+    <ClCompile Include="BucketRenderer.cpp">
+      <Filter>Engine\Renderers\Bucket</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

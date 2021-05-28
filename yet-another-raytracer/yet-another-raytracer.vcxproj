@@ -97,7 +97,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,7 +115,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,7 +138,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,7 +164,7 @@
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <MSCompilerVersion>1900</MSCompilerVersion>
       <StrictAliasing>true</StrictAliasing>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -184,14 +184,18 @@
     <ClInclude Include="base_matrix_operations.hpp" />
     <ClInclude Include="BitmapTexture.h" />
     <ClInclude Include="bounding_box_functions.hpp" />
+    <ClInclude Include="BucketRenderer.h" />
     <ClInclude Include="color_functions.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="DielectricMaterial.h" />
     <ClInclude Include="discrete_distribution.hpp" />
     <ClInclude Include="Distribution.h" />
     <ClInclude Include="GeometryLightSource.h" />
+    <ClInclude Include="IBucketSequencer.h" />
+    <ClInclude Include="IExecutor.h" />
     <ClInclude Include="LightingContext.h" />
     <ClInclude Include="OSAbstraction.h" />
+    <ClInclude Include="IRenderer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureCommandFactory.h" />
     <ClInclude Include="TextureCommandProcessor.h" />
@@ -203,6 +207,7 @@
     <ClInclude Include="ray_functions.hpp" />
     <ClInclude Include="SolidColorTexture.h" />
     <ClInclude Include="Stopwatch.h" />
+    <ClInclude Include="TopDownSequencer.h" />
     <ClInclude Include="UniformRandomBitGenerator.h" />
     <ClInclude Include="vector.hpp" />
     <ClInclude Include="vector3_operations.hpp" />
@@ -245,7 +250,7 @@
     <ClInclude Include="random.hpp" />
     <ClInclude Include="ray.hpp" />
     <ClInclude Include="Raytracer.h" />
-    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="SingleThreadedScanlineRenderer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneLoader.h" />
     <ClInclude Include="SettingsCommandFactory.h" />
@@ -270,6 +275,7 @@
   <ItemGroup>
     <ClCompile Include="BitmapTexture.cpp" />
     <ClCompile Include="BlinnMaterial.cpp" />
+    <ClCompile Include="BucketRenderer.cpp" />
     <ClCompile Include="CameraCommandFactory.cpp" />
     <ClCompile Include="CameraCommandProcessor.cpp" />
     <ClCompile Include="DielectricMaterial.cpp" />
@@ -297,7 +303,7 @@
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PointLightSource.cpp" />
     <ClCompile Include="Raytracer.cpp" />
-    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="SingleThreadedScanlineRenderer.cpp" />
     <ClCompile Include="SceneLoader.cpp" />
     <ClCompile Include="SettingsCommandFactory.cpp" />
     <ClCompile Include="SettingsCommandProcessor.cpp" />
