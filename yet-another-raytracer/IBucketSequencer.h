@@ -9,6 +9,9 @@ class IBucketSequence
 {
 public:
 	virtual ~IBucketSequence() = default;
+
+	// Returns next bucket 2-dimensional index (ie.e coord in bucket grid space, not pixel coords)
+	// Must support multithreaded access.
 	virtual std::optional<uint_vector2> getNext() = 0;
 };
 

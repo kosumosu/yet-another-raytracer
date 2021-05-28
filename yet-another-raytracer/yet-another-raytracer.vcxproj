@@ -309,6 +309,7 @@
     <ClCompile Include="SettingsCommandProcessor.cpp" />
     <ClCompile Include="SkyLightSource.cpp" />
     <ClCompile Include="SphereObject.cpp" />
+    <ClCompile Include="ThreadBarrier.hpp" />
     <ClCompile Include="TransformCommandFactory.cpp" />
     <ClCompile Include="TransformCommandProcessor.cpp" />
     <ClCompile Include="KDTreeNode.cpp" />

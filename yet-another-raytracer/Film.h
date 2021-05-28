@@ -19,6 +19,8 @@ public:
 	[[nodiscard]] const color_rgbx& getPixel(unsigned int x, unsigned int y) const { return pixels_[std::size_t(y) * width() + x]; }
 	void setPixel(uint_vector2 coord, const color_rgbx& value) { pixels_[std::size_t(coord[1]) * width() + coord[0]] = value; }
 
+	// Blits a block from another film.
+	// Must support multithreaded access. It is guaranteed that different threads don't write to the same pixels.
 	void transferFilm(const Film& sourceFilm, const uint_vector2& destinationMinCoord, const uint_vector2& blockSize)
 	{
 		for (unsigned int y = 0; y < sourceFilm.height(); ++y)

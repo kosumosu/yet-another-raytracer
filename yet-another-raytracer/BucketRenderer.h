@@ -26,7 +26,12 @@ public:
 	using initialization_finished_callback = std::function<void()>;
 	using rendering_finished_callback = std::function<void()>;
 
-	BucketRenderer(uint_vector2 bucketSize, std::unique_ptr<IBucketSequencer> bucketSequencer, initialization_finished_callback initializationFinishedCallback, rendering_finished_callback renderingFinishedCallback,
+	// progressCallback must support concurrent multithreaded calls
+	BucketRenderer(
+		uint_vector2 bucketSize,
+		std::unique_ptr<IBucketSequencer> bucketSequencer,
+		initialization_finished_callback initializationFinishedCallback,
+		rendering_finished_callback renderingFinishedCallback,
 		progress_callback progressCallback);
 	void Render(Film& film, const Scene& scene) const override;
 
@@ -38,5 +43,11 @@ private:
 	rendering_finished_callback renderingFinishedCallback_;
 
 	void ProcessBucket(Film& film, const uint_vector2& wholeFilmSize, const Scene& scene, const RayIntegrator& rayIntegrator, const Bucket& bucket) const;
-	void ProcessPixel(Film& subFilm, const uint_vector2&, const Scene& scene, const RayIntegrator& rayIntegrator, const uint_vector2& subFilmCoord, const uint_vector2& wholeFilmCoord) const;
+	void ProcessPixel(
+		Film& subFilm,
+		const uint_vector2&,
+		const Scene& scene,
+		const RayIntegrator& rayIntegrator,
+		const uint_vector2& subFilmCoord,
+		const uint_vector2& wholeFilmCoord) const;
 };

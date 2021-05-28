@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-#include <utility>
-
-
 #include "IBucketSequencer.h"
 
+#include <mutex>
+#include <utility>
 
 class TopDownSequencer : public IBucketSequencer
 {
@@ -12,7 +11,6 @@ private:
 	class TopDownSequence : public IBucketSequence
 	{
 	public:
-
 		explicit TopDownSequence(uint_vector2 gridSize)
 			: gridSize_(std::move(gridSize))
 		{
@@ -21,11 +19,12 @@ private:
 
 		std::optional<uint_vector2> getNext() override
 		{
+			std::lock_guard guard{mutex_}; // there's room for optimization
 			if (row_ >= gridSize_[1])
 				return std::nullopt;
-			
-			const uint_vector2 result{ column_, row_ };
-			
+
+			const uint_vector2 result{column_, row_};
+
 			++column_;
 			if (column_ == gridSize_[0])
 			{
@@ -33,13 +32,14 @@ private:
 				++row_;
 			}
 
-			return { result };
+			return {result};
 		}
-		
+
 	private:
 		const uint_vector2 gridSize_;
 		unsigned int row_ = 0;
 		unsigned int column_ = 0;
+		std::mutex mutex_;
 	};
 
 public:

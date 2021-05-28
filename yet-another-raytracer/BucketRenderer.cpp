@@ -10,7 +10,12 @@
 #include "Types.h"
 #include "UniformRandomBitGenerator.h"
 
+#include "ThreadBarrier.hpp"
+
+#include <atomic>
+#include <mutex>
 #include <random>
+#include <thread>
 
 BucketRenderer::BucketRenderer(
 	uint_vector2 bucketSize,
@@ -29,17 +34,15 @@ BucketRenderer::BucketRenderer(
 void BucketRenderer::Render(Film& film, const Scene& scene) const
 {
 	const KDTreeAccelerator accelerator(scene.objects());
-	Raytracer raytracer(std::unique_ptr<Marcher>(accelerator.CreateMarcher()));
 
 	std::vector<const LightSource*> lights(scene.lights().size());
 	std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights), [](const auto& lightPtr) { return lightPtr.get(); });
-	const MonteCarloPathIntegrator integrator{ &raytracer, std::move(lights), [&](const ray3& ray) { return scene.getEnvironmentColor(); } };
 
 	const bool isCropped = scene.getCropWidth() > 0 && scene.getCropHeight() > 0;
 
-	const uint_vector2 viewportSize{ scene.viewport_width(), scene.viewport_height() };
-	const uint_vector2 cropStart = isCropped ? uint_vector2{ scene.getCropX(), scene.getCropY() } : uint_vector2::zero();
-	const uint_vector2 cropSize = isCropped ? uint_vector2{ scene.getCropWidth(), scene.getCropHeight() } : viewportSize;
+	const uint_vector2 viewportSize{scene.viewport_width(), scene.viewport_height()};
+	const uint_vector2 cropStart = isCropped ? uint_vector2{scene.getCropX(), scene.getCropY()} : uint_vector2::zero();
+	const uint_vector2 cropSize = isCropped ? uint_vector2{scene.getCropWidth(), scene.getCropHeight()} : viewportSize;
 	const uint_vector2 cropEnd = cropStart + cropSize;
 	const uint_vector2 gridSize = math::intDivideRoundUp(cropSize, bucketSize_);
 
@@ -47,41 +50,96 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 
 	auto sequence = bucketSequencer_->CreateSequence(gridSize);
 
-	std::size_t completedCount = 0;
+	std::atomic_size_t completedCount = 0;
+
+	const auto threadCount = std::thread::hardware_concurrency();
+	std::vector<std::thread> threads;
+	threads.reserve(threadCount);
+
+	ThreadBarrier barrier{threadCount};
+
+	for (unsigned int i = 0; i < threadCount; ++i)
+	{
+		std::thread thread{
+			[&, sequence = sequence.get()]
+			{
+				Raytracer raytracer(std::unique_ptr<Marcher>(accelerator.CreateMarcher()));
+				const MonteCarloPathIntegrator integrator{ &raytracer, lights, [&](const ray3& ray) { return scene.getEnvironmentColor(); } };
+				
+				Film subFilm{bucketSize_};
+
+				barrier.arrive_and_wait();
+
+				for (auto bucketCoord = sequence->getNext(); bucketCoord; bucketCoord = sequence->getNext())
+				{
+					const uint_vector2 bucketMinCorner = cropStart + bucketSize_ * *bucketCoord;
+					const uint_vector2 bucketMaxCorner = math::min(bucketMinCorner + bucketSize_, cropEnd);
+					const uint_vector2 bucketSize = bucketMaxCorner - bucketMinCorner;
+
+					ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize});
+					film.transferFilm(subFilm, bucketMinCorner, bucketSize);
+					const auto localCompletedCount = ++completedCount;
+					progressCallback_(float(localCompletedCount) * oneOverTotalBuckets);
+				}
+			}
+		};
+		threads.push_back(std::move(thread));
+	}
+
+	barrier.wait();
+
 	initializationFinishedCallback_();
 
-	Film subFilm{ bucketSize_ };
-
-	for (auto bucketCoord = sequence->getNext(); bucketCoord; bucketCoord = sequence->getNext())
+	for (auto & thread : threads)
 	{
-		const uint_vector2 bucketMinCorner = cropStart + bucketSize_ * *bucketCoord;
-		const uint_vector2 bucketMaxCorner = math::min(bucketMinCorner + bucketSize_, cropEnd);
-		const uint_vector2 bucketSize = bucketMaxCorner - bucketMinCorner;
-
-		ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{ bucketMinCorner, bucketSize });
-		film.transferFilm(subFilm, bucketMinCorner, bucketSize);
-		++completedCount;
-		progressCallback_(float(completedCount) * oneOverTotalBuckets);
+		thread.join();
 	}
+
 	renderingFinishedCallback_();
+
+	//Film subFilm{bucketSize_};
+
+	//for (auto bucketCoord = sequence->getNext(); bucketCoord; bucketCoord = sequence->getNext())
+	//{
+	//	const uint_vector2 bucketMinCorner = cropStart + bucketSize_ * *bucketCoord;
+	//	const uint_vector2 bucketMaxCorner = math::min(bucketMinCorner + bucketSize_, cropEnd);
+	//	const uint_vector2 bucketSize = bucketMaxCorner - bucketMinCorner;
+
+	//	ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize});
+	//	film.transferFilm(subFilm, bucketMinCorner, bucketSize);
+	//	++completedCount;
+	//	progressCallback_(float(completedCount) * oneOverTotalBuckets);
+	//}
+	//
 }
 
-void BucketRenderer::ProcessBucket(Film& film, const uint_vector2& wholeFilmSize, const Scene& scene, const RayIntegrator& rayIntegrator, const Bucket& bucket) const
+void BucketRenderer::ProcessBucket(
+	Film& film,
+	const uint_vector2& wholeFilmSize,
+	const Scene& scene,
+	const RayIntegrator& rayIntegrator,
+	const Bucket& bucket) const
 {
 	for (size_t y = 0; y < bucket.size[1]; ++y)
 	{
 		for (size_t x = 0; x < bucket.size[0]; ++x)
 		{
-			const uint_vector2 localCoord{ x, y };
+			const uint_vector2 localCoord{x, y};
 			ProcessPixel(film, wholeFilmSize, scene, rayIntegrator, localCoord, bucket.start + localCoord);
 		}
 	}
 }
 
-void BucketRenderer::ProcessPixel(Film& subFilm, const uint_vector2& wholeFilmSize, const Scene& scene, const RayIntegrator& rayIntegrator, const uint_vector2& subFilmCoord, const uint_vector2& wholeFilmCoord) const
+void BucketRenderer::ProcessPixel(
+	Film& subFilm,
+	const uint_vector2& wholeFilmSize,
+	const Scene& scene,
+	const RayIntegrator& rayIntegrator,
+	const uint_vector2& subFilmCoord,
+	const uint_vector2& wholeFilmCoord) const
 {
 	const unsigned seed = wholeFilmCoord[0] | (wholeFilmCoord[1] << 16);
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::mt19937{ seed });
+	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::mt19937{seed});
 
 	const bool doJitter = scene.getSamplesPerPixel() > 1;
 	const color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
