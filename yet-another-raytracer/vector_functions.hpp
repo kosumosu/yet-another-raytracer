@@ -249,4 +249,47 @@ namespace math
 		});
 		return res;
 	}
+
+	template <typename T, std::size_t N>
+	bool anyNan(const vector<T, N>& one)
+	{
+		bool isNan = false;
+		iterate<0, N - 1>([&](std::size_t i)
+			{
+				isNan = isNan || std::isnan(one[i]);
+			});
+		return isNan;
+	}
+
+	template <typename T, std::size_t N, typename TCallable>
+	auto mapElements(const vector<T, N>& one, TCallable&& callable)
+	{
+		using TResult = std::invoke_result_t<TCallable, const T&>;
+		auto res = vector<TResult, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+			{
+				res[i] = std::invoke(std::forward<TCallable>(callable), one[i]);
+			});
+		return res;
+	}
+
+
+	template <typename T, std::size_t N>
+	auto floor(const vector<T, N>& one)
+	{
+		return mapElements(one, [](const auto& val) { return std::floor(val); });
+	}
+
+	template <typename TInt, typename T, std::size_t N>
+	auto fast_floor_int(const vector<T, N>& one)
+	{
+		return mapElements(one, [](const auto& val) { return static_cast<TInt>(std::floor(val)); });
+	}
+
+	template <typename TResult, typename T, std::size_t N>
+	auto cast(const vector<T, N>& one)
+	{
+		return mapElements(one, [](const auto& val) { return static_cast<TResult>(val); });
+	}
+	
 }

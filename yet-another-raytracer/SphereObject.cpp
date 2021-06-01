@@ -4,17 +4,20 @@
 
 SphereObject::SphereObject()
 	: m_center(vector3(0.0, 0.0, 0.0))
-	, m_radius(1.0) {}
-
-
-SphereObject::~SphereObject(void) {}
-
-Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
+	, m_radius(1.0)
 {
-	auto inversed_ray = math::transform3by4x4(ray, this->inverse_transform());
+}
+
+SphereObject::~SphereObject()
+{
+}
+
+Hit SphereObject::FindHit(const ray3& ray, space_real minDistance, space_real maxDistance) const
+{
+	const auto inversed_ray = math::transform3by4x4(ray, this->inverse_transform());
 
 	// from center of sphere to ray origin
-	auto center_to_origin = inversed_ray.origin() - m_center;
+	const auto center_to_origin = inversed_ray.origin() - m_center;
 
 	space_real a = math::length2(inversed_ray.direction());
 	space_real b = space_real(2.0) * math::dot(inversed_ray.direction(), center_to_origin);
@@ -22,7 +25,7 @@ Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real m
 
 	space_real d = b * b - space_real(4.0) * a * c;
 
-	if (d < space_real(0.0))
+	if (d <= space_real(0.0))
 	{
 		return Hit();
 	}
@@ -38,10 +41,7 @@ Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real m
 		}
 		else
 		{
-			const space_real biased_x =
-				math::is_same_sign(biasedX1, biasedX2)
-					? std::min(biasedX1, biasedX2)
-					: std::max(biasedX1, biasedX2);
+			const space_real biased_x = math::is_same_sign(biasedX1, biasedX2) ? std::min(biasedX1, biasedX2) : std::max(biasedX1, biasedX2);
 
 			const space_real x = biased_x + minDistance;
 
@@ -54,12 +54,14 @@ Hit SphereObject::FindHit(const ray3 & ray, space_real minDistance, space_real m
 			auto transformed_hit_point = (this->transform() * vector4(world_space_hit_point, 1.0)).reduce();
 			auto transformed_normal = math::normalize((this->normal_transform() * vector4(normal, space_real(0.0))).reduce());
 
-			return Hit(transformed_hit_point, transformed_normal, this, x, uvs_t{ vector2::zero() });
+			
+
+			return Hit(transformed_hit_point, transformed_normal, this, x, uvs_t{vector2::zero()});
 		}
 	}
 }
 
-bool SphereObject::DoesHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const
+bool SphereObject::DoesHit(const ray3& ray, space_real minDistance, space_real maxDistance) const
 {
 	auto inversed_ray = math::transform3by4x4(ray, this->inverse_transform());
 
@@ -81,7 +83,7 @@ bool SphereObject::DoesHit(const ray3 & ray, space_real minDistance, space_real 
 	return (x1 >= minDistance && x1 <= maxDistance) || (x2 > minDistance && x2 <= maxDistance);
 }
 
-bounding_box3 SphereObject::GetBoundsWithinBounds(const bounding_box3 & box) const
+bounding_box3 SphereObject::GetBoundsWithinBounds(const bounding_box3& box) const
 {
 	auto ownBox = bounding_box();
 	ownBox.Intersect(box);
@@ -107,14 +109,14 @@ space_real SphereObject::GetOneSidedSurfaceArea() const
 	return space_real(4.0 * math::pi) * m_radius * m_radius;
 }
 
-math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
+math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int>& engine) const
 {
 	const auto directionFromCenter = math::sphericalRand<space_real>(engine);
 	// scale is not supported
 	const auto worldPoint = transform() * vector4(m_center + directionFromCenter * m_radius, space_real(1.0));
 	const auto worldNormal = normal_transform() * vector4(directionFromCenter, space_real(0.0));
 	return math::random_sample<surface_point, space_real>(
-		surface_point(worldPoint.reduce(), worldNormal.reduce(), uvs_t{ vector2::zero() }),
+		surface_point(worldPoint.reduce(), worldNormal.reduce(), uvs_t{vector2::zero()}),
 		space_real(1.0) / GetOneSidedSurfaceArea(),
 		false);
 }

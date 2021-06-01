@@ -8,7 +8,7 @@ namespace math
 {
 
 	template <typename T>
-	vector<T, 3> inline cross( const vector<T, 3> & one, const vector<T, 3> & other)
+	vector<T, 3> cross( const vector<T, 3> & one, const vector<T, 3> & other)
 	{
 		return vector<T, 3>
 			(

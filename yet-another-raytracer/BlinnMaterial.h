@@ -5,7 +5,7 @@
 
 class Texture;
 
-class BlinnMaterial : public Material
+class BlinnMaterial final : public Material
 {
 public:
 	BlinnMaterial()

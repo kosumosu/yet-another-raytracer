@@ -8,63 +8,54 @@ constexpr pixel_component_t maxPixelValue = std::numeric_limits<png::pixel_trait
 constexpr color_real pixelValueNormalizationFactor = color_real(1.0) / color_real(maxPixelValue);
 constexpr color_real gammaPower = color_real(2.2);
 
-color_real convertChannel(const pixel_component_t & component)
+color_real convertChannel(const pixel_component_t& component)
 {
-	return std::pow(component * pixelValueNormalizationFactor, gammaPower);
+	return std::pow(color_real(component) * pixelValueNormalizationFactor, gammaPower);
 }
 
-color_rgbx convertColor(const pixel_t & pixel)
+color_rgbx convertColor(const pixel_t& pixel)
 {
 	return color_rgbx(convertChannel(pixel.red), convertChannel(pixel.green), convertChannel(pixel.blue), 0);
 }
 
-BitmapTexture::BitmapTexture(const std::string & filename)
+BitmapTexture::BitmapTexture(const std::string& filename)
+	: size_{0, 0}
+	, halfTexel_{vector2::zero()}
 {
 	std::ifstream stream(filename, std::ifstream::binary);
 	const png::image<pixel_t> image(stream);
 
-	_width = image.get_width();
-	_height = image.get_height();
-	_texels.resize(_width * _height, color_rgbx::zero());
+	size_ = {image.get_width(), image.get_height()};
+	halfTexel_ = space_real(1.0) / (size_ * space_real(2));
 
-	for (unsigned int y = 0; y < _height; ++y)
+	texels_.resize(std::size_t(size_[0]) * size_[1], color_rgbx::zero());
+
+	for (unsigned int y = 0; y < size_[1]; ++y)
 	{
-		for (unsigned int x = 0; x < _width; ++x)
+		for (unsigned int x = 0; x < size_[0]; ++x)
 		{
 			const auto pixel = image.get_pixel(x, y);
-			_texels[y * _width + x] = convertColor(pixel);
+			texels_[std::size_t(y) * size_[0] + x] = convertColor(pixel);
 		}
 	}
 }
 
-color_rgbx BitmapTexture::Sample(const TextureCoords & coords) const
+color_rgbx BitmapTexture::Sample(const TextureCoords& coords) const
 {
 	// tiled coords
-	const space_real finalU = coords.uvs[0][0] - std::floor(coords.uvs[0][0]);
-	const space_real finalV = coords.uvs[0][1] - std::floor(coords.uvs[0][1]);
+	const auto floatXY = (coords.uvs[0] - halfTexel_) * size_;
+	const auto minIntXY = (math::fast_floor_int<int>(floatXY) % size_ + size_) % size_;
 
-	const auto floatX = finalU * float(_width - 1);
-	const auto floatY = finalV * float(_height - 1);
+	const auto maxIntXY = (minIntXY + int_vector2{1, 1}) % size_;
 
-	const auto x0 = static_cast<unsigned int>(floatX);
-	const auto y0 = static_cast<unsigned int>(floatY);
+	const auto st = floatXY - math::floor(floatXY);
 
-	const auto x1 = (x0 + 1) % _width;
-	const auto y1 = (y0 + 1) % _height;
+	const auto weight_s0t0 = color_real((space_real(1) - st[0]) * (space_real(1) - st[1]));
+	const auto weight_s0t1 = color_real((space_real(1) - st[0]) * st[1]);
+	const auto weight_s1t0 = color_real(st[0] * (space_real(1) - st[1]));
+	const auto weight_s1t1 = color_real(st[0] * st[1]);
 
-	const auto s = floatX - std::floor(floatX);
-	const auto t = floatY - std::floor(floatY);
-
-	const auto weight_s0t0 = color_real((space_real(1) - s) * (space_real(1) - t));
-	const auto weight_s0t1 = color_real((space_real(1) - s) * t);
-	const auto weight_s1t0 = color_real(s * (space_real(1) - t));
-	const auto weight_s1t1 = color_real(s * t);
-
-	const auto width = std::size_t(_width);
-	return 
-		_texels[y0 * width + x0] * weight_s0t0
-		+ _texels[y0 * width + x1] * weight_s1t0
-		+ _texels[y1 * width + x0] * weight_s0t1
-		+ _texels[y1 * width + x1] * weight_s1t1
-		;
+	const auto width = std::size_t(size_[0]);
+	return texels_[minIntXY[1] * width + minIntXY[0]] * weight_s0t0 + texels_[minIntXY[1] * width + maxIntXY[0]] * weight_s1t0 + texels_[maxIntXY[1] * width +
+		minIntXY[0]] * weight_s0t1 + texels_[maxIntXY[1] * width + maxIntXY[0]] * weight_s1t1;
 }

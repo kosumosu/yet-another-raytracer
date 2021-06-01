@@ -23,11 +23,11 @@ public:
 	// Must support multithreaded access. It is guaranteed that different threads don't write to the same pixels.
 	void transferFilm(const Film& sourceFilm, const uint_vector2& destinationMinCoord, const uint_vector2& blockSize)
 	{
-		for (unsigned int y = 0; y < sourceFilm.height(); ++y)
+		for (unsigned int y = 0; y < blockSize[1]; ++y)
 		{
 			const auto destY = y + destinationMinCoord[1];
 
-			for (unsigned int x = 0; x < sourceFilm.width(); ++x)
+			for (unsigned int x = 0; x < blockSize[0]; ++x)
 			{
 				setPixel({ x + destinationMinCoord[0], destY }, sourceFilm.getPixel(x, y));
 			}

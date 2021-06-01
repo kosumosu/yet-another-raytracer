@@ -2,7 +2,7 @@
 #include "Texture.h"
 #include "color_functions.hpp"
 
-#define ENABLE_IMPORTANCE_SAMPLING true
+#define ENABLE_COSINE_WEIGHTED_SAMPLING true
 
 using bsdf_functional_distribution = FunctionalDistribution<const bsdf_sample, const vector3, space_real>;
 
@@ -36,15 +36,14 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 	bsdf_functional_distribution::generate_sample_func generateDiffuseFuncImpl = [&]()
 		{
 			const bool isEntering = math::is_obtuse_angle(incidentDirection, normal);
-			const std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+			const std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 			const auto translucenceProbability = color::get_importance(_translucency);
 			const bool isTranslucent = translucenceProbability > color_real(0.0) && translucenceProbability >= distr(randomEngine);
 
 			const bool flipNormal = isEntering == isTranslucent;
 
-#if ENABLE_IMPORTANCE_SAMPLING
-			const auto direction = flipNormal ? math::cosineWeightedHemiSphericalRand(-normal, randomEngine) : math::cosineWeightedHemiSphericalRand(normal, randomEngine);
-			const space_real pdf = std::abs(math::dot(direction, normal)) * space_real(math::oneOverPi);
+#if ENABLE_COSINE_WEIGHTED_SAMPLING
+			const auto [direction, pdf] = flipNormal ? math::cosineWeightedHemiSphericalRand(-normal, randomEngine) : math::cosineWeightedHemiSphericalRand(normal, randomEngine);
 #else
 			const auto direction = math::hemiSphericalRand(-normal, randomEngine);
 			const space_real pdf = space_real(0.5 * math::oneOverPi);
@@ -87,7 +86,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			: [&](const vector3 & direction)
 			{
 				const auto translucenceProbability = color::get_importance(_translucency);
-#if ENABLE_IMPORTANCE_SAMPLING
+#if ENABLE_COSINE_WEIGHTED_SAMPLING
 				return math::is_obtuse_angle(direction, normal)
 					       ? color_real(math::dot(direction, normal) * space_real(math::oneOverPi)) * (color_real(1.0) - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability)
 					       : color_real(math::dot(direction, -normal) * space_real(math::oneOverPi)) * (color_real(1.0) - GetReflectionProbability()) * translucenceProbability;
@@ -132,7 +131,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			: [&]()
 			{
 				const color_real reflectionPobability = GetReflectionProbability();
-				std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+				std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 				if (distr(randomEngine) < reflectionPobability)
 					return generateReflectionFuncImpl();
 				else

@@ -26,7 +26,7 @@ GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 
 void GeometryLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
 {
-	std::uniform_real_distribution<color_real> distr(color_real(0.0), upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+	std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 	const auto randomFunc = [&]()
 	{
 		return color_real(distr(randomEngine));

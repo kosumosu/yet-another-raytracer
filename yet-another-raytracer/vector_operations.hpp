@@ -84,7 +84,7 @@ namespace math
 	template <typename T1, typename T2, std::size_t N>
 	auto operator *(const vector<T1, N>& one, const vector<T2, N>& another)
 	{
-		using TResult = decltype(T1{} * T2{});
+		using TResult = decltype(one[0] * another[0]);
 		auto res = vector<TResult, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
 			{
@@ -103,14 +103,15 @@ namespace math
 		return one;
 	}
 
-	template <typename T, std::size_t N>
-	vector<T, N> operator *( const vector<T, N> & one, const T & scalar)
+	template <typename T1, typename T2, std::size_t N>
+	auto operator *(const vector<T1, N>& one, const T2& scalar)
 	{
-		vector<T, N> res = vector<T, N>::zero();
+		using TResult = decltype(one[0] * scalar);
+		auto res = vector<TResult, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
-		{
-			res[i] = one[i] * scalar;
-		});
+			{
+				res[i] = one[i] * scalar;
+			});
 		return res;
 	}
 
@@ -124,10 +125,11 @@ namespace math
 		return one;
 	}
 
-	template <typename T, std::size_t N>
-	vector<T, N> operator *( const T & scalar, const vector<T, N> & another)
+	template <typename T1, typename T2, std::size_t N>
+	auto operator *( const T1 & scalar, const vector<T2, N> & another)
 	{
-		vector<T, N> res = vector<T, N>::zero();
+		using TResult = decltype(scalar * another[0]);
+		auto res = vector<TResult, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
 			{
 				res[i] = scalar * another[i];
@@ -139,7 +141,7 @@ namespace math
 	template <typename T1, typename T2, std::size_t N>
 	auto operator /(const vector<T1, N>& one, const vector<T2, N>& another)
 	{
-		using TResult = decltype(T1{} / T2{});
+		using TResult = decltype(one[0] / another[0]);
 		auto res = vector<TResult, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
 			{
@@ -148,26 +150,39 @@ namespace math
 		return res;
 	}
 
-	template <typename T, std::size_t N>
-	vector<T, N> operator /( const vector<T, N> & one, const T & scalar)
+	template <typename T1, typename T2, std::size_t N>
+	auto operator /(const vector<T1, N>& one, const T2& scalar)
 	{
-		T recipr = T(1) / scalar;
-		vector<T, N> res = vector<T, N>::zero();
+		using TResult = decltype(one[0] / scalar);
+		auto res = vector<TResult, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
-		{
-			res[i] = one[i] * recipr;
-		});
+			{
+				res[i] = one[i] / scalar;
+			});
 		return res;
 	}
 
-	template <typename T, std::size_t N>
-	vector<T, N> operator /( const T & scalar, const vector<T, N> & another )
+	template <typename T1, typename T2, std::size_t N>
+	auto operator /(const T1& scalar, const vector<T2, N>& another)
 	{
-		vector<T, N> res = vector<T, N>::zero();
+		using TResult = decltype(scalar * another[0]);
+		auto res = vector<TResult, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
-		{
-			res[i] = scalar / another[i];
-		});
+			{
+				res[i] = scalar / another[i];
+			});
+		return res;
+	}
+
+	template <typename T1, typename T2, std::size_t N>
+	auto operator %(const vector<T1, N>& one, const vector<T2, N>& another)
+	{
+		using TResult = decltype(one[0] % another[0]);
+		auto res = vector<TResult, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+			{
+				res[i] = one[i] % another[i];
+			});
 		return res;
 	}
 

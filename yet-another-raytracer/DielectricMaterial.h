@@ -3,19 +3,19 @@
 #include "Material.h"
 #include "Types.h"
 
-class DielectricMaterial : public Material
+class DielectricMaterial final : public Material
 {
 public:
 
 	DielectricMaterial()
 		: _iorInside(1.5)
 		, _iorOutside(1.0)
-		, _surfaceTransparency(color_rgbx::fill(1)) { }
+		, surfaceTransparency_(color_rgbx::fill(1)) { }
 
 	explicit DielectricMaterial(space_real iorInside, space_real iorOutside, const color_rgbx & surfaceTransparency)
 		: _iorInside(iorInside)
 		, _iorOutside(iorOutside)
-		, _surfaceTransparency(surfaceTransparency)
+		, surfaceTransparency_(surfaceTransparency)
 	{
 
 	}
@@ -27,7 +27,7 @@ public:
 
 	void setIorInside(space_real ior) { _iorInside = ior; }
 	void setIorOutside(space_real ior) { _iorOutside = ior; }
-	void setSurfaceTransparency(const color_rgbx & value) { _surfaceTransparency = value; }
+	void setSurfaceTransparency(const color_rgbx & value) { surfaceTransparency_ = value; }
 
 	color_real GetEmissionImportance() const override;
 
@@ -37,6 +37,6 @@ public:
 private:
 	space_real _iorInside;
 	space_real _iorOutside;
-	color_rgbx _surfaceTransparency;
+	color_rgbx surfaceTransparency_;
 };
 

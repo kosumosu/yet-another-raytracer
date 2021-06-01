@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yet-another-raytracer", "yet-another-raytracer\yet-another-raytracer.vcxproj", "{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}"
 EndProject
@@ -11,6 +11,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
+		DebugOptimized|Win32 = DebugOptimized|Win32
+		DebugOptimized|x64 = DebugOptimized|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 	EndGlobalSection
@@ -19,6 +21,10 @@ Global
 		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.Debug|Win32.Build.0 = Debug|Win32
 		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.Debug|x64.ActiveCfg = Debug|x64
 		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.Debug|x64.Build.0 = Debug|x64
+		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.DebugOptimized|Win32.ActiveCfg = DebugOptimized|Win32
+		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.DebugOptimized|Win32.Build.0 = DebugOptimized|Win32
+		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.DebugOptimized|x64.ActiveCfg = DebugOptimized|x64
+		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.DebugOptimized|x64.Build.0 = DebugOptimized|x64
 		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.Release|Win32.ActiveCfg = Release|Win32
 		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.Release|Win32.Build.0 = Release|Win32
 		{2B102EB5-1454-4E52-82D7-64D41FEB5A3A}.Release|x64.ActiveCfg = Release|x64
@@ -27,6 +33,10 @@ Global
 		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.Debug|Win32.Build.0 = Debug|Win32
 		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.Debug|x64.ActiveCfg = Debug|x64
 		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.Debug|x64.Build.0 = Debug|x64
+		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.DebugOptimized|Win32.ActiveCfg = DebugOptimized|Win32
+		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.DebugOptimized|Win32.Build.0 = DebugOptimized|Win32
+		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.DebugOptimized|x64.ActiveCfg = DebugOptimized|x64
+		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.DebugOptimized|x64.Build.0 = DebugOptimized|x64
 		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.Release|Win32.ActiveCfg = Release|Win32
 		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.Release|Win32.Build.0 = Release|Win32
 		{B61BED1B-2EF0-42BC-9D02-B1D750FA4657}.Release|x64.ActiveCfg = Release|x64
@@ -34,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {81DAB7B5-F3EB-4D60-86BF-2F837547700C}
 	EndGlobalSection
 EndGlobal

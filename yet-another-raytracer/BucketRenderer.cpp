@@ -64,8 +64,8 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 			[&, sequence = sequence.get()]
 			{
 				Raytracer raytracer(std::unique_ptr<Marcher>(accelerator.CreateMarcher()));
-				const MonteCarloPathIntegrator integrator{ &raytracer, lights, [&](const ray3& ray) { return scene.getEnvironmentColor(); } };
-				
+				const MonteCarloPathIntegrator integrator{&raytracer, lights, [&](const ray3& ray) { return scene.getEnvironmentColor(); }};
+
 				Film subFilm{bucketSize_};
 
 				barrier.arrive_and_wait();
@@ -90,27 +90,12 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 
 	initializationFinishedCallback_();
 
-	for (auto & thread : threads)
+	for (auto& thread : threads)
 	{
 		thread.join();
 	}
 
 	renderingFinishedCallback_();
-
-	//Film subFilm{bucketSize_};
-
-	//for (auto bucketCoord = sequence->getNext(); bucketCoord; bucketCoord = sequence->getNext())
-	//{
-	//	const uint_vector2 bucketMinCorner = cropStart + bucketSize_ * *bucketCoord;
-	//	const uint_vector2 bucketMaxCorner = math::min(bucketMinCorner + bucketSize_, cropEnd);
-	//	const uint_vector2 bucketSize = bucketMaxCorner - bucketMinCorner;
-
-	//	ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize});
-	//	film.transferFilm(subFilm, bucketMinCorner, bucketSize);
-	//	++completedCount;
-	//	progressCallback_(float(completedCount) * oneOverTotalBuckets);
-	//}
-	//
 }
 
 void BucketRenderer::ProcessBucket(
@@ -146,14 +131,18 @@ void BucketRenderer::ProcessPixel(
 	color_rgbx averageColor = color_rgbx::zero();
 	const vector2 pixelLeftBottomCoord = wholeFilmCoord;
 	const vector2 sizeNormalizationFactor = vector2(1.0, 1.0) / wholeFilmSize; //(1.0 / subFilm.width(), 1.0 / subFilm.height());
+	const auto aspectRatio = space_real(wholeFilmSize[0] / wholeFilmSize[1]);
 
 	for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++)
 	{
 		const auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), pixelPersonalRandomEngine) : vector2(0.5, 0.5);
 		const auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
 
-		const auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, space_real(subFilm.width()) / space_real(subFilm.height()));
-		averageColor += rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
+		const auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, aspectRatio);
+
+		const auto rayPayload = rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
+		_ASSERT(!std::isnan(rayPayload[0]) && !std::isnan(rayPayload[1]) && !std::isnan(rayPayload[2]) && !std::isnan(rayPayload[3]));
+		averageColor += rayPayload;
 	}
 
 	subFilm.setPixel(subFilmCoord, averageColor);

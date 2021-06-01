@@ -286,8 +286,10 @@ void Render(const std::wstring& scene_file, const std::wstring& output_image_fil
 	Film film({scene.viewport_width(), scene.viewport_height()});
 	float processInitTime;
 	float realInitTime;
+
+#if true
 	const BucketRenderer renderer(
-		{32, 32},
+		{16, 16},
 		std::make_unique<TopDownSequencer>(),
 		[&]()
 		{
@@ -310,6 +312,30 @@ void Render(const std::wstring& scene_file, const std::wstring& output_image_fil
 			std::lock_guard guard{ coutMutex };
 			std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
 		});
+#else
+	const SingleThreadedScanlineRenderer renderer(
+		[&]()
+		{
+			processInitTime = processTimeStopwatch.Sample();
+			realInitTime = realTimeStopwatch.Sample();
+			std::wcout << "Initialization finished. Real time=" << processInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
+		},
+		[&]()
+		{
+			const auto processTotalElapsed = processTimeStopwatch.Sample();
+			const auto realTotalElapsed = realTimeStopwatch.Sample();
+			std::wcout << "Rendering finished." << std::endl;
+			std::wcout << "Real time : " << realTotalElapsed - realInitTime << "sec" << std::endl;
+			std::wcout << "Total real time : " << realTotalElapsed << "sec" << std::endl;
+			std::wcout << "Process time : " << processTotalElapsed - processInitTime << "sec" << std::endl;
+			std::wcout << "Total process time : " << processTotalElapsed << "sec" << std::endl;
+		},
+			[&coutMutex](float progress)
+		{
+			std::lock_guard guard{ coutMutex };
+			std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
+		});
+#endif
 
 	scene.PrepareForRendering();
 
@@ -317,7 +343,6 @@ void Render(const std::wstring& scene_file, const std::wstring& output_image_fil
 
 	film.SaveAsPng(output_image_file);
 }
-
 
 int _tmain(int argc, _TCHAR* argv[])
 {
