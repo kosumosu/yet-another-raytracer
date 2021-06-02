@@ -27,7 +27,7 @@ namespace math
 	constexpr double lowerRandomBound<double> = 1.97626258336498618e-323; // five steps away from 0.0 to avoid numeric problems.
 
 	// std::uniform_real_distribution frequently generates very small numbers (equal to lower bound) with too high probability when using fast floating point math. Locally forcing precise math for generation.
-#pragma float_control( precise, off, push)
+#pragma float_control( precise, on, push)
 	
 	template <typename TValue, std::size_t N, typename TRandomEngine>
 	vector<TValue, N> linearRand(const vector<TValue, N>& low, const vector<TValue, N>& high, TRandomEngine& engine)
