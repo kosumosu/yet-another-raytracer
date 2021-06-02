@@ -2,16 +2,16 @@
 size 1024 1024
 camera 278 273 -800 278 273 -799 0 1 0 39.3
 
-#crop 1005 1736 1 1
+#crop 1339 1488 1 1
 #crop 242 322 160 160
 #crop 833 1687 1 1
-crop 278 808 175 80
+#crop 278 808 175 175
 
 maxdepth 64
 background 0 0 0
 
-#samples 262144
-samples 65536
+#samples 65536
+samples 128
 #point 275 275 275 1 1 1
 
 #bitmapTexture "bitmap-texture" "TexturesCom_BrickLargeBrown0001_1_seamless_S.png"
