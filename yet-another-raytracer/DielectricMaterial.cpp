@@ -77,6 +77,7 @@ namespace
 		const vector3& normal_;
 		const vector3& fixedNormal_;
 		const space_real cosThetaI_;
+		const space_real absCosThetaI_;
 		const space_real ior_;
 
 		color_real reflectance_;
@@ -96,13 +97,14 @@ namespace
 
 
 		Fresnel(const vector3& incidentDirection, const vector3& normal, space_real etaI, space_real etaT)
-			: incidentDirection_{incidentDirection}
-			, normal_{normal}
-			, fixedNormal_{math::dot(incidentDirection, normal) < 0 ? normal : -normal}
-			, cosThetaI_{ std::abs( math::dot(incidentDirection, normal)) }
-			, ior_{etaI / etaT}
+			: incidentDirection_{ incidentDirection }
+			, normal_{ normal }
+			, fixedNormal_{ math::dot(incidentDirection, normal) < 0 ? normal : -normal }
+			, cosThetaI_{ math::dot(incidentDirection, normal) }
+			, absCosThetaI_{ std::abs(cosThetaI_) }
+			, ior_{ etaI / etaT }
 		{
-			const auto sin2ThetaI = std::max(space_real(0), space_real(1.0) - cosThetaI_ * cosThetaI_);
+			const auto sin2ThetaI = std::max(space_real(0), space_real(1.0) - absCosThetaI_ * absCosThetaI_);
 			const auto sin2ThetaT = ior_ * ior_ * sin2ThetaI;
 
 			if (sin2ThetaT >= space_real(1.0))
@@ -112,8 +114,8 @@ namespace
 			else
 			{
 				cosThetaT_ = std::sqrt(std::max(space_real(0.0), space_real(1.0) - sin2ThetaT));
-				const auto parallelPolarizationAmplitude = ((etaT * cosThetaI_) - (etaI * cosThetaT_)) / ((etaT * cosThetaI_) + (etaI * cosThetaT_));
-				const auto perpendicularPolarizationAmplitude = ((etaI * cosThetaI_) - (etaT * cosThetaT_)) / ((etaI * cosThetaI_) + (etaT * cosThetaT_));
+				const auto parallelPolarizationAmplitude = ((etaT * absCosThetaI_) - (etaI * cosThetaT_)) / ((etaT * absCosThetaI_) + (etaI * cosThetaT_));
+				const auto perpendicularPolarizationAmplitude = ((etaI * absCosThetaI_) - (etaT * cosThetaT_)) / ((etaI * absCosThetaI_) + (etaT * cosThetaT_));
 
 				reflectance_ = color_real(
 					(parallelPolarizationAmplitude * parallelPolarizationAmplitude + perpendicularPolarizationAmplitude * perpendicularPolarizationAmplitude) /
@@ -128,12 +130,12 @@ namespace
 
 		[[nodiscard]] Reflection evaluateReflection() const
 		{
-			return {cosThetaI_, incidentDirection_ + normal_ * (space_real(2.0) * cosThetaI_)};
+			return { absCosThetaI_, incidentDirection_ - normal_ * (space_real(2.0) * cosThetaI_) };
 		}
 
 		[[nodiscard]] Refraction evaluateRefraction() const
 		{
-			return {cosThetaT_, ior_ * incidentDirection_ + (ior_ * cosThetaI_ - cosThetaT_) * fixedNormal_};
+			return { cosThetaT_, ior_ * incidentDirection_ + (ior_ * absCosThetaI_ - cosThetaT_) * fixedNormal_ };
 		}
 	};
 }
@@ -200,16 +202,9 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			const space_real iorFrom = entering ? _iorOutside : _iorInside;
 			const space_real iorTo = entering ? _iorInside : _iorOutside;
 
-			const auto reflectance1 = FrDielectric(cosTheta, iorFrom, iorTo);
-
 			const Fresnel fresnel{ incidentDirection, normal, iorFrom, iorTo };
 
 			const auto reflectance = fresnel.reflectance();
-
-			if (std::abs(reflectance - reflectance1) > 0.01f )
-			{
-				//__debugbreak();
-			}
 
 			std::uniform_real_distribution distr(color_real(0.0), math::upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 			const auto randomNumber = distr(randomEngine);
@@ -219,21 +214,12 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			{
 				const auto reflection = fresnel.evaluateReflection();
 
-				const auto reflectedDirection = incidentDirection - normal * (space_real(2.0) * math::dot(incidentDirection, normal));
-
-				if (std::abs(reflection.reflectedRayToNormalCos - std::abs(cosTheta)) > 0.01f)
-				{
-					//__debugbreak();
-				}
-				
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
 						reflection.reflectedDirection,
-						//reflectedDirection,
 						[=]()
 						{
 							return color_rgbx::fill(reflectance / std::abs(color_real(reflection.reflectedRayToNormalCos)));
-							//return color_rgbx::fill(reflectance / std::abs(color_real(cosTheta)));
 						}),
 					space_real(reflectance),
 					true
@@ -242,30 +228,14 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			else
 			{
 				const auto transmission = color_real(1.0) - reflectance;
-
-				vector3 refractedDirection = vector3::zero();
-				space_real refractedCosTheta;
-				bool r = refract(incidentDirection, normal, iorFrom / iorTo, refractedDirection, refractedCosTheta);
-
 				const auto refraction = fresnel.evaluateRefraction();
-
-				const auto asd = std::abs(refraction.refractedRayToNormalCos - refractedCosTheta);
-
-				if (r && asd > 0.01f)
-				{
-					//volatile auto rrr = r;
-					//volatile auto gfd = asd;
-					//__debugbreak();
-				}
 
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
-						//refraction.refractedDirection,
-						refractedDirection,
+						refraction.refractedDirection,
 						[=]()
 						{
-							//return surfaceTransparency_ * color_real(transmission * color_real((iorFrom * iorFrom) / (iorTo * iorTo)) / std::abs(color_real(refraction.refractedRayToNormalCos)));
-							return surfaceTransparency_ * color_real(transmission * color_real((iorFrom * iorFrom) / (iorTo * iorTo)) / std::abs(color_real(refractedCosTheta)));
+							return surfaceTransparency_ * color_real(transmission * color_real((iorFrom * iorFrom) / (iorTo * iorTo)) / std::abs(color_real(refraction.refractedRayToNormalCos)));
 						}),
 					space_real(transmission),
 					true
