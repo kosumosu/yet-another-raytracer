@@ -211,6 +211,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 					{
 						throughput *= vertexThroughput / std::min(color_real(1.0), importance);
 						_ASSERT(!math::anyNan(throughput));
+						_ASSERT(math::max_element(throughput) < 100000.0f);
 					}
 
 					//throughput *= vertexThroughput;
