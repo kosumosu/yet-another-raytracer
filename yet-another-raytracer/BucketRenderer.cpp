@@ -131,7 +131,7 @@ void BucketRenderer::ProcessPixel(
 	color_rgbx averageColor = color_rgbx::zero();
 	const vector2 pixelLeftBottomCoord = wholeFilmCoord;
 	const vector2 sizeNormalizationFactor = vector2(1.0, 1.0) / wholeFilmSize; //(1.0 / subFilm.width(), 1.0 / subFilm.height());
-	const auto aspectRatio = space_real(wholeFilmSize[0] / wholeFilmSize[1]);
+	const auto aspectRatio = space_real(wholeFilmSize[0]) / space_real(wholeFilmSize[1]);
 
 	for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++)
 	{
