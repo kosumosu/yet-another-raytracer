@@ -51,7 +51,7 @@ SceneLoader::~SceneLoader( void )
 }
 
 
-void SceneLoader::CreateProcessors(ProcessorMap & command_map, ProcessorCollection & processors, const std::wstring & sceneFileName ) const
+void SceneLoader::CreateProcessors(ProcessorMap & command_map, ProcessorCollection & processors, const std::filesystem::path& sceneFileName ) const
 {
 	for (auto & factory : m_factories)
 	{
@@ -79,7 +79,7 @@ void SceneLoader::PrepareContext(LoadingContext & context, const ProcessorCollec
 
 
 
-void SceneLoader::Load(Scene & scene, const std::wstring & filename) const
+void SceneLoader::Load(Scene & scene, const std::filesystem::path& filename) const
 {
 	std::ifstream stream;
 

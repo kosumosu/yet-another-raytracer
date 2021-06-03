@@ -14,7 +14,7 @@ std::vector<std::string> TransformCommandFactory::GetSupportedCommands() const
 	};
 }
 
-CommandProcessor * TransformCommandFactory::CreateCommandProcessor(const std::wstring & sceneFileName) const
+CommandProcessor * TransformCommandFactory::CreateCommandProcessor(const std::filesystem::path& sceneFileName) const
 {
 	return new TransformCommandProcessor();
 }

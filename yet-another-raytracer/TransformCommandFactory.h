@@ -16,7 +16,7 @@ public:
 
 	std::vector<std::string> GetSupportedCommands() const override;
 
-	CommandProcessor * CreateCommandProcessor(const std::wstring & sceneFileName) const override;
+	CommandProcessor * CreateCommandProcessor(const std::filesystem::path& sceneFileName) const override;
 
 };
 

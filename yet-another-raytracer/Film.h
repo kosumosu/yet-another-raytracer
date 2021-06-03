@@ -2,6 +2,8 @@
 
 #include "Types.h"
 
+#include <filesystem>
+
 class Film
 {
 public:
@@ -34,7 +36,7 @@ public:
 		}
 	}
 
-	void SaveAsPng(const std::wstring& filename);
+	void SaveAsPng(const std::filesystem::path& filename);
 
 	[[nodiscard]] uint_vector2 size() const
 	{

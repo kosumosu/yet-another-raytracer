@@ -4,9 +4,9 @@
 #define NOGDI
 #include <Windows.h>
 
-void openImageFileForDisplay(const wchar_t* imageFileName)
+void openImageFileForDisplay(const std::filesystem::path& imageFileName)
 {
-	ShellExecute(nullptr, L"Open", imageFileName, nullptr, nullptr, SW_SHOWNORMAL);
+	ShellExecute(nullptr, L"Open", imageFileName.wstring().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 #elif defined(__linux__)
@@ -15,12 +15,11 @@ void openImageFileForDisplay(const wchar_t* imageFileName)
 #include <cstdlib>
 #include <sstream>
 
-void openImageFileForDisplay(const wchar_t* imageFileName)
+void openImageFileForDisplay(const std::filesystem::path& imageFileName)
 {
-	std::wstringstream ss;
+	std::stringstream ss;
 	ss << "xdg-open " << imageFileName;
-	auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>>{};
-	std::system(converter.to_bytes(ss.str()).c_str());
+	std::system(ss.str().c_str());
 }
 
 #endif

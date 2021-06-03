@@ -1,5 +1,5 @@
 #pragma once
 
-#include <string_view>
+#include <filesystem>
 
-void openImageFileForDisplay(const wchar_t* imageFileName);
+void openImageFileForDisplay(const std::filesystem::path& imageFileName);

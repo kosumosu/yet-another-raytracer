@@ -29,7 +29,7 @@ std::vector<std::string> MaterialCommandFactory::GetSupportedCommands() const
 	};
 }
 
-CommandProcessor * MaterialCommandFactory::CreateCommandProcessor(const std::wstring & sceneFileName) const
+CommandProcessor * MaterialCommandFactory::CreateCommandProcessor(const std::filesystem::path& sceneFileName) const
 {
 	return new MaterialCommandProcessor();
 }

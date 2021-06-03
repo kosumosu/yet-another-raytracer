@@ -244,14 +244,12 @@ std::wstring GetFileNameWithoutExtension(const std::wstring& input)
 	return index == std::string::npos ? filename : filename.substr(0, index);
 }
 
-std::wstring GetPathWithoutExtension(const std::wstring& input)
+std::filesystem::path GetPathWithoutExtension(const std::filesystem::path& input)
 {
-	const auto index = input.rfind('.');
-
-	return index == std::wstring::npos ? input : input.substr(0, index);
+	return input.parent_path() / input.stem();
 }
 
-void Render(const std::wstring& scene_file, const std::wstring& output_image_file)
+void Render(const std::filesystem::path& scene_file, const std::filesystem::path& output_image_file)
 {
 	Scene scene;
 
@@ -349,7 +347,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (argc < 2)
 		return 0;
 
-	const std::wstring image_file = GetPathWithoutExtension(argv[1]) + L".png";
+	const auto image_file = std::filesystem::path(argv[1]).replace_extension(".png");
 
 	Render(std::wstring(argv[1]), image_file);
 

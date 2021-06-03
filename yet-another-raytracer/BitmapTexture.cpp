@@ -18,7 +18,7 @@ color_rgbx convertColor(const pixel_t& pixel)
 	return color_rgbx(convertChannel(pixel.red), convertChannel(pixel.green), convertChannel(pixel.blue), 0);
 }
 
-BitmapTexture::BitmapTexture(const std::string& filename)
+BitmapTexture::BitmapTexture(const std::filesystem::path& filename)
 	: size_{0, 0}
 	, halfTexel_{vector2::zero()}
 {
