@@ -293,7 +293,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 		{
 			processInitTime = processTimeStopwatch.Sample();
 			realInitTime = realTimeStopwatch.Sample();
-			std::wcout << "Initialization finished. Real time=" << processInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
+			std::wcout << "Initialization finished. Real time=" << realInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
 		},
 		[&]()
 		{
@@ -349,7 +349,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	const auto image_file = std::filesystem::path(argv[1]).replace_extension(".png");
 
-	Render(std::wstring(argv[1]), image_file);
+	Render(std::filesystem::path(argv[1]), image_file);
 
 	openImageFileForDisplay(image_file.c_str());
 
