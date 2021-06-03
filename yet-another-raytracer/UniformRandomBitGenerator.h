@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include <memory>
 
 namespace math
 {
@@ -20,7 +21,7 @@ namespace math
 		virtual result_type operator()() = 0;
 	};
 
-	template <typename TValue, typename TEngine, class = typename std::enable_if_t<std::is_same<TValue, typename TEngine::result_type>::value>>
+    template <typename TValue, typename TEngine/*, class = typename std::enable_if_t<std::is_same<TValue, typename TEngine::result_type>::value>*/>
 	class StdUniformRandomBitGenerator : public UniformRandomBitGenerator<TValue>
 	{
 	public:

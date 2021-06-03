@@ -1,6 +1,7 @@
 #include "KDTreeNode.h"
 
 #include <algorithm>
+#include <cassert>
 
 const unsigned int OPTIMAL_PRIMITIVES_PER_LEAF = 4;
 
@@ -19,7 +20,7 @@ KDTreeNode::~KDTreeNode(void)
 
 unsigned int KDTreeNode::Build(const bounding_box3 & box, std::vector<GeometryObject*> && objects)
 {
-	_ASSERT(!box.empty());
+    assert(!box.empty());
 	//_ASSERT(objects->size() != 0);
 
 	if (objects.size() <= OPTIMAL_PRIMITIVES_PER_LEAF)

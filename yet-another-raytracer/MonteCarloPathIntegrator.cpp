@@ -9,6 +9,7 @@
 #include "color_functions.hpp"
 #include "discrete_distribution.hpp"
 
+#include <cassert>
 #include <iomanip>
 #include <random>
 #include <utility>
@@ -177,7 +178,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 							randomEngine);
 
 					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-					_ASSERT(!math::anyNan(samplePayload));
+                    assert(!math::anyNan(samplePayload));
 
 					integral += samplePayload;
 
@@ -200,7 +201,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 
 					const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
 
-					const std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
+                    std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
 					// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 					if (importance < color_real(1.0) && distr(randomEngine) >= importance)
 					{
@@ -210,8 +211,8 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 					else
 					{
 						throughput *= vertexThroughput / std::min(color_real(1.0), importance);
-						_ASSERT(!math::anyNan(throughput));
-						_ASSERT(math::max_element(throughput) < 100000.0f);
+                        assert(!math::anyNan(throughput));
+                        assert(math::max_element(throughput) < 100000.0f);
 					}
 
 					//throughput *= vertexThroughput;
@@ -245,7 +246,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 		else
 		{
 			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
-			_ASSERT(!math::anyNan(infinityPayload));
+            assert(!math::anyNan(infinityPayload));
 			integral += infinityPayload;
 			earlyExit = true;
 			break;
@@ -281,14 +282,14 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 							randomEngine);
 
 					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-					_ASSERT(!math::anyNan(samplePayload));
+                    assert(!math::anyNan(samplePayload));
 					integral += samplePayload;
 				});
 		}
 		else
 		{
 			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
-			_ASSERT(!math::anyNan(infinityPayload));
+            assert(!math::anyNan(infinityPayload));
 			integral += infinityPayload;
 		}
 	}

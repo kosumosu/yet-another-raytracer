@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Types.h"
+
+#include <cassert>
 #include <stack>
 #include <exception>
 
@@ -33,7 +35,7 @@ public:
 
 	void pop()
 	{
-		_ASSERT_EXPR(m_stack.size() > 1, "Can't pop from empty transfromation stack.");
+        assert(m_stack.size() > 1);
 
 		//if (m_stack.size() == 1)
 		//	throw std::exception();

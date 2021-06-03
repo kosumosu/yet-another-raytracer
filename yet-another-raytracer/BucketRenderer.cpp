@@ -13,6 +13,7 @@
 #include "ThreadBarrier.hpp"
 
 #include <atomic>
+#include <cassert>
 #include <mutex>
 #include <random>
 #include <thread>
@@ -141,7 +142,7 @@ void BucketRenderer::ProcessPixel(
 		const auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, aspectRatio);
 
 		const auto rayPayload = rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
-		_ASSERT(!std::isnan(rayPayload[0]) && !std::isnan(rayPayload[1]) && !std::isnan(rayPayload[2]) && !std::isnan(rayPayload[3]));
+        assert(!std::isnan(rayPayload[0]) && !std::isnan(rayPayload[1]) && !std::isnan(rayPayload[2]) && !std::isnan(rayPayload[3]));
 		averageColor += rayPayload;
 	}
 
