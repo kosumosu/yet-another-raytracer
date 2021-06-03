@@ -26,7 +26,9 @@
 #include <iomanip>
 #include <memory>
 #include <mutex>
-
+#if defined(_WIN32)
+#include <tchar.h>
+#endif
 
 template <typename TRandomEngine>
 void InsertRandomSpheres(Scene& scene, unsigned int count, TRandomEngine& engine)
@@ -292,7 +294,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 		{
 			processInitTime = processTimeStopwatch.Sample();
 			realInitTime = realTimeStopwatch.Sample();
-			std::wcout << "Initialization finished. Real time=" << processInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
+			std::wcout << "Initialization finished. Real time=" << realInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
 		},
 		[&]()
 		{
