@@ -18,7 +18,7 @@ void Film::SaveAsPng(const std::filesystem::path& filename)
 		throw std::exception();
 
 	png::image<png::rgb_pixel> image(width(), height());
-	image.set_file_gamma(1 / 2.2);
+	//image.set_gamma(1 / 2.2);
 
 	constexpr color_rgbx color_0(0.0f, 0.0f, 0.0f, 0.0f);
 	constexpr color_rgbx color_1(1.0f, 1.0f, 1.0f, 1.0f);
