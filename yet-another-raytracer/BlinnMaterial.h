@@ -46,9 +46,11 @@ public:
 
 	color_real GetEmissionImportance() const override;
 
-	void WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const override;
-	color_rgbx EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
-	color_rgbx EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const override;
+	void WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const bsdf_distribution_func & job) const override;
+	color_rgbx EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::
+		UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
+	color_rgbx EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math
+		::UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
 
 private:
 	color_rgbx _emission;
@@ -61,6 +63,7 @@ private:
 
 	color_real GetReflectionProbability() const;
 
-	color_rgbx EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector2 & uv, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const;
+	color_rgbx EvaluateDiffuseColor(const ::GeometryObject& object, const vector3& hitPoint, const vector3& normal, const vector2& uv, const vector3& incidentDirection, math::
+		UniformRandomBitGenerator<random_int_t>& randomEngine) const;
 };
 

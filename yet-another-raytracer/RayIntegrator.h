@@ -7,5 +7,5 @@ class RayIntegrator
 {
 public:
 	virtual ~RayIntegrator() = default;
-	virtual color_rgbx EvaluateRay(const ray3 & ray, unsigned int bounceLimit, space_real bias, math::UniformRandomBitGenerator<unsigned> & randomEngine) const = 0;
+	virtual color_rgbx EvaluateRay(const ray3 & ray, unsigned int bounceLimit, space_real bias, math::UniformRandomBitGenerator<random_int_t>& randomEngine) const = 0;
 };

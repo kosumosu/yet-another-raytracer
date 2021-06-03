@@ -11,7 +11,7 @@ SkyLightSource::SkyLightSource()
 
 
 
-void SkyLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
+void SkyLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const distibution_func & job) const
 {
 	job(lighting_functional_distribution(
 		[&]()

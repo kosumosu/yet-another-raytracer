@@ -51,7 +51,7 @@ public:
 
 	[[nodiscard]] virtual space_real GetOneSidedSurfaceArea() const = 0;
 
-	virtual math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int>& engine) const = 0;
+	virtual math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<random_int_t>& engine) const = 0;
 
 	[[nodiscard]] const Material* material() const { return material_; }
 	void material(const Material* val) { material_ = val; }

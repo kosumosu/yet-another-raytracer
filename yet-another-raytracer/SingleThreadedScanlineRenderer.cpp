@@ -24,7 +24,7 @@ SingleThreadedScanlineRenderer::SingleThreadedScanlineRenderer(
 void SingleThreadedScanlineRenderer::ProcessPixel(Film& film, const Scene& scene, const RayIntegrator& rayIntegrator, unsigned int x, unsigned int y) const
 {
 	const unsigned seed = x | (y << 16);
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::mt19937{seed});
+	math::StdUniformRandomBitGenerator<random_int_t, std::mt19937> pixelPersonalRandomEngine(std::mt19937{seed});
 
 	const bool doJitter = scene.getSamplesPerPixel() > 1;
 	const color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());

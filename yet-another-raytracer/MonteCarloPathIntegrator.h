@@ -27,9 +27,13 @@ private:
 public:
 	MonteCarloPathIntegrator(const Raytracer* raytracer, std::vector<const LightSource*> lights, infinity_func infinityEvaluator);
 
-	color_rgbx EvaluateRay(const ray3& ray, unsigned bounceLimit, space_real bias, math::UniformRandomBitGenerator<unsigned>& randomEngine) const override;
+	color_rgbx EvaluateRay(const ray3& ray, unsigned bounceLimit, space_real bias, math::UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
 
 private:
-	color_rgbx EvaluateRadianceByLightsAtVertex(const ray3& currentRay, const Hit& hit, bool entering, const bsdf_distribution& bsdfDistribution,
-		math::UniformRandomBitGenerator<unsigned>& randomEngine) const;
+	color_rgbx EvaluateRadianceByLightsAtVertex(
+		const ray3& currentRay,
+		const Hit& hit,
+		bool entering,
+		const bsdf_distribution& bsdfDistribution,
+		math::UniformRandomBitGenerator<random_int_t>& randomEngine) const;
 };

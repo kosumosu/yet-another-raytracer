@@ -109,7 +109,7 @@ space_real SphereObject::GetOneSidedSurfaceArea() const
 	return space_real(4.0 * math::pi) * m_radius * m_radius;
 }
 
-math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int>& engine) const
+math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<random_int_t>& engine) const
 {
 	const auto directionFromCenter = math::sphericalRand<space_real>(engine);
 	// scale is not supported

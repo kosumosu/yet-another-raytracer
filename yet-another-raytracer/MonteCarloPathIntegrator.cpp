@@ -48,7 +48,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 	const Hit& hit,
 	bool entering,
 	const bsdf_distribution& bsdfDistribution,
-	math::UniformRandomBitGenerator<unsigned>& randomEngine) const
+	math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
 {
 	color_rgbx radianceAtCurrentPathVertex{color_rgbx::zero()};
 	const LightingContext context(hit.point(), hit.normal(), BIAS, 1, false);
@@ -137,7 +137,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 	const ray3& ray,
 	unsigned bounceLimit,
 	space_real bias,
-	math::UniformRandomBitGenerator<unsigned>& randomEngine) const
+	math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
 {
 	color_rgbx integral(color_rgbx::zero());
 	color_rgbx throughput(color_rgbx::fill(1));

@@ -4,6 +4,8 @@
 #include "ray.hpp"
 #include "bounding_box.hpp"
 
+#include <cstdint>
+
 //#define DOUBLE_PRECISION
 
 #if defined (DOUBLE_PRECISION)
@@ -33,3 +35,4 @@ using color_rgbx = math::vector<color_real, 4>;
 constexpr std::size_t UVS_COUNT = 1;
 using uvs_t = std::array<vector2, UVS_COUNT>;
 
+using random_int_t = std::uint32_t;

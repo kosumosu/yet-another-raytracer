@@ -21,7 +21,7 @@ DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const 
 	_power = color::get_importance(_color) * color_real(BoundingSphereRadiusSqr * math::pi);
 }
 
-void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
+void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const distibution_func & job) const
 {
 	if (true || math::dot(_direction, context.getNormal()) >= 0.0f)
 	{

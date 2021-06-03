@@ -175,7 +175,7 @@ space_real FlatTriangleObject::GetOneSidedSurfaceArea() const
 	return GetPreciseOneSidedSurfaceArea();
 }
 
-math::random_sample<surface_point, space_real> FlatTriangleObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const
+math::random_sample<surface_point, space_real> FlatTriangleObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<random_int_t> & engine) const
 {
 	std::uniform_real_distribution<space_real> distr;
 	const auto rawU = distr(engine);

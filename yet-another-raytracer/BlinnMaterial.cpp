@@ -16,7 +16,7 @@ color_real BlinnMaterial::GetReflectionProbability() const
 	return color::get_importance(_specular);
 }
 
-color_rgbx BlinnMaterial::EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector2 & uv, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx BlinnMaterial::EvaluateDiffuseColor(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const vector2 & uv, const vector3 & incidentDirection, math::UniformRandomBitGenerator<random_int_t> & randomEngine) const
 {
 	//return math::dot(incidentDirection, normal) < 0 ? color_rgbx(1.0, 0.0, 0.0, 0.0) : color_rgbx(0.0, 1.0, 1.0, 0.0);
 
@@ -30,7 +30,7 @@ color_rgbx BlinnMaterial::EvaluateDiffuseColor(const GeometryObject & object, co
 	}
 }
 
-void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine, const bsdf_distribution_func & job) const
+void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const bsdf_distribution_func & job) const
 {
 	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, randomEngine);
 	bsdf_functional_distribution::generate_sample_func generateDiffuseFuncImpl = [&]()
@@ -53,7 +53,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(direction,
-						[=, this]()
+						[=]()
 						{
 							return _translucency * (color_rgbx::fill(1.0) - _specular);
 						}),
@@ -65,7 +65,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(direction,
-						[=, this]()
+						[=]()
 						{
 							return diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency);
 						}),
@@ -103,7 +103,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * cosTheta);
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(reflected_direction,
-					[=, this]()
+					[=]()
 					{
 						return _specular / color_real(std::abs(cosTheta));
 					}),
@@ -148,7 +148,8 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 		generateSampleFunc));
 }
 
-color_rgbx BlinnMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx BlinnMaterial::EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::
+	UniformRandomBitGenerator<random_int_t>& randomEngine) const
 {
 	if (_diffuseMap == nullptr)
 	{
@@ -160,7 +161,8 @@ color_rgbx BlinnMaterial::EvaluateEmission(const GeometryObject & object, const 
 	}
 }
 
-color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math::UniformRandomBitGenerator<unsigned> & randomEngine) const
+color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math
+	::UniformRandomBitGenerator<random_int_t>& randomEngine) const
 {
 	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, randomEngine);
 	return math::is_obtuse_angle(incidentDirection, normal)

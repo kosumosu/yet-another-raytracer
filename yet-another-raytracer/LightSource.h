@@ -36,7 +36,7 @@ public:
 
 	virtual ~LightSource() = default;
 
-	virtual void DoWithDistribution(const LightingContext& context, math::UniformRandomBitGenerator<unsigned int>& randomEngine,
+	virtual void DoWithDistribution(const LightingContext& context, math::UniformRandomBitGenerator<random_int_t>& randomEngine,
 	                                const distibution_func& job) const = 0;
 
 	virtual color_real GetApproximateTotalPower() const = 0;

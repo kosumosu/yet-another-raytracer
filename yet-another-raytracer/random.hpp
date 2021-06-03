@@ -3,6 +3,7 @@
 #include "constants.hpp"
 #include "vector.hpp"
 #include <algorithm>
+#include <cassert>
 #include <random>
 
 namespace math
@@ -26,9 +27,21 @@ namespace math
 	template <>
 	constexpr double lowerRandomBound<double> = 1.97626258336498618e-323; // five steps away from 0.0 to avoid numeric problems.
 
-	// std::uniform_real_distribution frequently generates very small numbers (equal to lower bound) with too high probability when using fast floating point math. Locally forcing precise math for generation.
-#pragma float_control( precise, on, push)
-	
+	// std::uniform_real_distribution frequently generates very small numbers (equal to lower bound) with too high probability when using fast floating point math.
+	template <typename TValue, typename TRandomEngine>
+	TValue getGrain(TRandomEngine& engine)
+	{
+		return TValue(1.0) / (TValue(engine.max()) - TValue(engine.min()));
+	}
+
+	template <typename TValue, typename TRandomEngine>
+	TValue generateUniformLeftExclusiveRightInclusive(TRandomEngine& engine)
+	{
+		std::uniform_real_distribution<TValue> distr{ getGrain<TValue>(engine), TValue(1.0) };
+
+		return distr(engine);
+	}
+
 	template <typename TValue, std::size_t N, typename TRandomEngine>
 	vector<TValue, N> linearRand(const vector<TValue, N>& low, const vector<TValue, N>& high, TRandomEngine& engine)
 	{
@@ -112,16 +125,19 @@ namespace math
 
 		std::uniform_real_distribution<TValue> distr { lowerRandomBound<TValue>, TValue(1.0) };
 
-		const TValue randomNumber0 = distr(engine);
+		const TValue randomNumber0 = generateUniformLeftExclusiveRightInclusive<TValue>(engine);
+		const TValue randomNumber1 = generateUniformLeftExclusiveRightInclusive<TValue>(engine);
+
+		assert(randomNumber0 > 1e-40);
 
 		const TValue normalCosine = std::sqrt(randomNumber0);
 		const TValue radius = std::sqrt(TValue(1.0) - randomNumber0);
-		const TValue theta = distr(engine) * TValue(2.0 * math::pi);
+		const TValue theta = randomNumber1 * TValue(2.0 * math::pi);
 
 		const auto pointOnCircle = vector<TValue, 2>(radius * std::cos(theta), radius * std::sin(theta));
 
 		const auto point = firstBinormal * pointOnCircle[0] + secondBinormal * pointOnCircle[1] + normal * normalCosine;
 		return { point, normalCosine * TValue(oneOverPi) };
 }
-#pragma float_control( pop )
+
 }
