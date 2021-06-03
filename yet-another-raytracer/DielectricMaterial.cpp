@@ -1,4 +1,6 @@
 #include "DielectricMaterial.h"
+
+#include <cassert>
 #include <iomanip>
 #include <optional>
 
@@ -73,9 +75,9 @@ namespace
 
 	class Fresnel
 	{
-		const vector3& incidentDirection_;
-		const vector3& normal_;
-		const vector3& fixedNormal_;
+		const vector3 incidentDirection_;
+		const vector3 normal_;
+		const vector3 fixedNormal_;
 		const space_real cosThetaI_;
 		const space_real absCosThetaI_;
 		const space_real ior_;
@@ -229,6 +231,8 @@ void DielectricMaterial::WithBsdfDistribution(const GeometryObject & object, con
 			{
 				const auto transmission = color_real(1.0) - reflectance;
 				const auto refraction = fresnel.evaluateRefraction();
+
+				assert(math::length2(refraction.refractedDirection) <= space_real(1.00001));
 
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
