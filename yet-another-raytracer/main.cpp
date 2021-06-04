@@ -26,8 +26,9 @@
 #include <iomanip>
 #include <memory>
 #include <mutex>
+#if defined(_WIN32)
 #include <tchar.h>
-
+#endif
 
 template <typename TRandomEngine>
 void InsertRandomSpheres(Scene& scene, unsigned int count, TRandomEngine& engine)
@@ -219,7 +220,7 @@ void InitCamera(Scene& scene, unsigned int width, unsigned int height)
 
 //////////////////////////////////////////////////////////////////////////
 
-void LoadFromFile(Scene& scene, const std::wstring& filename)
+void LoadFromFile(Scene& scene, const std::filesystem::path& filename)
 {
 	const std::unique_ptr<SceneLoader> loader{SceneLoader::CreateDefault()};
 
@@ -342,6 +343,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 	film.SaveAsPng(output_image_file);
 }
 
+#if defined(_WIN32)
 int _tmain(int argc, _TCHAR* argv[])
 {
 	if (argc < 2)
@@ -349,9 +351,25 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	const auto image_file = std::filesystem::path(argv[1]).replace_extension(".png");
 
-	Render(std::filesystem::path(argv[1]), image_file);
+    Render(std::filesystem::path(argv[1]), image_file);
 
 	openImageFileForDisplay(image_file.c_str());
 
 	return 0;
 }
+#elif defined (__linux__)
+int main(int argc, const char* argv[])
+{
+    if (argc < 2)
+        return 0;
+
+    const auto image_file = std::filesystem::path(argv[1]).replace_extension(".png");
+
+    Render(std::filesystem::path(argv[1]), image_file);
+
+    openImageFileForDisplay(image_file.c_str());
+
+    return 0;
+}
+
+#endif

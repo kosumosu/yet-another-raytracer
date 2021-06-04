@@ -1,5 +1,6 @@
 #include "ProcessTimeStopwatch.h"
 
+#if defined(_WIN32)
 #define NOGDI
 #include "Windows.h"
 
@@ -35,3 +36,16 @@ float ProcessTimeStopwatch::Sample() const
 
 	return float(kernelTime + userTime) * 0.000'000'1f;
 }
+#else
+
+void ProcessTimeStopwatch::Restart()
+{
+
+}
+
+float ProcessTimeStopwatch::Sample() const
+{
+    return 666.0f;
+}
+
+#endif

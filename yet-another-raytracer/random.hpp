@@ -109,7 +109,7 @@ namespace math
 		return vector<TValue, 3>(
 			pointOnCircle[0],
 			pointOnCircle[1],
-			std::sqrtf(std::max(0.f, 1.f - pointOnCircle[0] * pointOnCircle[0] - pointOnCircle[1] * pointOnCircle[1])));
+            std::sqrt(std::max(0.f, 1.f - pointOnCircle[0] * pointOnCircle[0] - pointOnCircle[1] * pointOnCircle[1])));
 	}
 
 

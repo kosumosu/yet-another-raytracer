@@ -36,7 +36,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 	bsdf_functional_distribution::generate_sample_func generateDiffuseFuncImpl = [&]()
 		{
 			const bool isEntering = math::is_obtuse_angle(incidentDirection, normal);
-			const std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+            std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>); // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 			const auto translucenceProbability = color::get_importance(_translucency);
 			const bool isTranslucent = translucenceProbability > color_real(0.0) && translucenceProbability >= distr(randomEngine);
 
