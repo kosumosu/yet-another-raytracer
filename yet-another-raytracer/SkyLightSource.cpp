@@ -3,7 +3,7 @@
 
 #define ENABLE_COSINE_WEIGHTED_SAMPLING true
 
-using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
+using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;
 
 SkyLightSource::SkyLightSource()
 	: m_samples(20)
@@ -23,7 +23,7 @@ void SkyLightSource::DoWithDistribution(const LightingContext & context, math::U
 			const space_real pdf = space_real(0.5 * math::oneOverPi);
 #endif
 
-			return math::random_sample<const light_sample, space_real>(
+			return math::random_sample<std::optional<light_sample>, space_real>(
 				light_sample(
 					direction,
 					std::numeric_limits<space_real>::max(),

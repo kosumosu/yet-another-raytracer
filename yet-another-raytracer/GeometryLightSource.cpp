@@ -2,11 +2,11 @@
 #include "Material.h"
 #include "LightingContext.h"
 
-using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
+using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;
 
 GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 {
-	std::vector<std::pair<GeometryObject*, color_real>> objectsWithWeights;
+	std::vector<std::pair<const GeometryObject*, color_real>> objectsWithWeights;
 
 	color_real totalPower = { 0 };
 	for (const auto & object : objects)
@@ -21,7 +21,7 @@ GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 	}
 
 	_totalPower = totalPower;
-	_distribution = math::discrete_distribution<GeometryObject*, color_real>(std::begin(objectsWithWeights), std::end(objectsWithWeights));
+	_distribution = math::discrete_distribution<const GeometryObject*, color_real>(std::begin(objectsWithWeights), std::end(objectsWithWeights));
 }
 
 void GeometryLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const distibution_func & job) const
@@ -35,27 +35,44 @@ void GeometryLightSource::DoWithDistribution(const LightingContext & context, ma
 		[&]()
 		{
 			const auto objectSample = _distribution.GetRandomElement(randomFunc);
-			const auto pointSample = objectSample.getValue()->PickRandomPointOnSurface(randomEngine);
 
-			const auto pointToLight = pointSample.getValue().point - context.getPoint();
-			const space_real distance = math::length(pointToLight);
-			const auto direction = pointToLight / distance;
+			const auto optionalPointSample = (objectSample.getValue() == context.object())
+				? objectSample.getValue()->PickRandomPointOnSurfaceForLighting(context.getPoint(), randomEngine)
+				: std::make_optional(objectSample.getValue()->PickRandomPointOnSurface(randomEngine));
 
-			const auto geometricFactor = std::max(color_real(0), color_real(-math::dot(pointSample.getValue().normal, direction)));
+			if (optionalPointSample)
+			{
+				const auto& pointSample = *optionalPointSample;
 
-			const auto pdf = objectSample.getPdf() * pointSample.getPdf() * (distance * distance) / geometricFactor;
+				const auto pointToLight = pointSample.getValue().point - context.getPoint();
+				const space_real distance = math::length(pointToLight);
+				const auto direction = pointToLight / distance;
 
-			return math::random_sample<const light_sample, space_real>(
-				light_sample(
-					direction,
-					distance,
-					[=, &randomEngine]()
-					{
-						return objectSample.getValue()->material()->EvaluateEmission(*objectSample.getValue(), pointSample.getValue().point, pointSample.getValue().normal, pointSample.getValue().uvs, direction, randomEngine);
-					}
-				),
-				pdf,
-				false);
+				const auto geometricFactor = std::max(color_real(0), color_real(-math::dot(pointSample.getValue().normal, direction)));
+
+				const auto pdf = objectSample.getPdf() * pointSample.getPdf() * (distance * distance) / geometricFactor;
+
+				assert(pdf > 1e-5f);
+
+				return math::random_sample<std::optional<light_sample>, space_real>(
+					light_sample(
+						direction,
+						distance,
+						[=, &randomEngine]()
+						{
+							return objectSample.getValue()->material()->EvaluateEmission(*objectSample.getValue(), pointSample.getValue().point, pointSample.getValue().normal, pointSample.getValue().uvs, direction, randomEngine);
+						}
+					),
+					pdf,
+					false);
+			}
+			else
+			{
+				return math::random_sample<std::optional<light_sample>, space_real>(
+					std::nullopt,
+					objectSample.getPdf(),
+					false);
+			}
 		},
 		[&](const vector3 & sample)
 		{

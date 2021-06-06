@@ -2,7 +2,7 @@
 #include "LightingContext.h"
 #include "color_functions.hpp"
 
-using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
+using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;
 
 PointLightSource::PointLightSource()
 	: m_position(vector3::zero())
@@ -23,7 +23,7 @@ void PointLightSource::DoWithDistribution(const LightingContext & context, math:
 				1U,
 				[&](const lighting_functional_distribution::delta_func & subJob)
 				{
-					subJob(math::random_sample<const light_sample, space_real>(
+					subJob(math::random_sample<std::optional<light_sample>, space_real>(
 						light_sample(
 							direction,
 							distance,
@@ -37,7 +37,7 @@ void PointLightSource::DoWithDistribution(const LightingContext & context, math:
 				},
 				[&]()
 				{
-					return math::random_sample<const light_sample, space_real>(
+					return math::random_sample<std::optional<light_sample>, space_real>(
 						light_sample(
 							direction,
 							distance,

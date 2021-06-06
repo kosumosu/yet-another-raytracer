@@ -52,7 +52,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 	math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
 {
 	color_rgbx radianceAtCurrentPathVertex{color_rgbx::zero()};
-	const LightingContext context(hit.point(), hit.normal(), BIAS, 1, false);
+	const LightingContext context{ hit.object(), hit.point(), hit.normal(), BIAS, 1, false };
 
 #if false
 	for (const auto & light : _lights)
@@ -100,31 +100,37 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 		{
 			if (lightDistribution.delta_components() != 0 || lightDistribution.has_non_delta_component())
 			{
-				const auto lightSample = lightDistribution.generate_sample();
+				const auto optionalLightSample = lightDistribution.generate_sample();
 
-				const bool isOccluded = raytracer_->DoesIntersect(
-					ray3(hit.point(), lightSample.getValue().direction),
-					BIAS,
-					lightSample.getValue().distance - BIAS * lightSample.getValue().distance,
-					hit.object(),
-					hit.normal());
+				if (optionalLightSample.getValue()) {
+					const auto& lightSample = *optionalLightSample.getValue();
+					
+					const bool isOccluded = raytracer_->DoesIntersect(
+						ray3(hit.point(), lightSample.direction),
+						BIAS,
+						lightSample.distance - BIAS * lightSample.distance,
+						hit.object(),
+						hit.normal());
 
-				if (!isOccluded)
-				{
-					const auto geometricTerm = color_real(std::abs(math::dot(lightSample.getValue().direction, hit.normal())));
-					const auto radianceByLight = lightSample.getValue().evaluate() * hit.object()->material()->EvaluateNonDeltaScattering(
-						*hit.object(),
-						hit.point(),
-						hit.normal(),
-						hit.uvs(),
-						currentRay.direction(),
-						lightSample.getValue().direction,
-						randomEngine) * geometricTerm * color_real(math::oneOverPi) / color_real(lightSample.getPdf());
+					if (!isOccluded)
+					{
+						const auto geometricTerm = color_real(std::abs(math::dot(lightSample.direction, hit.normal())));
+						const auto radianceByLight = lightSample.evaluate() * hit.object()->material()->EvaluateNonDeltaScattering(
+							*hit.object(),
+							hit.point(),
+							hit.normal(),
+							hit.uvs(),
+							currentRay.direction(),
+							lightSample.direction,
+							randomEngine) * geometricTerm * color_real(math::oneOverPi) / color_real(optionalLightSample.getPdf());
 
-					//if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
-					//	throw std::exception();
+						//if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
+						//	throw std::exception();
 
-					radianceAtCurrentPathVertex = radianceByLight / sampledLight.getPdf();
+						radianceAtCurrentPathVertex = radianceByLight / sampledLight.getPdf();
+
+						assert(math::max_element(radianceAtCurrentPathVertex) < 20000.0f);
+					}
 				}
 			}
 		});
@@ -178,9 +184,10 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 							randomEngine);
 
 					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-                    assert(!math::anyNan(samplePayload));
+					assert(!math::anyNan(samplePayload));
 
 					integral += samplePayload;
+					assert(math::max_element(integral) < 20000.0f);
 
 					if (!bsdfDistribution.has_non_delta_component() && bsdfDistribution.delta_components() == 0)
 					{
@@ -201,7 +208,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 
 					const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
 
-                    std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
+					std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
 					// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 					if (importance < color_real(1.0) && distr(randomEngine) >= importance)
 					{
@@ -211,8 +218,8 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 					else
 					{
 						throughput *= vertexThroughput / std::min(color_real(1.0), importance);
-                        assert(!math::anyNan(throughput));
-                        assert(math::max_element(throughput) < 100000.0f);
+						assert(!math::anyNan(throughput));
+						assert(math::max_element(throughput) < 100000.0f);
 					}
 
 					//throughput *= vertexThroughput;
@@ -246,7 +253,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 		else
 		{
 			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
-            assert(!math::anyNan(infinityPayload));
+			assert(!math::anyNan(infinityPayload));
 			integral += infinityPayload;
 			earlyExit = true;
 			break;
@@ -282,18 +289,19 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 							randomEngine);
 
 					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-                    assert(!math::anyNan(samplePayload));
+					assert(!math::anyNan(samplePayload));
 					integral += samplePayload;
 				});
 		}
 		else
 		{
 			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
-            assert(!math::anyNan(infinityPayload));
+			assert(!math::anyNan(infinityPayload));
 			integral += infinityPayload;
 		}
 	}
 
+	assert(math::max_element(integral) < 20000.0f);
 
 	return integral;
 }

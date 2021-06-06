@@ -4,7 +4,7 @@
 #include "color_functions.hpp"
 #include <limits>
 
-using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
+using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;
 
 
 DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const color_rgbx & color, const Scene & scene) 
@@ -29,7 +29,7 @@ void DirectionalLightSource::DoWithDistribution(const LightingContext & context,
 				1U,
 				[&](const lighting_functional_distribution::delta_func & subJob)
 				{
-					subJob(math::random_sample<const light_sample, space_real>(
+					subJob(math::random_sample<std::optional<light_sample>, space_real>(
 						light_sample(
 							_direction,
 							std::numeric_limits<space_real>::max(),
@@ -43,7 +43,7 @@ void DirectionalLightSource::DoWithDistribution(const LightingContext & context,
 				},
 				[&]()
 				{
-					return math::random_sample<const light_sample, space_real>(
+					return math::random_sample<std::optional<light_sample>, space_real>(
 						light_sample(
 							_direction,
 							std::numeric_limits<space_real>::max(),

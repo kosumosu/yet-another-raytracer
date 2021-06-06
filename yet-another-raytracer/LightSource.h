@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <optional>
 
 class LightingContext;
 class RayEvaluator;
@@ -25,7 +26,8 @@ struct light_sample
 	const std::function<color_rgbx()> evaluate;
 };
 
-using light_distribution = Distribution<const light_sample, const vector3, space_real>;
+// TSample is optional because light can sometimes beforehand tell it will not return light from this sample.
+using light_distribution = Distribution<std::optional<light_sample>, vector3, space_real>;
 using distibution_func = std::function<void(const light_distribution& job)>;
 
 class LightSource
