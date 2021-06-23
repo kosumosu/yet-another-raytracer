@@ -1,7 +1,7 @@
 #include "SkyLightSource.h"
 #include "LightingContext.h"
 
-#define ENABLE_COSINE_WEIGHTED_SAMPLING true
+#define ENABLE_IMPORTANCE_SAMPLING true
 
 using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;
 
@@ -16,7 +16,7 @@ void SkyLightSource::DoWithDistribution(const LightingContext & context, math::U
 	job(lighting_functional_distribution(
 		[&]()
 		{
-#if ENABLE_COSINE_WEIGHTED_SAMPLING
+#if ENABLE_IMPORTANCE_SAMPLING
 			const auto [direction, pdf] = math::cosineWeightedHemiSphericalRand(context.getNormal(), randomEngine);
 #else
 			auto direction = math::hemiSphericalRand(normal);
@@ -37,7 +37,7 @@ void SkyLightSource::DoWithDistribution(const LightingContext & context, math::U
 		},
 		[&](const vector3 & sample)
 		{
-#if ENABLE_COSINE_WEIGHTED_SAMPLING
+#if ENABLE_IMPORTANCE_SAMPLING
 			return math::dot(sample, context.getNormal()) * space_real(math::oneOverPi);
 #else
 			return space_real(0.5 * math::oneOverPi);

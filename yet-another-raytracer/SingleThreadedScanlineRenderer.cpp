@@ -81,5 +81,11 @@ void SingleThreadedScanlineRenderer::Render(Film& film, const Scene& scene) cons
 			}
 		}
 	}
+	stats_ = integrator.getStats();
 	renderingFinishedCallback_();
+}
+
+void SingleThreadedScanlineRenderer::PrintStats(std::ostream& stream) const
+{
+	stats_.printResult(stream);
 }

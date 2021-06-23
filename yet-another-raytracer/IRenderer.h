@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+
 class RayIntegrator;
 class Film;
 class Scene;
@@ -16,4 +18,6 @@ public:
 	virtual ~IRenderer() = default;
 
 	virtual void Render(Film& film, const Scene& scene) const = 0;
+
+	virtual void PrintStats(std::ostream& stream) const = 0;
 };

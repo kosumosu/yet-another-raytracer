@@ -340,6 +340,8 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 
 	renderer.Render(film, scene);
 
+	renderer.PrintStats(std::cout);
+
 	film.SaveAsPng(output_image_file);
 }
 

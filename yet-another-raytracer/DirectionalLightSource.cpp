@@ -27,20 +27,6 @@ void DirectionalLightSource::DoWithDistribution(const LightingContext & context,
 	{
 		job(lighting_functional_distribution(
 				1U,
-				[&](const lighting_functional_distribution::delta_func & subJob)
-				{
-					subJob(math::random_sample<std::optional<light_sample>, space_real>(
-						light_sample(
-							_direction,
-							std::numeric_limits<space_real>::max(),
-							[&]()
-							{
-								return _color;
-							}
-						),
-						space_real(1.0),
-						true));
-				},
 				[&]()
 				{
 					return math::random_sample<std::optional<light_sample>, space_real>(

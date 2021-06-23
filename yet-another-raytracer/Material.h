@@ -28,7 +28,7 @@ class Material
 public:
 	virtual ~Material() = default;
 
-	// first integrate over hemisphere, then find average across averywhere
+	// first integrate over hemisphere, then find average across everywhere
 	[[nodiscard]] virtual color_real GetEmissionImportance() const = 0;
 
 	virtual void WithBsdfDistribution(
@@ -37,23 +37,23 @@ public:
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+		const math::UniformRandomBitGenerator<random_int_t>& randomEngine,
 		const bsdf_distribution_func& job) const = 0;
 
-	virtual color_rgbx EvaluateEmission(
+	[[nodiscard]] virtual color_rgbx EvaluateEmission(
 		const GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		math::UniformRandomBitGenerator<random_int_t>& randomEngine) const = 0;
+		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const = 0;
 
-	virtual color_rgbx EvaluateNonDeltaScattering(
+	[[nodiscard]] virtual color_rgbx EvaluateNonDeltaScattering(
 		const GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
 		const vector3& outgoingDirection,
-		math::UniformRandomBitGenerator<random_int_t>& randomEngine) const = 0;
+		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const = 0;
 };

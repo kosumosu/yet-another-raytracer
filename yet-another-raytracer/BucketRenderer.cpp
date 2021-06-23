@@ -57,6 +57,9 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 	std::vector<std::thread> threads;
 	threads.reserve(threadCount);
 
+	
+	std::mutex statsMutex;
+
 	ThreadBarrier barrier{threadCount};
 
 	for (unsigned int i = 0; i < threadCount; ++i)
@@ -82,6 +85,8 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 					const auto localCompletedCount = ++completedCount;
 					progressCallback_(float(localCompletedCount) * oneOverTotalBuckets);
 				}
+
+				stats_.mergeIn(integrator.getStats());
 			}
 		};
 		threads.push_back(std::move(thread));
@@ -97,6 +102,11 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 	}
 
 	renderingFinishedCallback_();
+}
+
+void BucketRenderer::PrintStats(std::ostream& stream) const
+{
+	stats_.printResult(stream);
 }
 
 void BucketRenderer::ProcessBucket(

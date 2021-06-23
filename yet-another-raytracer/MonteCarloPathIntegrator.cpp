@@ -54,37 +54,6 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 	color_rgbx radianceAtCurrentPathVertex{color_rgbx::zero()};
 	const LightingContext context{ hit.object(), hit.point(), hit.normal(), BIAS, 1, false };
 
-#if false
-	for (const auto & light : _lights)
-	{
-		light->DoWithDistribution(context, randomEngine,
-			[&](const light_distribution & lightDistribution)
-			{
-				if (lightDistribution.delta_components() != 0 || lightDistribution.has_non_delta_component())
-				{
-					const auto lightSample = lightDistribution.generate_sample();
-
-					const bool isOccluded = _raytracer->DoesIntersect(ray3(hit.point(), lightSample.getValue().direction), BIAS, lightSample.getValue().distance - BIAS * lightSample.getValue().distance, hit.object(), hit.normal());
-
-					if (!isOccluded)
-					{
-						const auto geometricTerm = color_real(std::abs(math::dot(lightSample.getValue().direction, hit.normal())));
-						const auto radianceByLight =
-							lightSample.getValue().evaluate()
-							* hit.object()->material()->EvaluateNonDeltaScattering(*hit.object(), hit.point(), hit.normal(), hit.uvs(), currentRay.direction(), lightSample.getValue().direction, randomEngine)
-							* geometricTerm
-							* color_real(math::oneOverPi)
-							/ color_real(lightSample.getPdf());
-
-						//if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
-						//	throw std::exception();
-
-						radianceAtCurrentPathVertex += radianceByLight;
-					}
-				}
-			});
-	}
-#else
 	std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
 	// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 	const auto randomFunc = [&]()
@@ -134,7 +103,6 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 				}
 			}
 		});
-#endif
 
 	return radianceAtCurrentPathVertex;
 }
@@ -157,73 +125,81 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 
 	for (unsigned bounce = 0; bounce < bounceLimit - 1; ++bounce)
 	{
-		if (hit.has_occurred())
+		if (!hit.has_occurred())
 		{
-			hit.object()->material()->WithBsdfDistribution(
-				*hit.object(),
-				hit.point(),
-				hit.normal(),
-				hit.uvs(),
-				currentRay.direction(),
-				randomEngine,
-				[&](const bsdf_distribution& bsdfDistribution)
+			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
+			assert(!math::anyNan(infinityPayload));
+			integral += infinityPayload;
+			stats_.registerPath(!math::isZero(infinityPayload));
+			earlyExit = true;
+			break;
+		}
+		
+		hit.object()->material()->WithBsdfDistribution(
+			*hit.object(),
+			hit.point(),
+			hit.normal(),
+			hit.uvs(),
+			currentRay.direction(),
+			randomEngine,
+			[&](const bsdf_distribution& bsdfDistribution)
+			{
+				const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
+				color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
+
+				if (bsdfDistribution.has_non_delta_component())
+					radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
+
+				if (accountForEmission)
+					radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(
+						*hit.object(),
+						hit.point(),
+						hit.normal(),
+						hit.uvs(),
+						currentRay.direction(),
+						randomEngine);
+
+				const auto samplePayload = radianceAtCurrentPathVertex * throughput;
+				assert(!math::anyNan(samplePayload));
+
+				integral += samplePayload;
+				stats_.registerPath(!math::isZero(samplePayload));
+				
+				assert(math::max_element(integral) < 20000.0f);
+
+				if (!bsdfDistribution.has_non_delta_component() && bsdfDistribution.delta_components() == 0)
 				{
-					const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
-					color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
+					earlyExit = true;
+					return;
+				}
 
-					if (bsdfDistribution.has_non_delta_component())
-						radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
+				const auto bsdfSample = bsdfDistribution.generate_sample();
+				const auto bsdfDirection = bsdfSample.getValue().outgoingDirection;
+				const auto bsdfColor = bsdfSample.getValue().evaluate();
+				const auto bsdfPdf = color_real(bsdfSample.getPdf());
 
-					if (accountForEmission)
-						radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(
-							*hit.object(),
-							hit.point(),
-							hit.normal(),
-							hit.uvs(),
-							currentRay.direction(),
-							randomEngine);
+				const auto geometricTerm = color_real(std::abs(math::dot(bsdfDirection, hit.normal())));
 
-					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-					assert(!math::anyNan(samplePayload));
+				const auto vertexThroughput = bsdfSample.getIsDelta()
+					                              ? bsdfColor * geometricTerm / bsdfPdf
+					                              : bsdfColor * geometricTerm * color_real(math::oneOverPi) / bsdfPdf;
 
-					integral += samplePayload;
-					assert(math::max_element(integral) < 20000.0f);
+				const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
 
-					if (!bsdfDistribution.has_non_delta_component() && bsdfDistribution.delta_components() == 0)
-					{
-						earlyExit = true;
-						return;
-					}
-
-					const auto bsdfSample = bsdfDistribution.generate_sample();
-					const auto bsdfDirection = bsdfSample.getValue().outgoingDirection;
-					const auto bsdfColor = bsdfSample.getValue().evaluate();
-					const auto bsdfPdf = color_real(bsdfSample.getPdf());
-
-					const auto geometricTerm = color_real(std::abs(math::dot(bsdfDirection, hit.normal())));
-
-					const auto vertexThroughput = bsdfSample.getIsDelta()
-						                              ? bsdfColor * geometricTerm / bsdfPdf
-						                              : bsdfColor * geometricTerm * color_real(math::oneOverPi) / bsdfPdf;
-
-					const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
-
-					std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
-					// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
-					if (importance < color_real(1.0) && distr(randomEngine) >= importance)
-					{
-						earlyExit = true;
-						return;
-					}
-					else
-					{
-						throughput *= vertexThroughput / std::min(color_real(1.0), importance);
-						assert(!math::anyNan(throughput));
-						assert(math::max_element(throughput) < 100000.0f);
-					}
-
-					//throughput *= vertexThroughput;
-
+				std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
+				// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+				if (importance < color_real(1.0) && distr(randomEngine) >= importance || importance == color_real(0.0))
+				{
+					earlyExit = true;
+					return;
+				}
+				else
+				{
+					throughput *= vertexThroughput / std::min(color_real(1.0), importance);
+					assert(!math::anyNan(throughput));
+					assert(math::max_element(throughput) < 100000.0f);
+				}
+				
 #if false
 				if (
 					vertexThroughput[0] < color_real(0.0) || vertexThroughput[1] < color_real(0.0) || vertexThroughput[2] < color_real(0.0)
@@ -243,27 +219,25 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 #endif
 
 
-					currentRay = ray3(hit.point(), bsdfDirection);
-					hit = raytracer_->TraceRay(currentRay, BIAS, std::numeric_limits<space_real>::max(), hit.object(), hit.normal());
-					accountForEmission = bsdfSample.getIsDelta();
-				});
-			if (earlyExit)
-				break;
-		}
-		else
-		{
-			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
-			assert(!math::anyNan(infinityPayload));
-			integral += infinityPayload;
-			earlyExit = true;
+				currentRay = ray3(hit.point(), bsdfDirection);
+				hit = raytracer_->TraceRay(currentRay, BIAS, std::numeric_limits<space_real>::max(), hit.object(), hit.normal());
+				accountForEmission = bsdfSample.getIsDelta();
+			});
+		if (earlyExit)
 			break;
-		}
 	}
 
 	// last bounce is a special case
 	if (bounceLimit > 0 && !earlyExit)
 	{
-		if (hit.has_occurred())
+		if (!hit.has_occurred())
+		{
+			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
+			assert(!math::anyNan(infinityPayload));
+			integral += infinityPayload;
+			stats_.registerPath(!math::isZero(infinityPayload));
+		}
+		else
 		{
 			hit.object()->material()->WithBsdfDistribution(
 				*hit.object(),
@@ -291,17 +265,14 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
 					assert(!math::anyNan(samplePayload));
 					integral += samplePayload;
+					stats_.registerPath(!math::isZero(samplePayload));
 				});
-		}
-		else
-		{
-			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
-			assert(!math::anyNan(infinityPayload));
-			integral += infinityPayload;
 		}
 	}
 
 	assert(math::max_element(integral) < 20000.0f);
+
+	stats_.registerBundle(!math::isZero(integral));
 
 	return integral;
 }

@@ -3,67 +3,93 @@
 #include "Material.h"
 #include "Types.h"
 
+#include <utility>
+
 class Texture;
 
 class BlinnMaterial final : public Material
 {
+	color_rgbx emission_;
+	const Texture* diffuseMap_;
+	color_rgbx diffuse_;
+	color_rgbx specular_;
+	color_real shininess_;
+	color_rgbx translucency_;
+
 public:
 	BlinnMaterial()
-		: _emission(color_rgbx::zero())
-		, _diffuseMap(nullptr)
-		, _diffuse(color_rgbx::zero())
-		, _specular(color_rgbx::zero())
-		, _shininess(1.0f)
-		, _translucency(color_rgbx::zero()) { }
-
-	 
-	BlinnMaterial(const color_rgbx & emission, const Texture * diffuseMap, const color_rgbx & diffuse, const color_rgbx & specular, color_real shininess, const color_rgbx & translucency)
-		: _emission(emission)
-		, _diffuseMap(diffuseMap)
-		, _diffuse(diffuse)
-		, _specular(specular)
-		, _shininess(shininess)
-		, _translucency(translucency)
+		: emission_(color_rgbx::zero())
+		, diffuseMap_(nullptr)
+		, diffuse_(color_rgbx::zero())
+		, specular_(color_rgbx::zero())
+		, shininess_(1.0f)
+		, translucency_(color_rgbx::zero())
 	{
-		
 	}
 
 
-	const color_rgbx & emission() const { return _emission; }
-	void emission(const color_rgbx & value) { _emission = value; }
+	BlinnMaterial(color_rgbx emission, const Texture* diffuseMap, color_rgbx diffuse, color_rgbx specular, color_real shininess, color_rgbx translucency)
+		: emission_(std::move(emission))
+		, diffuseMap_(diffuseMap)
+		, diffuse_(std::move(diffuse))
+		, specular_(std::move(specular))
+		, shininess_(shininess)
+		, translucency_(std::move(translucency))
+	{
+	}
 
-	const color_rgbx & diffuse() const { return _diffuse; }
-	void diffuse(const color_rgbx & value) { _diffuse = value; }
 
-	const color_rgbx & specular() const { return _specular; }
-	void specular(const color_rgbx & value) { _specular = value; }
+	const color_rgbx& emission() const { return emission_; }
+	void emission(const color_rgbx& value) { emission_ = value; }
 
-	color_real shininess() const { return _shininess; }
-	void shininess(color_real value) { _shininess = value; }
+	const color_rgbx& diffuse() const { return diffuse_; }
+	void diffuse(const color_rgbx& value) { diffuse_ = value; }
 
-	color_rgbx translucency() const { return _translucency; }
-	void translucency(const color_rgbx & value) { _translucency = value; }
+	const color_rgbx& specular() const { return specular_; }
+	void specular(const color_rgbx& value) { specular_ = value; }
+
+	color_real shininess() const { return shininess_; }
+	void shininess(color_real value) { shininess_ = value; }
+
+	color_rgbx translucency() const { return translucency_; }
+	void translucency(const color_rgbx& value) { translucency_ = value; }
 
 	color_real GetEmissionImportance() const override;
 
-	void WithBsdfDistribution(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const bsdf_distribution_func & job) const override;
-	color_rgbx EvaluateEmission(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, math::
-		UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
-	color_rgbx EvaluateNonDeltaScattering(const GeometryObject & object, const vector3 & hitPoint, const vector3 & normal, const uvs_t & uvs, const vector3 & incidentDirection, const vector3 & outgoingDirection, math
-		::UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
+	void WithBsdfDistribution(
+		const GeometryObject& object,
+		const vector3& hitPoint,
+		const vector3& normal,
+		const uvs_t& uvs,
+		const vector3& incidentDirection,
+		const math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+		const bsdf_distribution_func& job) const override;
+
+	color_rgbx EvaluateEmission(
+		const GeometryObject& object,
+		const vector3& hitPoint,
+		const vector3& normal,
+		const uvs_t& uvs,
+		const vector3& incidentDirection,
+		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
+
+	color_rgbx EvaluateNonDeltaScattering(
+		const GeometryObject& object,
+		const vector3& hitPoint,
+		const vector3& normal,
+		const uvs_t& uvs,
+		const vector3& incidentDirection,
+		const vector3& outgoingDirection,
+		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
 
 private:
-	color_rgbx _emission;
-	const Texture * _diffuseMap;
-	color_rgbx _diffuse;
-	color_rgbx _specular;
-	color_real _shininess;
-	color_rgbx _translucency;
-
-
 	color_real GetReflectionProbability() const;
 
-	color_rgbx EvaluateDiffuseColor(const ::GeometryObject& object, const vector3& hitPoint, const vector3& normal, const vector2& uv, const vector3& incidentDirection, math::
-		UniformRandomBitGenerator<random_int_t>& randomEngine) const;
+	color_rgbx EvaluateDiffuseColor(
+		const ::GeometryObject& object,
+		const vector3& hitPoint,
+		const vector3& normal,
+		const vector2& uv,
+		const vector3& incidentDirection,
+		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const;
 };
-

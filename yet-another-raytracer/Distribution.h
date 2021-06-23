@@ -13,7 +13,6 @@ public:
 	virtual ~Distribution() = default;
 
 	virtual std::size_t delta_components() const = 0;
-	virtual void iterate_over_delta_components(const delta_func& job) const = 0;
 	virtual math::random_sample<TSample, TProbability> generate_delta_component_sample() const = 0;
 	virtual bool has_non_delta_component() const = 0;
 	virtual math::random_sample<TSample, TProbability> generate_non_delta_component_sample() const = 0;
@@ -28,106 +27,96 @@ class FunctionalDistribution : public Distribution<TSample, TPdfSample, TProbabi
 public:
 	using delta_func = std::function<void(const math::random_sample<TSample, TProbability>& sample)>;
 
-	using iterate_over_delta_func = std::function<void(const delta_func& job)>;
 	using generate_sample_func = std::function<math::random_sample<TSample, TProbability>()>;
 	using evaluate_pdf_func = std::function<TProbability(const TPdfSample& sample)>;
 
+private:
+	const std::size_t deltaComponentCount_;
+	const bool hasNonDeltaComponents_;
+	const generate_sample_func generateDeltaComponentSample_;
+	const generate_sample_func generateNonDeltaComponentSample_;
+	const evaluate_pdf_func evaluatePdf_;
+	const generate_sample_func generateSample_;
+
+public:
+
 	FunctionalDistribution()
-		: _deltaComponentCount(0)
-		, _hasNonDeltaComponents(false)
-		, _iterateOverDeltaComponents(nullptr)
-		, _generateNonDeltaComponentSample(nullptr)
-		, _evaluatePdf(zero_evaluate_pdf)
-		, _generateSample(nullptr)
+		: deltaComponentCount_(0)
+		, hasNonDeltaComponents_(false)
+		, generateNonDeltaComponentSample_(nullptr)
+		, evaluatePdf_(zero_evaluate_pdf)
+		, generateSample_(nullptr)
 	{
 	}
 
 	FunctionalDistribution(
 		std::size_t deltaComponentCount,
-		const iterate_over_delta_func& iterateOverDeltaComponents,
-		const generate_sample_func& generateDeltaComponentSample,
-		const generate_sample_func& generateNonDeltaComponentSample,
-		const evaluate_pdf_func& evaluatePdf,
-		const generate_sample_func& generateSample)
-		: _deltaComponentCount(deltaComponentCount)
-		, _hasNonDeltaComponents(generateNonDeltaComponentSample != nullptr)
-		, _iterateOverDeltaComponents(iterateOverDeltaComponents)
-		, _generateDeltaComponentSample(generateDeltaComponentSample)
-		, _generateNonDeltaComponentSample(generateNonDeltaComponentSample)
-		, _evaluatePdf(evaluatePdf)
-		, _generateSample(generateSample)
+		generate_sample_func generateDeltaComponentSample,
+		generate_sample_func generateNonDeltaComponentSample,
+		evaluate_pdf_func evaluatePdf,
+		generate_sample_func generateSample)
+		: deltaComponentCount_(deltaComponentCount)
+		, hasNonDeltaComponents_(generateNonDeltaComponentSample != nullptr)
+		, generateDeltaComponentSample_(std::move(generateDeltaComponentSample))
+		, generateNonDeltaComponentSample_(std::move(generateNonDeltaComponentSample))
+		, evaluatePdf_(std::move(evaluatePdf))
+		, generateSample_(std::move(generateSample))
 	{
 	}
 
-	explicit FunctionalDistribution(const generate_sample_func& generateNonDeltaComponentSample, evaluate_pdf_func evaluatePdf)
-		: _deltaComponentCount(0)
-		, _hasNonDeltaComponents(generateNonDeltaComponentSample != nullptr)
-		, _iterateOverDeltaComponents(nullptr)
-		, _generateNonDeltaComponentSample(generateNonDeltaComponentSample)
-		, _evaluatePdf(std::move(evaluatePdf))
-		, _generateSample(generateNonDeltaComponentSample)
+	explicit FunctionalDistribution(generate_sample_func generateNonDeltaComponentSample, evaluate_pdf_func evaluatePdf)
+		: deltaComponentCount_(0)
+		, hasNonDeltaComponents_(generateNonDeltaComponentSample != nullptr)
+		, generateNonDeltaComponentSample_(generateNonDeltaComponentSample)
+		, evaluatePdf_(std::move(evaluatePdf))
+		, generateSample_(std::move(generateNonDeltaComponentSample))
 	{
 	}
 
 	FunctionalDistribution(
 		std::size_t deltaComponentCount,
-		const iterate_over_delta_func& iterateOverDeltaComponents,
-		const generate_sample_func& generateDeltaComponentSample)
-		: _deltaComponentCount(deltaComponentCount)
-		, _hasNonDeltaComponents(false)
-		, _iterateOverDeltaComponents(iterateOverDeltaComponents)
-		, _generateDeltaComponentSample(generateDeltaComponentSample)
-		, _generateNonDeltaComponentSample(nullptr)
-		, _evaluatePdf(zero_evaluate_pdf)
-		, _generateSample(generateDeltaComponentSample)
+		generate_sample_func generateDeltaComponentSample)
+		: deltaComponentCount_(deltaComponentCount)
+		, hasNonDeltaComponents_(false)
+		, generateDeltaComponentSample_(generateDeltaComponentSample)
+		, generateNonDeltaComponentSample_(nullptr)
+		, evaluatePdf_(zero_evaluate_pdf)
+		, generateSample_(std::move(generateDeltaComponentSample))
 	{
 	}
 
 
 	std::size_t delta_components() const override
 	{
-		return _deltaComponentCount;
-	}
-
-	void iterate_over_delta_components(const delta_func& job) const override
-	{
-		_iterateOverDeltaComponents(job);
+		return deltaComponentCount_;
 	}
 
 	math::random_sample<TSample, TProbability> generate_delta_component_sample() const override
 	{
-		return _generateDeltaComponentSample();
+		return generateDeltaComponentSample_();
 	}
 
 	bool has_non_delta_component() const override
 	{
-		return _hasNonDeltaComponents;
+		return hasNonDeltaComponents_;
 	}
 
 	math::random_sample<TSample, TProbability> generate_non_delta_component_sample() const override
 	{
-		return _generateNonDeltaComponentSample();
+		return generateNonDeltaComponentSample_();
 	}
 
 	TProbability evaluate_pdf(const TPdfSample& sample) const override
 	{
-		return _evaluatePdf(sample);
+		return evaluatePdf_(sample);
 	}
 
 	math::random_sample<TSample, TProbability> generate_sample() const override
 	{
-		return _generateSample();
+		return generateSample_();
 	}
 
 private:
-	std::size_t _deltaComponentCount;
-	bool _hasNonDeltaComponents;
-	iterate_over_delta_func _iterateOverDeltaComponents;
-	generate_sample_func _generateDeltaComponentSample;
-	generate_sample_func _generateNonDeltaComponentSample;
-	evaluate_pdf_func _evaluatePdf;
-	generate_sample_func _generateSample;
-
 	static TProbability zero_evaluate_pdf(const TPdfSample& sample)
 	{
 		return TProbability(0);

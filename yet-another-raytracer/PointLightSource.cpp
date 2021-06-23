@@ -21,20 +21,6 @@ void PointLightSource::DoWithDistribution(const LightingContext & context, math:
 
 		job(lighting_functional_distribution(
 				1U,
-				[&](const lighting_functional_distribution::delta_func & subJob)
-				{
-					subJob(math::random_sample<std::optional<light_sample>, space_real>(
-						light_sample(
-							direction,
-							distance,
-							[&]()
-							{
-								return m_color * m_attenuation.Evaluate(distance);
-							}
-						),
-						space_real(1.0),
-						true));
-				},
 				[&]()
 				{
 					return math::random_sample<std::optional<light_sample>, space_real>(
