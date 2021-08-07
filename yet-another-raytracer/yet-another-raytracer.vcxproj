@@ -265,6 +265,7 @@
     <ClInclude Include="discrete_distribution.hpp" />
     <ClInclude Include="Distribution.h" />
     <ClInclude Include="GeometryLightSource.h" />
+    <ClInclude Include="Hashing.h" />
     <ClInclude Include="IBucketSequencer.h" />
     <ClInclude Include="IExecutor.h" />
     <ClInclude Include="LightingContext.h" />

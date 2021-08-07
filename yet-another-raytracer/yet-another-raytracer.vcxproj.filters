@@ -356,6 +356,9 @@
     <ClInclude Include="Statistics.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Hashing.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Film.cpp">

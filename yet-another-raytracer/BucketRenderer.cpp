@@ -1,6 +1,7 @@
 #include "BucketRenderer.h"
 
 #include "Film.h"
+#include "Hashing.h"
 #include "KDTreeAccelerator.h"
 #include "Marcher.h"
 #include "MonteCarloPathIntegrator.h"
@@ -134,7 +135,7 @@ void BucketRenderer::ProcessPixel(
 	const uint_vector2& subFilmCoord,
 	const uint_vector2& wholeFilmCoord) const
 {
-	const unsigned seed = wholeFilmCoord[0] | (wholeFilmCoord[1] << 16);
+	const unsigned seed = xxhash32(wholeFilmCoord);
 	math::StdUniformRandomBitGenerator<random_int_t, std::mt19937> pixelPersonalRandomEngine(std::mt19937{seed});
 
 	const bool doJitter = scene.getSamplesPerPixel() > 1;
