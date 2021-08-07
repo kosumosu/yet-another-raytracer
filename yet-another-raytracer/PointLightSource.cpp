@@ -10,7 +10,7 @@ PointLightSource::PointLightSource()
 	, m_attenuation(1.0f, 0.0f, 0.0f) {}
 
 
-void PointLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const distibution_func & job) const
+void PointLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const
 {
 	const auto point_to_light = m_position - context.getPoint();
 

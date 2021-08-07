@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UniformRandomBitGenerator.h"
+#include "Sampler.h"
 #include "Types.h"
 #include "Distribution.h"
 #include <vector>
@@ -38,7 +38,7 @@ public:
 
 	virtual ~LightSource() = default;
 
-	virtual void DoWithDistribution(const LightingContext& context, math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+	virtual void DoWithDistribution(const LightingContext& context, math::Sampler<space_real>& sampler,
 	                                const distibution_func& job) const = 0;
 
 	virtual color_real GetApproximateTotalPower() const = 0;

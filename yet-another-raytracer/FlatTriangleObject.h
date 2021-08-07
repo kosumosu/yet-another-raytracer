@@ -46,11 +46,11 @@ public:
 
 	bounding_box3 GetBoundsWithinBounds(const bounding_box3 & box) const override;
 	space_real GetOneSidedSurfaceArea() const override;
-	math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<random_int_t> & engine) const override;
+	math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::Sampler<space_real> & sampler) const override;
 
 	[[nodiscard]] std::optional<math::random_sample<surface_point, space_real>> PickRandomPointOnSurfaceForLighting(
 		const vector3& illuminatedPointOnSelf,
-		math::UniformRandomBitGenerator<random_int_t>& engine) const override;
+		math::Sampler<space_real>& sampler) const override;
 private:
 	vector3 _vertex0;
 	vector3 _vertex1;

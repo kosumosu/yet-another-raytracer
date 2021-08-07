@@ -271,6 +271,7 @@
     <ClInclude Include="LightingContext.h" />
     <ClInclude Include="OSAbstraction.h" />
     <ClInclude Include="IRenderer.h" />
+    <ClInclude Include="Sampler.h" />
     <ClInclude Include="Statistics.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureCommandFactory.h" />

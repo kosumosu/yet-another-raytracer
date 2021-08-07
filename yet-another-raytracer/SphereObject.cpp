@@ -108,9 +108,9 @@ space_real SphereObject::GetOneSidedSurfaceArea() const
 	return space_real(4.0 * math::pi) * m_radius * m_radius;
 }
 
-math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<random_int_t>& engine) const
+math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::Sampler<space_real>& sampler) const
 {
-	const auto directionFromCenter = math::sphericalRand<space_real>(engine);
+	const auto directionFromCenter = math::sphericalRand<space_real>(sampler);
 	// scale is not supported
 	const auto worldPoint = transform() * vector4(m_center + directionFromCenter * m_radius, space_real(1.0));
 	const auto worldNormal = normal_transform() * vector4(directionFromCenter, space_real(0.0));
@@ -122,8 +122,8 @@ math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSu
 
 std::optional<math::random_sample<surface_point, space_real>> SphereObject::PickRandomPointOnSurfaceForLighting(
 	const vector3& illuminatedPointOnSelf,
-	math::UniformRandomBitGenerator<random_int_t>& engine) const
+	math::Sampler<space_real>& sampler) const
 {
 	// TODO: needs proper implementation to avoid points that are too close to each other
-	return PickRandomPointOnSurface(engine);
+	return PickRandomPointOnSurface(sampler);
 }

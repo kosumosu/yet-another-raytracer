@@ -3,7 +3,7 @@
 #include "Hit.h"
 #include "Types.h"
 #include "random_sample.hpp"
-#include "UniformRandomBitGenerator.h"
+#include "Sampler.h"
 
 #include <memory>
 #include <optional>
@@ -53,9 +53,9 @@ public:
 	[[nodiscard]] virtual space_real GetOneSidedSurfaceArea() const = 0;
 
 	// Pick random point
-	[[nodiscard]] virtual math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<random_int_t>& engine) const = 0;
+	[[nodiscard]] virtual math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::Sampler<space_real>& engine) const = 0;
 	// Pick random point that lits given point on itself. illuminatedPointOnSelf should probably have uv or st coords.
-	[[nodiscard]] virtual std::optional<math::random_sample<surface_point, space_real>> PickRandomPointOnSurfaceForLighting(const vector3& illuminatedPointOnSelf, math::UniformRandomBitGenerator<random_int_t>& engine) const = 0;
+	[[nodiscard]] virtual std::optional<math::random_sample<surface_point, space_real>> PickRandomPointOnSurfaceForLighting(const vector3& illuminatedPointOnSelf, math::Sampler<space_real>& engine) const = 0;
 
 	[[nodiscard]] const Material* material() const { return material_; }
 	void material(const Material* val) { material_ = val; }

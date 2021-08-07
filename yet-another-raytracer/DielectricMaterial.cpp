@@ -148,7 +148,7 @@ void DielectricMaterial::WithBsdfDistribution(
 	const vector3& normal,
 	const uvs_t& uvs,
 	const vector3& incidentDirection,
-	const math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+	const math::Sampler<space_real>& sampler,
 	const bsdf_distribution_func& job) const
 {
 	job(
@@ -166,10 +166,9 @@ void DielectricMaterial::WithBsdfDistribution(
 				const Fresnel fresnel{incidentDirection, normal, iorFrom, iorTo};
 
 				const auto reflectance = fresnel.reflectance();
-
-				const std::uniform_real_distribution distr(color_real(0.0), math::upperRandomBound<color_real>);
+				
 				// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
-				const auto randomNumber = distr(randomEngine);
+				const auto randomNumber = sampler.Get1D();
 				const bool doReflectance = randomNumber < reflectance;
 
 				if (doReflectance)
@@ -214,7 +213,7 @@ color_rgbx DielectricMaterial::EvaluateEmission(
 	const vector3& normal,
 	const uvs_t& uvs,
 	const vector3& incidentDirection,
-	const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
+	const math::Sampler<space_real>& sampler) const
 {
 	return color_rgbx::zero();
 }
@@ -226,7 +225,7 @@ color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(
 	const uvs_t& uvs,
 	const vector3& incidentDirection,
 	const vector3& outgoingDirection,
-	const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
+	const math::Sampler<space_real>& sampler) const
 {
 	return color_rgbx::zero();
 }

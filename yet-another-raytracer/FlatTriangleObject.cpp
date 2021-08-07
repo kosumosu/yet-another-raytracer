@@ -178,11 +178,11 @@ space_real FlatTriangleObject::GetOneSidedSurfaceArea() const
 	return GetPreciseOneSidedSurfaceArea();
 }
 
-math::random_sample<surface_point, space_real> FlatTriangleObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<random_int_t>& engine) const
+math::random_sample<surface_point, space_real> FlatTriangleObject::PickRandomPointOnSurface(math::Sampler<space_real>& sampler) const
 {
-	std::uniform_real_distribution<space_real> distr;
-	const auto rawU = distr(engine);
-	const auto rawV = distr(engine);
+	const auto sample = sampler.Get2D();
+	const auto rawU = sample[0];
+	const auto rawV = sample[1];
 
 	const bool isOnTheOtherHalfOfTheParallelogram = rawV + rawU > space_real(1);
 
@@ -199,7 +199,7 @@ math::random_sample<surface_point, space_real> FlatTriangleObject::PickRandomPoi
 
 std::optional<math::random_sample<surface_point, space_real>> FlatTriangleObject::PickRandomPointOnSurfaceForLighting(
 	const vector3& illuminatedPointOnSelf,
-	math::UniformRandomBitGenerator<random_int_t>& engine) const
+	math::Sampler<space_real>& sampler) const
 {
 	// Since flat triangle can't illuminate itself, just ignore it.
 	return std::nullopt;

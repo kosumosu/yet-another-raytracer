@@ -18,9 +18,8 @@ constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_r
 //constexpr space_real BIAS = space_real(0); // std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 
 
-MonteCarloPathIntegrator::MonteCarloPathIntegrator(const Raytracer* raytracer, std::vector<const LightSource*> lights, infinity_func infinityEvaluator)
+MonteCarloPathIntegrator::MonteCarloPathIntegrator(const Raytracer* raytracer, const std::vector<const LightSource*>& lights, infinity_func infinityEvaluator)
 	: raytracer_(raytracer)
-	, lights_(std::move(lights))
 	, infinityEvaluator_(std::move(infinityEvaluator))
 {
 	std::vector<std::pair<const LightSource*, color_real>> lightsWithWeights;
@@ -49,22 +48,21 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 	const Hit& hit,
 	bool entering,
 	const bsdf_distribution& bsdfDistribution,
-	math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
+	math::Sampler<space_real>& sampler) const
 {
 	color_rgbx radianceAtCurrentPathVertex{color_rgbx::zero()};
 	const LightingContext context{ hit.object(), hit.point(), hit.normal(), BIAS, 1, false };
-
-	std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
+	
 	// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 	const auto randomFunc = [&]()
 	{
-		return color_real(distr(randomEngine));
+		return color_real(sampler.Get1D());
 	};
 	const auto sampledLight = lightDistribution_.GetRandomElement(randomFunc);
 	const auto light = sampledLight.getValue();
 	light->DoWithDistribution(
 		context,
-		randomEngine,
+		sampler,
 		[&](const light_distribution& lightDistribution)
 		{
 			if (lightDistribution.delta_components() != 0 || lightDistribution.has_non_delta_component())
@@ -91,7 +89,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 							hit.uvs(),
 							currentRay.direction(),
 							lightSample.direction,
-							randomEngine) * geometricTerm * color_real(math::oneOverPi) / color_real(optionalLightSample.getPdf());
+							sampler) * geometricTerm * color_real(math::oneOverPi) / color_real(optionalLightSample.getPdf());
 
 						//if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
 						//	throw std::exception();
@@ -112,7 +110,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 	const ray3& ray,
 	unsigned bounceLimit,
 	space_real bias,
-	math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
+	math::Sampler<space_real>& sampler) const
 {
 	color_rgbx integral(color_rgbx::zero());
 	color_rgbx throughput(color_rgbx::fill(1));
@@ -141,14 +139,14 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 			hit.normal(),
 			hit.uvs(),
 			currentRay.direction(),
-			randomEngine,
+			sampler,
 			[&](const bsdf_distribution& bsdfDistribution)
 			{
 				const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
 				color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
 
 				if (bsdfDistribution.has_non_delta_component())
-					radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
+					radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, sampler);
 
 				if (accountForEmission)
 					radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(
@@ -157,7 +155,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 						hit.normal(),
 						hit.uvs(),
 						currentRay.direction(),
-						randomEngine);
+						sampler);
 
 				const auto samplePayload = radianceAtCurrentPathVertex * throughput;
 				assert(!math::anyNan(samplePayload));
@@ -185,10 +183,9 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 					                              : bsdfColor * geometricTerm * color_real(math::oneOverPi) / bsdfPdf;
 
 				const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
-
-				std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
+				
 				// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
-				if (importance < color_real(1.0) && distr(randomEngine) >= importance || importance == color_real(0.0))
+				if (importance < color_real(1.0) && sampler.Get1D() >= importance || importance == color_real(0.0))
 				{
 					earlyExit = true;
 					return;
@@ -245,13 +242,13 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 				hit.normal(),
 				hit.uvs(),
 				currentRay.direction(),
-				randomEngine,
+				sampler,
 				[&](const bsdf_distribution& bsdfDistribution)
 				{
 					const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
 					color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
 					if (bsdfDistribution.has_non_delta_component())
-						radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, randomEngine);
+						radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(currentRay, hit, entering, bsdfDistribution, sampler);
 
 					if (accountForEmission)
 						radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(
@@ -260,7 +257,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 							hit.normal(),
 							hit.uvs(),
 							currentRay.direction(),
-							randomEngine);
+							sampler);
 
 					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
 					assert(!math::anyNan(samplePayload));

@@ -1,6 +1,7 @@
 #include "SingleThreadedScanlineRenderer.h"
 
 #include "Film.h"
+#include "Hashing.h"
 #include "KDTreeAccelerator.h"
 #include "MonteCarloPathIntegrator.h"
 #include "NullAccelerator.h"
@@ -23,8 +24,8 @@ SingleThreadedScanlineRenderer::SingleThreadedScanlineRenderer(
 
 void SingleThreadedScanlineRenderer::ProcessPixel(Film& film, const Scene& scene, const RayIntegrator& rayIntegrator, unsigned int x, unsigned int y) const
 {
-	const unsigned seed = x | (y << 16);
-	math::StdUniformRandomBitGenerator<random_int_t, std::mt19937> pixelPersonalRandomEngine(std::mt19937{seed});
+	const unsigned seed = xxhash32({x, y});
+	math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
 
 	const bool doJitter = scene.getSamplesPerPixel() > 1;
 	const color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
@@ -34,11 +35,11 @@ void SingleThreadedScanlineRenderer::ProcessPixel(Film& film, const Scene& scene
 
 	for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++)
 	{
-		const auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), pixelPersonalRandomEngine) : vector2(0.5, 0.5);
+		const auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), pixelPersonalSampler) : vector2(0.5, 0.5);
 		const auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
 
 		const auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, space_real(film.width()) / space_real(film.height()));
-		averageColor += rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
+		averageColor += rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalSampler) * sampleWeight;
 	}
 
 	film.setPixel({x, y}, averageColor);

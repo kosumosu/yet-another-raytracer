@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UniformRandomBitGenerator.h"
+#include "Sampler.h"
 #include "Distribution.h"
 #include "Types.h"
 #include <functional>
@@ -37,7 +37,7 @@ public:
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+		const math::Sampler<space_real>& sampler,
 		const bsdf_distribution_func& job) const = 0;
 
 	[[nodiscard]] virtual color_rgbx EvaluateEmission(
@@ -46,7 +46,7 @@ public:
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const = 0;
+		const math::Sampler<space_real>& sampler) const = 0;
 
 	[[nodiscard]] virtual color_rgbx EvaluateNonDeltaScattering(
 		const GeometryObject& object,
@@ -55,5 +55,5 @@ public:
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
 		const vector3& outgoingDirection,
-		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const = 0;
+		const math::Sampler<space_real>& sampler) const = 0;
 };

@@ -11,13 +11,13 @@ SkyLightSource::SkyLightSource()
 
 
 
-void SkyLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const distibution_func & job) const
+void SkyLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const
 {
 	job(lighting_functional_distribution(
 		[&]()
 		{
 #if ENABLE_IMPORTANCE_SAMPLING
-			const auto [direction, pdf] = math::cosineWeightedHemiSphericalRand(context.getNormal(), randomEngine);
+			const auto [direction, pdf] = math::cosineWeightedHemiSphericalRand(context.getNormal(), sampler);
 #else
 			auto direction = math::hemiSphericalRand(normal);
 			const space_real pdf = space_real(0.5 * math::oneOverPi);

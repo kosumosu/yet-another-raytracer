@@ -14,7 +14,7 @@ public:
 
 	void DoWithDistribution(
 		const LightingContext& context,
-		math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+		math::Sampler<space_real>& sampler,
 		const distibution_func& job) const override;
 
 	color_real GetApproximateTotalPower() const override;

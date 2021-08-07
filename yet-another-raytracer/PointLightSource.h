@@ -18,7 +18,7 @@ public:
 	Attenuation attenuation() const { return m_attenuation; }
 	void attenuation(Attenuation val) { m_attenuation = val; }
 
-	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<random_int_t> & randomEngine, const distibution_func & job) const override;
+	void DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const override;
 
 	color_real GetApproximateTotalPower() const override;
 private:

@@ -157,13 +157,13 @@ void InsertTriangle(Scene& scene)
 }
 
 template <typename TRandomEngine>
-void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& size, TRandomEngine& engine)
+void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& size, TRandomEngine& sampler)
 {
 	for (unsigned int i = 0; i < count; i++)
 	{
 		std::shared_ptr<BlinnMaterial> material{new BlinnMaterial{}};
 		scene.getMaterials().insert(std::make_pair("InsertTriangle()::material #" + std::to_string(i), material));
-		material->diffuse(math::linearRand(color_rgbx::zero(), color_rgbx::fill(1.0), engine));
+		material->diffuse(math::linearRand(color_rgbx::zero(), color_rgbx::fill(1.0), sampler));
 		//material->specular(math::linearRand(zero4, one4));
 		//material->shininess(math::linearRand(10.0, 300.0));
 		//material->emission(math::linearRand(zero4, one4 * 0.2));
@@ -171,13 +171,13 @@ void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& s
 		const vector3 min_bound = vector3::fill(-size);
 		const vector3 max_bound = vector3::fill(size);
 
-		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), engine);
+		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), sampler);
 
 		std::shared_ptr<FlatTriangleObject> object{new FlatTriangleObject{}};
 		object->material(material.get());
-		object->vertex0(pivot + math::linearRand(min_bound, max_bound, engine));
-		object->vertex1(pivot + math::linearRand(min_bound, max_bound, engine));
-		object->vertex2(pivot + math::linearRand(min_bound, max_bound, engine));
+		object->vertex0(pivot + math::linearRand(min_bound, max_bound, sampler));
+		object->vertex1(pivot + math::linearRand(min_bound, max_bound, sampler));
+		object->vertex2(pivot + math::linearRand(min_bound, max_bound, sampler));
 
 		scene.objects().push_back(object);
 	}

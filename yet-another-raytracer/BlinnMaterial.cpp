@@ -22,7 +22,7 @@ color_rgbx BlinnMaterial::EvaluateDiffuseColor(
 	const vector3& normal,
 	const vector2& uv,
 	const vector3& incidentDirection,
-	const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
+	const math::Sampler<space_real>& sampler) const
 {
 	//return math::dot(incidentDirection, normal) < 0 ? color_rgbx(1.0, 0.0, 0.0, 0.0) : color_rgbx(0.0, 1.0, 1.0, 0.0);
 
@@ -42,26 +42,25 @@ void BlinnMaterial::WithBsdfDistribution(
 	const vector3& normal,
 	const uvs_t& uvs,
 	const vector3& incidentDirection,
-	const math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+	const math::Sampler<space_real>& sampler,
 	const bsdf_distribution_func& job) const
 {
-	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, randomEngine);
+	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, sampler);
 	bsdf_functional_distribution::generate_sample_func generateDiffuseFuncImpl = [&]()
 	{
 		const bool isEntering = math::is_obtuse_angle(incidentDirection, normal);
-		std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
 		// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
 		const auto translucenceProbability = color::get_importance(translucency_);
-		const bool isTranslucent = translucenceProbability > color_real(0.0) && translucenceProbability >= distr(randomEngine);
+		const bool isTranslucent = translucenceProbability > color_real(0.0) && translucenceProbability >= sampler.Get1D();
 
 		const bool flipNormal = isEntering == isTranslucent;
 
 #if ENABLE_IMPORTANCE_SAMPLING
 		const auto [direction, pdf] = flipNormal
-			? math::cosineWeightedHemiSphericalRand(-normal, randomEngine)
-			: math::cosineWeightedHemiSphericalRand(normal, randomEngine);
+			? math::cosineWeightedHemiSphericalRand(-normal, sampler)
+			: math::cosineWeightedHemiSphericalRand(normal, sampler);
 #else
-			const auto direction = math::hemiSphericalRand(-normal, randomEngine);
+			const auto direction = math::hemiSphericalRand(-normal, sampler);
 			const space_real pdf = space_real(0.5 * math::oneOverPi);
 #endif
 
@@ -137,9 +136,8 @@ void BlinnMaterial::WithBsdfDistribution(
 		: [&]()
 		{
 			const color_real reflectionProbability = GetReflectionProbability();
-			std::uniform_real_distribution<color_real> distr(color_real(0.0), math::upperRandomBound<color_real>);
 			// a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
-			if (distr(randomEngine) < reflectionProbability)
+			if (sampler.Get1D() < reflectionProbability)
 				return generateReflectionFuncImpl();
 			else
 				return generateDiffuseFuncImpl();
@@ -161,7 +159,7 @@ color_rgbx BlinnMaterial::EvaluateEmission(
 	const vector3& normal,
 	const uvs_t& uvs,
 	const vector3& incidentDirection,
-	const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
+	const math::Sampler<space_real>& sampler) const
 {
 	if (diffuseMap_ == nullptr)
 	{
@@ -180,9 +178,9 @@ color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(
 	const uvs_t& uvs,
 	const vector3& incidentDirection,
 	const vector3& outgoingDirection,
-	const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const
+	const math::Sampler<space_real>& sampler) const
 {
-	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, randomEngine);
+	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, sampler);
 	return math::is_obtuse_angle(incidentDirection, normal)
 		? diffuseColor * (color_rgbx::fill(1.0) - specular_) * (color_rgbx::fill(1.0) - translucency_)
 		: (color_rgbx::fill(1.0) - specular_) * translucency_;

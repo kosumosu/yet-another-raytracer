@@ -41,7 +41,7 @@ public:
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::UniformRandomBitGenerator<random_int_t>& randomEngine,
+		const math::Sampler<space_real>& sampler,
 		const bsdf_distribution_func& job) const override;
 	
 	color_rgbx EvaluateEmission(
@@ -50,7 +50,7 @@ public:
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
+		const math::Sampler<space_real>& sampler) const override;
 	
 	color_rgbx EvaluateNonDeltaScattering(
 		const GeometryObject& object,
@@ -59,5 +59,5 @@ public:
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
 		const vector3& outgoingDirection,
-		const math::UniformRandomBitGenerator<random_int_t>& randomEngine) const override;
+		const math::Sampler<space_real>& sampler) const override;
 };
