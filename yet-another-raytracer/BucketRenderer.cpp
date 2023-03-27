@@ -125,7 +125,7 @@ void BucketRenderer::ProcessPixel(
 	const uint_vector2& wholeFilmCoord) const
 {
 	const unsigned seed = wholeFilmCoord[0] | (wholeFilmCoord[1] << 16);
-	math::StdUniformRandomBitGenerator<unsigned int, std::mt19937> pixelPersonalRandomEngine(std::mt19937{seed});
+        math::StdUniformRandomBitGenerator<unsigned int, std::minstd_rand> pixelPersonalRandomEngine(std::minstd_rand{seed});
 
 	const bool doJitter = scene.getSamplesPerPixel() > 1;
 	const color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());

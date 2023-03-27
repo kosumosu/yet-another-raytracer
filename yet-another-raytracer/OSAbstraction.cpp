@@ -6,7 +6,7 @@
 
 void openImageFileForDisplay(const std::filesystem::path& imageFileName)
 {
-	ShellExecute(nullptr, L"Open", imageFileName.wstring().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+        ShellExecute(nullptr, L"Open", imageFileName.wstring().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 #elif defined(__linux__)
@@ -15,11 +15,14 @@ void openImageFileForDisplay(const std::filesystem::path& imageFileName)
 #include <cstdlib>
 #include <sstream>
 
-void openImageFileForDisplay(const std::filesystem::path& imageFileName)
+void openImageFileForDisplay(const std::experimental::filesystem::path& imageFileName)
 {
-	std::stringstream ss;
-	ss << "xdg-open " << imageFileName;
-	std::system(ss.str().c_str());
+        // Unfortunately this launches GIMP which crashes vcxsrv
+        return;
+
+        std::stringstream ss;
+        ss << "xdg-open " << imageFileName;
+        std::system(ss.str().c_str());
 }
 
 #endif

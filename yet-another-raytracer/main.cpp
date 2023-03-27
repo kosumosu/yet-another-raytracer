@@ -220,7 +220,7 @@ void InitCamera(Scene& scene, unsigned int width, unsigned int height)
 
 //////////////////////////////////////////////////////////////////////////
 
-void LoadFromFile(Scene& scene, const std::filesystem::path& filename)
+void LoadFromFile(Scene& scene, const std::experimental::filesystem::path& filename)
 {
 	const std::unique_ptr<SceneLoader> loader{SceneLoader::CreateDefault()};
 
@@ -245,12 +245,12 @@ std::wstring GetFileNameWithoutExtension(const std::wstring& input)
 	return index == std::string::npos ? filename : filename.substr(0, index);
 }
 
-std::filesystem::path GetPathWithoutExtension(const std::filesystem::path& input)
+std::experimental::filesystem::path GetPathWithoutExtension(const std::experimental::filesystem::path& input)
 {
 	return input.parent_path() / input.stem();
 }
 
-void Render(const std::filesystem::path& scene_file, const std::filesystem::path& output_image_file)
+void Render(const std::experimental::filesystem::path& scene_file, const std::experimental::filesystem::path& output_image_file)
 {
 	Scene scene;
 
@@ -288,7 +288,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 
 #if true
 	const BucketRenderer renderer(
-		{16, 16},
+                {32, 32},
 		std::make_unique<TopDownSequencer>(),
 		[&]()
 		{
@@ -349,9 +349,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (argc < 2)
 		return 0;
 
-	const auto image_file = std::filesystem::path(argv[1]).replace_extension(".png");
+	const auto image_file = std::experimental::filesystem::path(argv[1]).replace_extension(".png");
 
-    Render(std::filesystem::path(argv[1]), image_file);
+    Render(std::experimental::filesystem::path(argv[1]), image_file);
 
 	openImageFileForDisplay(image_file.c_str());
 
@@ -360,12 +360,14 @@ int _tmain(int argc, _TCHAR* argv[])
 #elif defined (__linux__)
 int main(int argc, const char* argv[])
 {
-    if (argc < 2)
+    if (argc < 2) {
+        std::cout << "Missing scene path\n";
         return 0;
+    }
 
-    const auto image_file = std::filesystem::path(argv[1]).replace_extension(".png");
+    const auto image_file = std::experimental::filesystem::path(argv[1]).replace_extension(".png");
 
-    Render(std::filesystem::path(argv[1]), image_file);
+    Render(std::experimental::filesystem::path(argv[1]), image_file);
 
     openImageFileForDisplay(image_file.c_str());
 

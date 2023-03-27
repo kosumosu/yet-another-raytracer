@@ -3,6 +3,7 @@
 #include "vector.hpp"
 #include "helper.hpp"
 #include <algorithm>
+#include <functional>
 
 namespace math
 {

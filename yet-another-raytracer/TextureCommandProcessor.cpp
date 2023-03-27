@@ -4,9 +4,7 @@
 #include "VisualizeUVTexture.h"
 #include "BitmapTexture.h"
 
-#include <filesystem>
-
-namespace fs = std::filesystem;
+namespace fs = std::experimental::filesystem;
 
 fs::path getPathRelativeToScene(const fs::path & sceneFilePath, const fs::path & relative)
 {

@@ -146,13 +146,16 @@ SOURCES = \
 INCLUDEPATH = \
     $$PWD/.
 
-INCLUDEPATH += /usr/include/png++/
-
+INCLUDEPATH += /export/home/kosmos/sources/png++-0.2.10
 
 CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
+
+QMAKE_CXXFLAGS += -std=c++17 -O3 -ffast-math
+
 #DEFINES = 
+unix|win32: LIBS += -lstdc++fs
 
 unix|win32: LIBS += -lpng
 

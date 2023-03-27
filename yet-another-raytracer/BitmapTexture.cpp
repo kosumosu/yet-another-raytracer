@@ -1,5 +1,5 @@
 #include "BitmapTexture.h"
-#include "png.hpp"
+#include <png.hpp>
 
 using pixel_t = png::rgb_pixel_16;
 using pixel_component_t = png::pixel_traits<pixel_t>::component_type;
@@ -18,7 +18,7 @@ color_rgbx convertColor(const pixel_t& pixel)
 	return color_rgbx(convertChannel(pixel.red), convertChannel(pixel.green), convertChannel(pixel.blue), 0);
 }
 
-BitmapTexture::BitmapTexture(const std::filesystem::path& filename)
+BitmapTexture::BitmapTexture(const std::experimental::filesystem::path& filename)
 	: size_{0, 0}
 	, halfTexel_{vector2::zero()}
 {

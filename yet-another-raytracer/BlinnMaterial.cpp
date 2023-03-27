@@ -53,7 +53,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(direction,
-						[=, this]()
+                        [=]()
 						{
 							return _translucency * (color_rgbx::fill(1.0) - _specular);
 						}),
@@ -65,7 +65,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(direction,
-						[=, this]()
+                        [=]()
 						{
 							return diffuseColor * (color_rgbx::fill(1.0) - _specular) * (color_rgbx::fill(1.0) - _translucency);
 						}),
@@ -103,7 +103,7 @@ void BlinnMaterial::WithBsdfDistribution(const GeometryObject & object, const ve
 			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * cosTheta);
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(reflected_direction,
-					[=, this]()
+                    [=]()
 					{
 						return _specular / color_real(std::abs(cosTheta));
 					}),

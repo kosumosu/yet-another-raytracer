@@ -1,12 +1,12 @@
 #pragma once
 #include "Texture.h"
 
-#include <filesystem>
+#include <experimental/filesystem>
 
 class BitmapTexture : public Texture
 {
 public:
-	explicit BitmapTexture(const std::filesystem::path& filename);
+    explicit BitmapTexture(const std::experimental::filesystem::path& filename);
 
 	color_rgbx Sample(const TextureCoords & coords) const override;
 private:
