@@ -1,6 +1,7 @@
 #include "BucketRenderer.h"
 
 #include "Film.h"
+#include "Hashing.h"
 #include "KDTreeAccelerator.h"
 #include "Marcher.h"
 #include "MonteCarloPathIntegrator.h"
@@ -8,7 +9,7 @@
 #include "Raytracer.h"
 #include "Scene.h"
 #include "Types.h"
-#include "UniformRandomBitGenerator.h"
+#include "Sampler.h"
 
 #include "ThreadBarrier.hpp"
 
@@ -57,6 +58,9 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 	std::vector<std::thread> threads;
 	threads.reserve(threadCount);
 
+	
+	std::mutex statsMutex;
+
 	ThreadBarrier barrier{threadCount};
 
 	for (unsigned int i = 0; i < threadCount; ++i)
@@ -82,6 +86,8 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 					const auto localCompletedCount = ++completedCount;
 					progressCallback_(float(localCompletedCount) * oneOverTotalBuckets);
 				}
+
+				stats_.mergeIn(integrator.getStats());
 			}
 		};
 		threads.push_back(std::move(thread));
@@ -97,6 +103,11 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 	}
 
 	renderingFinishedCallback_();
+}
+
+void BucketRenderer::PrintStats(std::ostream& stream) const
+{
+	stats_.printResult(stream);
 }
 
 void BucketRenderer::ProcessBucket(
@@ -124,8 +135,8 @@ void BucketRenderer::ProcessPixel(
 	const uint_vector2& subFilmCoord,
 	const uint_vector2& wholeFilmCoord) const
 {
-	const unsigned seed = wholeFilmCoord[0] | (wholeFilmCoord[1] << 16);
-        math::StdUniformRandomBitGenerator<unsigned int, std::minstd_rand> pixelPersonalRandomEngine(std::minstd_rand{seed});
+	const unsigned seed = xxhash32(wholeFilmCoord);
+	math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
 
 	const bool doJitter = scene.getSamplesPerPixel() > 1;
 	const color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
@@ -136,12 +147,12 @@ void BucketRenderer::ProcessPixel(
 
 	for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++)
 	{
-		const auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), pixelPersonalRandomEngine) : vector2(0.5, 0.5);
+		const auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0), pixelPersonalSampler) : vector2(0.5, 0.5);
 		const auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
 
 		const auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, aspectRatio);
 
-		const auto rayPayload = rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalRandomEngine) * sampleWeight;
+		const auto rayPayload = rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalSampler) * sampleWeight;
         assert(!std::isnan(rayPayload[0]) && !std::isnan(rayPayload[1]) && !std::isnan(rayPayload[2]) && !std::isnan(rayPayload[3]));
 		averageColor += rayPayload;
 	}

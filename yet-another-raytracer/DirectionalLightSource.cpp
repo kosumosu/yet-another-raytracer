@@ -4,7 +4,7 @@
 #include "color_functions.hpp"
 #include <limits>
 
-using lighting_functional_distribution = FunctionalDistribution<const light_sample, const vector3, space_real>;
+using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;
 
 
 DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const color_rgbx & color, const Scene & scene) 
@@ -21,29 +21,15 @@ DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const 
 	_power = color::get_importance(_color) * color_real(BoundingSphereRadiusSqr * math::pi);
 }
 
-void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const
+void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const
 {
 	if (true || math::dot(_direction, context.getNormal()) >= 0.0f)
 	{
 		job(lighting_functional_distribution(
 				1U,
-				[&](const lighting_functional_distribution::delta_func & subJob)
-				{
-					subJob(math::random_sample<const light_sample, space_real>(
-						light_sample(
-							_direction,
-							std::numeric_limits<space_real>::max(),
-							[&]()
-							{
-								return _color;
-							}
-						),
-						space_real(1.0),
-						true));
-				},
 				[&]()
 				{
-					return math::random_sample<const light_sample, space_real>(
+					return math::random_sample<std::optional<light_sample>, space_real>(
 						light_sample(
 							_direction,
 							std::numeric_limits<space_real>::max(),

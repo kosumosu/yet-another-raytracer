@@ -353,6 +353,15 @@
     <ClInclude Include="IExecutor.h">
       <Filter>Engine\Renderers\Bucket\Executors</Filter>
     </ClInclude>
+    <ClInclude Include="Statistics.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sampler.h">
+      <Filter>Engine\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Film.cpp">

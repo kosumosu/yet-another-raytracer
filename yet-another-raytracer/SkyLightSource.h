@@ -20,7 +20,7 @@ public:
 		m_color = val;
 	}
 
-	void DoWithDistribution(const LightingContext & context, math::UniformRandomBitGenerator<unsigned> & randomEngine, const distibution_func & job) const override;
+	void DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const override;
 
 
 	color_real GetApproximateTotalPower() const override;

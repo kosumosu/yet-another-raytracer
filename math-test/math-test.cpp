@@ -10,12 +10,52 @@
 
 //////////////////////////////////////////////////////////////////////////
 
+template <typename TValue, typename TEngine>
+class TestSampler
+{
+	mutable TEngine engine_;
+	mutable std::uniform_real_distribution<TValue> distr_;
+public:
+	explicit TestSampler(TEngine engine)
+		: engine_{ std::move(engine) }
+		, distr_{ TValue(0), TValue(1) - getGrain() }
+	{
+	}
+
+	TValue Get1D() const
+	{
+		return distr_(engine_);
+	}
+
+	math::vector<TValue, 2> Get2D() const
+	{
+		return { Get1D(), Get1D() };
+	}
+
+private:
+	TValue getGrain() const
+	{
+		return TValue(1.0) / (TValue(engine_.max()) - TValue(engine_.min()));
+	}
+
+	static float getGrain(const TEngine& engine, float)
+	{
+		return float(1.0) / (float(engine.max()) - float(engine.min()));
+	}
+
+	static double getGrain(const TEngine& engine, double)
+	{
+		const auto engineSpan = double(engine.max()) - double(engine.min());
+		return double(1.0) / (engineSpan * engineSpan);
+	}
+};
+
 __declspec(noinline)
 bool TestFloatVectorLinearRand()
 {
-	std::mt19937_64 engine;
-	auto vec1 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22), engine);
-	auto vec2 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22), engine);
+	TestSampler<float, std::mt19937_64> sampler { std::mt19937_64{} };
+	auto vec1 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22), sampler);
+	auto vec2 = math::linearRand(vector3(1, 11, 21), vector3(2, 12, 22), sampler);
 
 	bool success = vec1[0] >= 1 && vec1[0] <= 2 && vec1[1] >= 11 && vec1[1] <= 12 && vec1[2] >= 21 && vec1[2] <= 22;
 	success &= vec2[0] >= 1 && vec2[0] <= 2 && vec2[1] >= 11 && vec2[1] <= 12 && vec2[2] >= 21 && vec2[2] <= 22;

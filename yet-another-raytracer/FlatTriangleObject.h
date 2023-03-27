@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "GeometryObject.h"
 
 class FlatTriangleObject : public GeometryObject
@@ -14,19 +16,17 @@ public:
 		, _uvs1({vector2(0, 0)})
 		, _uvs2({vector2(0, 0)}) {}
 
-	FlatTriangleObject(const vector3 & vert0, const vector3 & vert1, const vector3 & vert2, const uvs_t & uvs0, const uvs_t & uvs1, const uvs_t & uvs2)
-		: _vertex0(vert0)
-		, _vertex1(vert1)
-		, _vertex2(vert2)
+	FlatTriangleObject(vector3 vert0, vector3 vert1, vector3 vert2, uvs_t uvs0, uvs_t uvs1, uvs_t uvs2)
+		: _vertex0(std::move(vert0))
+		, _vertex1(std::move(vert1))
+		, _vertex2(std::move(vert2))
 		, _normal(vector3::zero())
-		, _uvs0(uvs0)
-		, _uvs1(uvs1)
-		, _uvs2(uvs2)
+		, _uvs0(std::move(uvs0))
+		, _uvs1(std::move(uvs1))
+		, _uvs2(std::move(uvs2))
 	{
 		calculate_normal();
 	}
-
-	virtual ~FlatTriangleObject(void);
 
 	Hit FindHit(const ray3 & ray, space_real minDistance, space_real maxDistance) const override;
 
@@ -46,8 +46,11 @@ public:
 
 	bounding_box3 GetBoundsWithinBounds(const bounding_box3 & box) const override;
 	space_real GetOneSidedSurfaceArea() const override;
-	math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const override;
+	math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::Sampler<space_real> & sampler) const override;
 
+	[[nodiscard]] std::optional<math::random_sample<surface_point, space_real>> PickRandomPointOnSurfaceForLighting(
+		const vector3& illuminatedPointOnSelf,
+		math::Sampler<space_real>& sampler) const override;
 private:
 	vector3 _vertex0;
 	vector3 _vertex1;

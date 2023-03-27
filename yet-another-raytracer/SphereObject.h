@@ -23,7 +23,11 @@ public:
 	void PrepareForRendering() override;
 
 	space_real GetOneSidedSurfaceArea() const override;
-	math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int> & engine) const override;
+	math::random_sample<surface_point, space_real> PickRandomPointOnSurface(math::Sampler<space_real> & sampler) const override;
+
+	[[nodiscard]] std::optional<math::random_sample<surface_point, space_real>> PickRandomPointOnSurfaceForLighting(
+		const vector3& illuminatedPointOnSelf,
+		math::Sampler<space_real>& sampler) const override;
 private:
 	vector3 m_center;
 	space_real m_radius;

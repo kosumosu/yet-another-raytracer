@@ -54,7 +54,6 @@ Hit SphereObject::FindHit(const ray3& ray, space_real minDistance, space_real ma
 			auto transformed_hit_point = (this->transform() * vector4(world_space_hit_point, 1.0)).reduce();
 			auto transformed_normal = math::normalize((this->normal_transform() * vector4(normal, space_real(0.0))).reduce());
 
-			
 
 			return Hit(transformed_hit_point, transformed_normal, this, x, uvs_t{vector2::zero()});
 		}
@@ -109,9 +108,9 @@ space_real SphereObject::GetOneSidedSurfaceArea() const
 	return space_real(4.0 * math::pi) * m_radius * m_radius;
 }
 
-math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::UniformRandomBitGenerator<unsigned int>& engine) const
+math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSurface(math::Sampler<space_real>& sampler) const
 {
-	const auto directionFromCenter = math::sphericalRand<space_real>(engine);
+	const auto directionFromCenter = math::sphericalRand<space_real>(sampler);
 	// scale is not supported
 	const auto worldPoint = transform() * vector4(m_center + directionFromCenter * m_radius, space_real(1.0));
 	const auto worldNormal = normal_transform() * vector4(directionFromCenter, space_real(0.0));
@@ -119,4 +118,12 @@ math::random_sample<surface_point, space_real> SphereObject::PickRandomPointOnSu
 		surface_point(worldPoint.reduce(), worldNormal.reduce(), uvs_t{vector2::zero()}),
 		space_real(1.0) / GetOneSidedSurfaceArea(),
 		false);
+}
+
+std::optional<math::random_sample<surface_point, space_real>> SphereObject::PickRandomPointOnSurfaceForLighting(
+	const vector3& illuminatedPointOnSelf,
+	math::Sampler<space_real>& sampler) const
+{
+	// TODO: needs proper implementation to avoid points that are too close to each other
+	return PickRandomPointOnSurface(sampler);
 }

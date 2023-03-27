@@ -292,5 +292,16 @@ namespace math
 	{
 		return mapElements(one, [](const auto& val) { return static_cast<TResult>(val); });
 	}
+
+	template <typename T, std::size_t N>
+	bool isZero(const vector<T, N>& one)
+	{
+		bool isZero = true;
+		iterate<0, N - 1>([&](std::size_t i)
+			{
+				isZero = isZero && (one[i] == T(0));
+			});
+		return isZero;
+	}
 	
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UniformRandomBitGenerator.h"
+#include "Sampler.h"
 #include "Distribution.h"
 #include "Types.h"
 #include <functional>
@@ -28,7 +28,7 @@ class Material
 public:
 	virtual ~Material() = default;
 
-	// first integrate over hemisphere, then find average across averywhere
+	// first integrate over hemisphere, then find average across everywhere
 	[[nodiscard]] virtual color_real GetEmissionImportance() const = 0;
 
 	virtual void WithBsdfDistribution(
@@ -37,23 +37,23 @@ public:
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		math::UniformRandomBitGenerator<unsigned int>& randomEngine,
+		const math::Sampler<space_real>& sampler,
 		const bsdf_distribution_func& job) const = 0;
 
-	virtual color_rgbx EvaluateEmission(
+	[[nodiscard]] virtual color_rgbx EvaluateEmission(
 		const GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		math::UniformRandomBitGenerator<unsigned int>& randomEngine) const = 0;
+		const math::Sampler<space_real>& sampler) const = 0;
 
-	virtual color_rgbx EvaluateNonDeltaScattering(
+	[[nodiscard]] virtual color_rgbx EvaluateNonDeltaScattering(
 		const GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
 		const vector3& outgoingDirection,
-		math::UniformRandomBitGenerator<unsigned int>& randomEngine) const = 0;
+		const math::Sampler<space_real>& sampler) const = 0;
 };

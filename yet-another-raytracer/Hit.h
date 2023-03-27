@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "ray.hpp"
 #include "Types.h"
 
@@ -9,13 +11,15 @@ class Hit
 {
 public:
 	// Initializes successful hit
-	Hit(const vector3 & point, const vector3 & normal, const GeometryObject * object, space_real distance, const uvs_t & uvs)
+	Hit(vector3 point, vector3 normal, const GeometryObject* object, space_real distance, uvs_t uvs)
 		: _object(object)
 		, _has_occurred(true)
-		, _point(point)
-		, _normal(normal)
+		, _point(std::move(point))
+		, _normal(std::move(normal))
 		, _distance(distance)
-		, _uvs(uvs) { }
+		, _uvs(std::move(uvs))
+	{
+	}
 
 	// Initializes unsuccessful hit
 	Hit()
@@ -24,27 +28,29 @@ public:
 		, _point(vector3::zero())
 		, _normal(vector3::zero())
 		, _distance(0)
-		, _uvs({vector2(0, 0)}) { }
+		, _uvs({vector2(0, 0)})
+	{
+	}
 
-	const GeometryObject * object() const { return _object; }
+	const GeometryObject* object() const { return _object; }
 
 	// Gets value determining that hit has occurred
 	bool has_occurred() const { return _has_occurred; }
 
 	// Gets point where object was hit
-	const vector3 & point() const { return _point; }
+	const vector3& point() const { return _point; }
 
 	// Gets surface normal at point where object was hit
-	const vector3 & normal() const { return _normal; }
+	const vector3& normal() const { return _normal; }
 
 	// Gets distance from ray origin to hit point
 	space_real distance() const { return _distance; }
 
-	const uvs_t & uvs() const { return _uvs; }
-	uvs_t & uvs() { return _uvs; }
+	const uvs_t& uvs() const { return _uvs; }
+	uvs_t& uvs() { return _uvs; }
 
 private:
-	const GeometryObject * _object;
+	const GeometryObject* _object;
 	bool _has_occurred;
 	vector3 _point;
 	vector3 _normal;
