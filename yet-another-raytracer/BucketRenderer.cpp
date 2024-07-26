@@ -68,7 +68,7 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 		std::thread thread{
 			[&, sequence = sequence.get()]
 			{
-				Raytracer raytracer(std::unique_ptr<Marcher>(accelerator.CreateMarcher()));
+				Raytracer raytracer(accelerator.CreateMarcher());
 				const MonteCarloPathIntegrator integrator{&raytracer, lights, [&](const ray3& ray) { return scene.getEnvironmentColor(); }};
 
 				Film subFilm{bucketSize_};

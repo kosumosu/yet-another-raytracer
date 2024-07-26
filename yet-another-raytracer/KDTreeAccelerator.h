@@ -3,14 +3,14 @@
 #include "Accelerator.h"
 #include "KDTreeNode.h"
 
-class KDTreeAccelerator : public Accelerator
+class KDTreeAccelerator final: public Accelerator
 {
 public:
 	KDTreeAccelerator(const ObjectCollection & objects);
 	KDTreeAccelerator(const KDTreeAccelerator & other) = delete;
-	virtual ~KDTreeAccelerator(void);
+	~KDTreeAccelerator() override = default;
 
-	virtual Marcher * CreateMarcher() const override;
+	std::unique_ptr<Marcher> CreateMarcher() const override;
 
 private:
 	KDTreeNode m_root_node;

@@ -8,13 +8,8 @@ NullAccelerator::NullAccelerator(const ObjectCollection & objects)
 	std::transform(std::begin(objects), std::end(objects), std::begin(m_objects), [](auto objectPtr) { return objectPtr.get(); });
 }
 
-
-NullAccelerator::~NullAccelerator(void)
+std::unique_ptr<Marcher> NullAccelerator::CreateMarcher() const
 {
-}
-
-Marcher * NullAccelerator::CreateMarcher() const
-{
-	return new NullMarcher(&m_objects);
+	return std::make_unique<NullMarcher>(&m_objects);
 }
 

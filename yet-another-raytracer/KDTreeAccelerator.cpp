@@ -18,12 +18,7 @@ KDTreeAccelerator::KDTreeAccelerator( const ObjectCollection & objects )
 	m_max_depth = m_root_node.Build(scene_box, std::move(objects_copy));
 }
 
-
-KDTreeAccelerator::~KDTreeAccelerator(void)
+std::unique_ptr<Marcher> KDTreeAccelerator::CreateMarcher() const
 {
-}
-
-Marcher * KDTreeAccelerator::CreateMarcher() const
-{
-	return new KDTreeMarcher(m_scene_box, &m_root_node, m_max_depth);
+	return std::make_unique<KDTreeMarcher>(m_scene_box, &m_root_node, m_max_depth);
 }

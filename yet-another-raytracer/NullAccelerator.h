@@ -3,13 +3,13 @@
 #include "Accelerator.h"
 #include <vector>
 
-class NullAccelerator : public Accelerator
+class NullAccelerator final : public Accelerator
 {
 public:
 	NullAccelerator(const ObjectCollection & objects);
-	~NullAccelerator(void);
+	~NullAccelerator() override = default;
 
-	virtual Marcher * CreateMarcher() const override;
+	std::unique_ptr<Marcher> CreateMarcher() const override;
 
 private:
 	std::vector<GeometryObject*> m_objects;
