@@ -203,14 +203,14 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 					|| std::isnan(vertexThroughput[0]) || std::isnan(vertexThroughput[1]) || std::isnan(vertexThroughput[2])
 					)
 				{
-					std::cout << typeid(*hit.object()->material()).name() << "\n";
-					std::cout << std::setprecision(std::numeric_limits<space_real>::max_digits10 + 1);
-					std::cout << vertexThroughput[0] << " " << vertexThroughput[1] << " " << vertexThroughput[2] << "\n";
-					std::cout << "hit point " << hit.point()[0] << " " << hit.point()[1] << " " << hit.point()[2] << "\n";
-					std::cout << "hit normal " << hit.normal()[0] << " " << hit.normal()[1] << " " << hit.normal()[2] << "\n";
-					std::cout << "ray direction " << currentRay.direction()[0] << " " << currentRay.direction()[1] << " " << currentRay.direction()[2] << "\n";
-					std::cout << "ray origin " << currentRay.origin()[0] << " " << currentRay.origin()[1] << " " << currentRay.origin()[2] << "\n";
-					std::cout << "bsdfPdf " << bsdfPdf << "\n";
+					std::wcout << typeid(*hit.object()->material()).name() << "\n";
+					std::wcout << std::setprecision(std::numeric_limits<space_real>::max_digits10 + 1);
+					std::wcout << vertexThroughput[0] << " " << vertexThroughput[1] << " " << vertexThroughput[2] << "\n";
+					std::wcout << "hit point " << hit.point()[0] << " " << hit.point()[1] << " " << hit.point()[2] << "\n";
+					std::wcout << "hit normal " << hit.normal()[0] << " " << hit.normal()[1] << " " << hit.normal()[2] << "\n";
+					std::wcout << "ray direction " << currentRay.direction()[0] << " " << currentRay.direction()[1] << " " << currentRay.direction()[2] << "\n";
+					std::wcout << "ray origin " << currentRay.origin()[0] << " " << currentRay.origin()[1] << " " << currentRay.origin()[2] << "\n";
+					std::wcout << "bsdfPdf " << bsdfPdf << "\n";
 					throw std::exception();
 				}
 #endif

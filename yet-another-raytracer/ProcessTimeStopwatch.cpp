@@ -38,14 +38,16 @@ float ProcessTimeStopwatch::Sample() const
 }
 #else
 
+#include <ctime>
+
 void ProcessTimeStopwatch::Restart()
 {
-
+    _userStartTime = clock();
 }
 
 float ProcessTimeStopwatch::Sample() const
 {
-    return 666.0f;
+    return float(clock() - _userStartTime) / float(CLOCKS_PER_SEC);
 }
 
 #endif

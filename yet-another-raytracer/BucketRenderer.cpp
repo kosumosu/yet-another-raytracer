@@ -105,7 +105,7 @@ void BucketRenderer::Render(Film& film, const Scene& scene) const
 	renderingFinishedCallback_();
 }
 
-void BucketRenderer::PrintStats(std::ostream& stream) const
+void BucketRenderer::PrintStats(std::wostream& stream) const
 {
 	stats_.printResult(stream);
 }

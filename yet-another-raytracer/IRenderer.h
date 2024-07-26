@@ -19,5 +19,5 @@ public:
 
 	virtual void Render(Film& film, const Scene& scene) const = 0;
 
-	virtual void PrintStats(std::ostream& stream) const = 0;
+	virtual void PrintStats(std::wostream& stream) const = 0;
 };

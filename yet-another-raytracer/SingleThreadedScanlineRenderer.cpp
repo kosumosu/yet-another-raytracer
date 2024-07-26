@@ -86,7 +86,7 @@ void SingleThreadedScanlineRenderer::Render(Film& film, const Scene& scene) cons
 	renderingFinishedCallback_();
 }
 
-void SingleThreadedScanlineRenderer::PrintStats(std::ostream& stream) const
+void SingleThreadedScanlineRenderer::PrintStats(std::wostream& stream) const
 {
 	stats_.printResult(stream);
 }

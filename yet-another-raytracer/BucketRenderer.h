@@ -29,7 +29,7 @@ public:
 		rendering_finished_callback renderingFinishedCallback,
 		progress_callback progressCallback);
 	void Render(Film& film, const Scene& scene) const override;
-	void PrintStats(std::ostream& stream) const override;
+	void PrintStats(std::wostream& stream) const override;
 private:
 	uint_vector2 bucketSize_;
 	std::unique_ptr<IBucketSequencer> bucketSequencer_;

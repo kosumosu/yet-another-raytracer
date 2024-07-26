@@ -294,22 +294,22 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 		{
 			processInitTime = processTimeStopwatch.Sample();
 			realInitTime = realTimeStopwatch.Sample();
-			std::wcout << "Initialization finished. Real time=" << realInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
+			std::wcout << "Initialization finished. Real time=" << realInitTime << "sec. Process time=" << processInitTime << "sec\n";
 		},
 		[&]()
 		{
 			const auto processTotalElapsed = processTimeStopwatch.Sample();
 			const auto realTotalElapsed = realTimeStopwatch.Sample();
-			std::wcout << "Rendering finished." << std::endl;
-			std::wcout << "Real time : " << realTotalElapsed - realInitTime << "sec" << std::endl;
-			std::wcout << "Total real time : " << realTotalElapsed << "sec" << std::endl;
-			std::wcout << "Process time : " << processTotalElapsed - processInitTime << "sec" << std::endl;
-			std::wcout << "Total process time : " << processTotalElapsed << "sec" << std::endl;
+			std::wcout << "Rendering finished.\n";
+			std::wcout << "Real time : " << realTotalElapsed - realInitTime << "sec\n";
+			std::wcout << "Total real time : " << realTotalElapsed << "sec\n";
+			std::wcout << "Process time : " << processTotalElapsed - processInitTime << "sec\n";
+			std::wcout << "Total process time : " << processTotalElapsed << "sec\n";
 		},
 		[&coutMutex] (float progress)
 		{
 			std::lock_guard guard{ coutMutex };
-			std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
+			std::wcout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%\n";
 		});
 #else
 	const SingleThreadedScanlineRenderer renderer(
@@ -317,22 +317,22 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 		{
 			processInitTime = processTimeStopwatch.Sample();
 			realInitTime = realTimeStopwatch.Sample();
-			std::wcout << "Initialization finished. Real time=" << processInitTime << "sec. Process time=" << processInitTime << "sec" << std::endl;
+			std::wcout << "Initialization finished. Real time=" << processInitTime << "sec. Process time=" << processInitTime << "sec\n";
 		},
 		[&]()
 		{
 			const auto processTotalElapsed = processTimeStopwatch.Sample();
 			const auto realTotalElapsed = realTimeStopwatch.Sample();
-			std::wcout << "Rendering finished." << std::endl;
-			std::wcout << "Real time : " << realTotalElapsed - realInitTime << "sec" << std::endl;
-			std::wcout << "Total real time : " << realTotalElapsed << "sec" << std::endl;
-			std::wcout << "Process time : " << processTotalElapsed - processInitTime << "sec" << std::endl;
-			std::wcout << "Total process time : " << processTotalElapsed << "sec" << std::endl;
+			std::wcout << "Rendering finished.\n";
+			std::wcout << "Real time : " << realTotalElapsed - realInitTime << "sec\n";
+			std::wcout << "Total real time : " << realTotalElapsed << "sec\n";
+			std::wcout << "Process time : " << processTotalElapsed - processInitTime << "sec\n";
+			std::wcout << "Total process time : " << processTotalElapsed << "sec\n";
 		},
 			[&coutMutex](float progress)
 		{
 			std::lock_guard guard{ coutMutex };
-			std::cout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%" << std::endl;
+			std::wcout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%\n";
 		});
 #endif
 
@@ -340,7 +340,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 
 	renderer.Render(film, scene);
 
-	renderer.PrintStats(std::cout);
+	renderer.PrintStats(std::wcout);
 
 	film.SaveAsPng(output_image_file);
 }

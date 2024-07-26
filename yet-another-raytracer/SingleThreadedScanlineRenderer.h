@@ -22,7 +22,7 @@ public:
 		rendering_finished_callback renderingFinishedCallback,
 		progress_callback progressCallback);
 	void Render(Film& film, const Scene& scene) const override;
-	void PrintStats(std::ostream& stream) const override;
+	void PrintStats(std::wostream& stream) const override;
 private:
 	progress_callback progressCallback_;
 	initialization_finished_callback initializationFinishedCallback_;

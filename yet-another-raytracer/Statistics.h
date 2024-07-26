@@ -39,7 +39,7 @@ namespace statistics::detail
 			derived().mergeInImpl(stats);
 		}
 
-		void printResult(std::ostream& stream) const
+		void printResult(std::wostream& stream) const
 		{
 			derived().printResultImpl(stream);
 		}
@@ -80,7 +80,7 @@ namespace statistics::detail
 		{
 		}
 
-		void printResultImpl(std::ostream& /*stream*/) const
+		void printResultImpl(std::wostream& /*stream*/) const
 		{
 		}
 	};
@@ -121,16 +121,15 @@ namespace statistics::detail
 			nonLightCarryingBundles_ += stats.nonLightCarryingBundles_;
 		}
 
-		void printResultImpl(std::ostream& stream) const
+		void printResultImpl(std::wostream& stream) const
 		{
-			stream << "Stats:" << std::endl;
-			stream << "Total paths: " << std::setprecision(3) << double(lightCarryingPaths_ + nonLightCarryingPaths_) / 1'000'000'000.0 << " bln" << std::endl;
-			stream << "Total bundles: " << std::setprecision(3) << double(lightCarryingBundles_ + nonLightCarryingBundles_) / 1'000'000'000.0 << " bln" <<
-				std::endl;
+			stream << "Stats:\n";
+			stream << "Total paths: " << std::setprecision(3) << double(lightCarryingPaths_ + nonLightCarryingPaths_) / 1'000'000'000.0 << " bln\n";
+			stream << "Total bundles: " << std::setprecision(3) << double(lightCarryingBundles_ + nonLightCarryingBundles_) / 1'000'000'000.0 << " bln\n";
 			stream << "Light carrying paths: " << std::setprecision(3) << double(lightCarryingPaths_) / double(lightCarryingPaths_ + nonLightCarryingPaths_) *
-				100.0 << "%" << std::endl;
+				100.0 << "%\n";
 			stream << "Light carrying bundles: " << std::setprecision(3) << double(lightCarryingBundles_) / double(
-				lightCarryingBundles_ + nonLightCarryingBundles_) * 100.0 << "%" << std::endl;
+				lightCarryingBundles_ + nonLightCarryingBundles_) * 100.0 << "%\n";
 		}
 	};
 }
