@@ -147,11 +147,12 @@ void InsertTriangle(Scene& scene)
 	material1->emission(color_rgbx(0.01f, 0.03f, 0.075f, 1.0f));
 	scene.getMaterials().insert(std::make_pair("InsertTriangle()::material1", material1));
 
-	std::shared_ptr<FlatTriangleObject> object1(new FlatTriangleObject());
+	std::shared_ptr<FlatTriangleObject> object1(new FlatTriangleObject(
+            {0.0f, 0.0f, 0.0f},
+            {0.0f, 2.0f, 0.0f},
+            {0.0f, 0.0f, 1.0f}
+            ));
 	object1->material(material1.get());
-	object1->vertex0(vector3(0.0f, 0.0f, 0.0f));
-	object1->vertex1(vector3(0.0f, 2.0f, 0.0f));
-	object1->vertex2(vector3(0.0f, 0.0f, 1.0f));
 
 	scene.objects().push_back(std::move(object1));
 }
@@ -173,11 +174,12 @@ void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& s
 
 		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), sampler);
 
-		std::shared_ptr<FlatTriangleObject> object{new FlatTriangleObject{}};
+		std::shared_ptr<FlatTriangleObject> object{new FlatTriangleObject{
+                pivot + math::linearRand(min_bound, max_bound, sampler),
+                pivot + math::linearRand(min_bound, max_bound, sampler),
+                pivot + math::linearRand(min_bound, max_bound, sampler)
+        }};
 		object->material(material.get());
-		object->vertex0(pivot + math::linearRand(min_bound, max_bound, sampler));
-		object->vertex1(pivot + math::linearRand(min_bound, max_bound, sampler));
-		object->vertex2(pivot + math::linearRand(min_bound, max_bound, sampler));
 
 		scene.objects().push_back(object);
 	}
@@ -288,7 +290,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 
 #if true
 	const BucketRenderer renderer(
-		{16, 16},
+		{32, 32},
 		std::make_unique<TopDownSequencer>(),
 		[&]()
 		{

@@ -2,29 +2,28 @@
 
 #include <limits>
 
-constexpr space_real EPSILON = std::numeric_limits<space_real>::min() * space_real(16.0);
 
+namespace {
+    constexpr space_real EPSILON = std::numeric_limits<space_real>::min() * space_real(16.0);
 
-template <std::size_t... Indices>
-uvs_t interpolateUVs_impl(const uvs_t& uvs0, const uvs_t& uvs1, const uvs_t& uvs2, space_real u, space_real v, space_real w, std::index_sequence<Indices...>)
-{
-	return uvs_t{{(uvs0[Indices] * w + uvs1[Indices] * u + uvs2[Indices] * v)...}};
-}
+    template<std::size_t... Indices>
+    uvs_t interpolateUVs_impl(const uvs_t &uvs0, const uvs_t &uvs1, const uvs_t &uvs2, space_real u, space_real v,
+                              std::index_sequence<Indices...>) {
+        return uvs_t{{(uvs0[Indices] + uvs1[Indices] * u + uvs2[Indices] * v)...}};
+    }
 
-uvs_t interpolateUVs(const uvs_t& uvs0, const uvs_t& uvs1, const uvs_t& uvs2, space_real u, space_real v, space_real w)
-{
-	return interpolateUVs_impl(uvs0, uvs1, uvs2, u, v, w, std::make_index_sequence<UVS_COUNT>());
+    uvs_t
+    interpolateUVs(const uvs_t &uvs0, const uvs_t &uvs1, const uvs_t &uvs2, space_real u, space_real v) {
+        return interpolateUVs_impl(uvs0, uvs1, uvs2, u, v, std::make_index_sequence<UVS_COUNT>());
+    }
 }
 
 // Implementation of "Fast, minimum storage ray/triangle intersection" by Tomas Moller & Ben Trumbore (MT97)
 Hit FlatTriangleObject::FindHit(const ray3& ray, space_real minDistance, space_real maxDistance) const
 {
-	const auto edge1 = _vertex1 - _vertex0;
-	const auto edge2 = _vertex2 - _vertex0;
+	const auto p = math::cross(ray.direction(), _edge02);
 
-	const auto p = math::cross(ray.direction(), edge2);
-
-	const auto det = math::dot(p, edge1);
+	const auto det = math::dot(p, _edge01);
 
 	//if (det > -EPSILON && det < EPSILON)
 	if (det == space_real(0.0))
@@ -38,33 +37,28 @@ Hit FlatTriangleObject::FindHit(const ray3& ray, space_real minDistance, space_r
 	if (u < space_real(0.0) || u > space_real(1.0))
 		return Hit();
 
-	const auto q = math::cross(t, edge1);
+	const auto q = math::cross(t, _edge01);
 
 	const space_real v = math::dot(q, ray.direction()) * inv_det;
 
 	if (v < space_real(0.0) || u + v > space_real(1.0))
 		return Hit();
 
-	const space_real dist = math::dot(q, edge2) * inv_det;
+	const space_real dist = math::dot(q, _edge02) * inv_det;
 
 	if (dist < minDistance || dist > maxDistance)
 		return Hit();
 
-	const space_real w = space_real(1) - u - v;
+	const auto hit_point = _vertex0 + u * _edge01 + v * _edge02;
 
-	const auto hit_point = w * _vertex0 + u * _vertex1 + v * _vertex2;
-
-	return Hit(hit_point, _normal, this, dist, interpolateUVs(_uvs0, _uvs1, _uvs2, u, v, w));
+	return Hit(hit_point, _normal, this, dist, interpolateUVs(_uvs0, _uvs_edge01, _uvs_edge02, u, v));
 }
 
 bool FlatTriangleObject::DoesHit(const ray3& ray, space_real minDistance, space_real maxDistance) const
 {
-	const auto edge1 = _vertex1 - _vertex0;
-	const auto edge2 = _vertex2 - _vertex0;
+	const auto p = math::cross(ray.direction(), _edge02);
 
-	const auto p = math::cross(ray.direction(), edge2);
-
-	const space_real det = math::dot(p, edge1);
+	const space_real det = math::dot(p, _edge01);
 
 	//if (det > -EPSILON && det < EPSILON)
 	if (det == space_real(0.0))
@@ -78,33 +72,26 @@ bool FlatTriangleObject::DoesHit(const ray3& ray, space_real minDistance, space_
 	if (u < space_real(0.0) || u > space_real(1.0))
 		return false;
 
-	const auto q = math::cross(t, edge1);
+	const auto q = math::cross(t, _edge01);
 
 	const space_real v = math::dot(q, ray.direction()) * inv_det;
 
 	if (v < space_real(0.0) || u + v > space_real(1.0))
 		return false;
 
-	const space_real dist = math::dot(q, edge2) * inv_det;
+	const space_real dist = math::dot(q, _edge02) * inv_det;
 
 	return dist >= minDistance && dist <= maxDistance;
-}
-
-void FlatTriangleObject::calculate_normal()
-{
-	_normal = math::normalize(math::cross(_vertex1 - _vertex0, _vertex2 - _vertex0));
 }
 
 
 void FlatTriangleObject::PrepareForRendering()
 {
-	calculate_normal();
-
 	bounding_box3 bbox;
 
-	bbox.Include(_vertex0);
-	bbox.Include(_vertex1);
-	bbox.Include(_vertex2);
+	bbox.Include(vertex0());
+	bbox.Include(vertex1());
+	bbox.Include(vertex2());
 
 	bbox.ExtendForEpsilon();
 
@@ -170,7 +157,7 @@ bounding_box3 FlatTriangleObject::GetBoundsWithinBounds(const bounding_box3& box
 
 space_real FlatTriangleObject::GetPreciseOneSidedSurfaceArea() const
 {
-	return math::length(math::cross(_vertex1 - _vertex0, _vertex2 - _vertex0)) * space_real(0.5);
+	return math::length(math::cross(_edge01, _edge02)) * space_real(0.5);
 }
 
 space_real FlatTriangleObject::GetOneSidedSurfaceArea() const
@@ -188,11 +175,10 @@ math::random_sample<surface_point, space_real> FlatTriangleObject::PickRandomPoi
 
 	const auto finalU = isOnTheOtherHalfOfTheParallelogram ? space_real(1) - rawU : rawU;
 	const auto finalV = isOnTheOtherHalfOfTheParallelogram ? space_real(1) - rawV : rawV;
-	const auto finalW = space_real(1) - finalU - finalV;
 
-	const auto finalPoint = _vertex0 * finalW + _vertex1 * finalU + _vertex2 * finalV;
+	const auto finalPoint = _vertex0 + _edge01 * finalU + _edge02 * finalV;
 	return math::random_sample<surface_point, space_real>(
-		surface_point(finalPoint, _normal, interpolateUVs(_uvs0, _uvs1, _uvs2, finalW, finalU, finalV)),
+		surface_point(finalPoint, _normal, interpolateUVs(_uvs0, _uvs_edge01, _uvs_edge02, finalU, finalV)),
 		space_real(1.0) / GetPreciseOneSidedSurfaceArea(),
 		false);
 }
