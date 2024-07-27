@@ -69,7 +69,7 @@ void BlinnMaterial::WithBsdfDistribution(
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(
 					direction,
-					[=]()
+					[=, this]()
 					{
 						return translucency_ * (color_rgbx::fill(1.0) - specular_);
 					}),
@@ -81,7 +81,7 @@ void BlinnMaterial::WithBsdfDistribution(
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(
 					direction,
-					[=]()
+					[=, this]()
 					{
 						return diffuseColor * (color_rgbx::fill(1.0) - specular_) * (color_rgbx::fill(1.0) - translucency_);
 					}),
@@ -119,7 +119,7 @@ void BlinnMaterial::WithBsdfDistribution(
 		return math::random_sample<const bsdf_sample, space_real>(
 			bsdf_sample(
 				reflected_direction,
-				[=]()
+				[=, this]()
 				{
 					return specular_ / color_real(std::abs(cosTheta));
 				}),

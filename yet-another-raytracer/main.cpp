@@ -172,7 +172,7 @@ void InsertRandomTriangles(Scene& scene, unsigned int count, const space_real& s
 		const vector3 min_bound = vector3::fill(-size);
 		const vector3 max_bound = vector3::fill(size);
 
-		auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), sampler);
+		const auto pivot = math::linearRand(vector3::fill(-2.0), vector3::fill(2.0), sampler);
 
 		std::shared_ptr<FlatTriangleObject> object{new FlatTriangleObject{
                 pivot + math::linearRand(min_bound, max_bound, sampler),

@@ -27,7 +27,7 @@ void SkyLightSource::DoWithDistribution(const LightingContext & context, math::S
 				light_sample(
 					direction,
 					std::numeric_limits<space_real>::max(),
-					[=]()
+					[=, this]()
 					{
 						return m_color;
 					}

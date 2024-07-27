@@ -195,7 +195,7 @@ void DielectricMaterial::WithBsdfDistribution(
 					return math::random_sample<const bsdf_sample, space_real>(
 						bsdf_sample(
 							refraction.refractedDirection,
-							[=]()
+							[=, this]()
 							{
 								return surfaceTransparency_ * color_real(
 									transmission * color_real((iorFrom * iorFrom) / (iorTo * iorTo)) / std::abs(

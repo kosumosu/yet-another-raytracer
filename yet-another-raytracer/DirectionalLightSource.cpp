@@ -33,7 +33,7 @@ void DirectionalLightSource::DoWithDistribution(const LightingContext & context,
 						light_sample(
 							_direction,
 							std::numeric_limits<space_real>::max(),
-							[=]()
+							[this]()
 							{
 								return _color;
 							}
