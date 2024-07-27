@@ -6,6 +6,7 @@ class RayIntegrator;
 class Film;
 class Scene;
 
+template <class TAccelerator>
 class IRenderer
 {
 public:
@@ -17,7 +18,7 @@ public:
 
 	virtual ~IRenderer() = default;
 
-	virtual void Render(Film& film, const Scene& scene) const = 0;
+	virtual void Render(Film& film, const Scene& scene, const TAccelerator& accelerator) const = 0;
 
 	virtual void PrintStats(std::wostream& stream) const = 0;
 };

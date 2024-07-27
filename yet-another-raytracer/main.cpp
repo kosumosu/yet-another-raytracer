@@ -21,6 +21,7 @@
 #include "SingleThreadedScanlineRenderer.h"
 #include "BucketRenderer.h"
 #include "TopDownSequencer.h"
+#include "NullAccelerator.h"
 
 #include <iostream>
 #include <iomanip>
@@ -288,8 +289,10 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 	float processInitTime;
 	float realInitTime;
 
+    NullAccelerator accelerator{ scene.objects() };
+
 #if true
-	const BucketRenderer renderer(
+	const BucketRenderer<typeof(accelerator)> renderer(
 		{32, 32},
 		std::make_unique<TopDownSequencer>(),
 		[&]()
@@ -340,7 +343,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 
 	scene.PrepareForRendering();
 
-	renderer.Render(film, scene);
+	renderer.Render(film, scene, accelerator);
 
 	renderer.PrintStats(std::wcout);
 
