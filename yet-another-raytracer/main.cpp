@@ -22,6 +22,7 @@
 #include "BucketRenderer.h"
 #include "TopDownSequencer.h"
 #include "NullAccelerator.h"
+#include "KDTreeAccelerator.h"
 
 #include <iostream>
 #include <iomanip>
@@ -289,7 +290,10 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 	float processInitTime;
 	float realInitTime;
 
-    NullAccelerator accelerator{ scene.objects() };
+    scene.PrepareForRendering();
+
+//    NullAccelerator accelerator{ scene.objects() };
+    KDTreeAccelerator accelerator{ scene.objects() };
 
 #if true
 	const BucketRenderer<typeof(accelerator)> renderer(
@@ -340,8 +344,6 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 			std::wcout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%\n";
 		});
 #endif
-
-	scene.PrepareForRendering();
 
 	renderer.Render(film, scene, accelerator);
 
