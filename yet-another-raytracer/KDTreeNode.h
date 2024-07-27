@@ -11,6 +11,22 @@ enum class NodeKind
 
 class KDTreeNode
 {
+    bool m_leaf;
+    unsigned int m_split_axis;
+    union
+    {
+        struct
+        {
+            space_real m_split_coord;
+            KDTreeNode * m_subnodes[2];
+        };
+
+        struct
+        {
+            const std::vector<GeometryObject*> * m_objects;
+        };
+    };
+
 public:
 	KDTreeNode(void);
 	~KDTreeNode(void);
@@ -55,25 +71,6 @@ public:
 	unsigned int Build(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
 
 private:
-	bool m_leaf;
-	unsigned int m_split_axis;
-	union
-	{
-		struct
-		{
-			space_real m_split_coord;
-			KDTreeNode * m_subnodes[2];
-		};
-
-		struct
-		{
-			const std::vector<GeometryObject*> * m_objects;
-		};
-	};
-	
-	
-
-
 	unsigned int BeacomeALeaf(std::vector<GeometryObject*> && objects);
 	unsigned int BecomeABranch(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
 	unsigned int GetSplittingAxis(const bounding_box3 & box, const std::vector<GeometryObject*> & objects) const;

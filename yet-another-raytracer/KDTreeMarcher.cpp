@@ -35,7 +35,7 @@ void KDTreeMarcher::Restart(const ray3 & ray, space_real near, space_real far)
 		return;
 
 	m_stack.clear();
-	m_stack.push_back(KDTraverseFrame(biased_near, biased_far, m_root_node));
+	m_stack.emplace_back(biased_near, biased_far, m_root_node);
 }
 
 const std::vector<GeometryObject*> * KDTreeMarcher::GetCurrentObjects()
@@ -51,7 +51,7 @@ bool KDTreeMarcher::MarcheNext()
 	if (m_stack.empty())
 		return false;
 
-	auto & frame = m_stack.back();
+	const auto & frame = m_stack.back();
 	const KDTreeNode * node = frame.node();
 	space_real dist_near = frame.near();
 	space_real dist_far = frame.far();
