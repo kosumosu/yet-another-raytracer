@@ -30,14 +30,18 @@ namespace renderers
         using progress_callback = std::function<void(float progress)>;
         using initialization_finished_callback = std::function<void()>;
         using rendering_finished_callback = std::function<void()>;
+        using area_finished_callback = std::function<void(const Film& result)>;
+        using area_started_callback = std::function<area_finished_callback(const uint_vector2& top_left, const uint_vector2& bottom_right)>;
 
     private:
         uint_vector2 bucketSize_;
         std::unique_ptr<IBucketSequencer> bucketSequencer_;
         initialization_finished_callback initializationFinishedCallback_;
-        progress_callback progressCallback_;
+        area_started_callback areaStartedCallback_;
         rendering_finished_callback renderingFinishedCallback_;
+        progress_callback progressCallback_;
 
+        mutable std::mutex thisMutex_;
         mutable statistics::Stats stats_;
 
     public:
@@ -47,18 +51,19 @@ namespace renderers
                 std::unique_ptr<IBucketSequencer> bucketSequencer,
                 initialization_finished_callback initializationFinishedCallback,
                 rendering_finished_callback renderingFinishedCallback,
+                area_started_callback areaStartedCallback,
                 progress_callback progressCallback)
                 : bucketSize_(std::move(bucketSize)), bucketSequencer_(std::move(bucketSequencer)),
                   initializationFinishedCallback_(std::move(initializationFinishedCallback)),
-                  progressCallback_(std::move(progressCallback)),
-                  renderingFinishedCallback_(std::move(renderingFinishedCallback)) {
+                  renderingFinishedCallback_(std::move(renderingFinishedCallback)),
+                  areaStartedCallback_(std::move(areaStartedCallback)),
+                  progressCallback_(std::move(progressCallback))
+        {
 
         }
 
 
-        void Render(Film &film, const Scene &scene, const TAccelerator &accelerator, area_started_reporter_t report_area_started) const override {
-            //	const KDTreeAccelerator accelerator(scene.objects());
-            //        const NullAccelerator accelerator(scene.objects());
+        void Render(Film &film, const Scene &scene, const TAccelerator &accelerator) const override {
 
             std::vector<const LightSource *> lights(scene.lights().size());
             std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights),
@@ -102,7 +107,7 @@ namespace renderers
                             const uint_vector2 bucketMaxCorner = math::min(bucketMinCorner + bucketSize_, cropEnd);
                             const uint_vector2 bucketSize = bucketMaxCorner - bucketMinCorner;
 
-                            auto reportAreaFinished = report_area_started(bucketMinCorner, bucketMaxCorner);
+                            auto reportAreaFinished = areaStartedCallback_(bucketMinCorner, bucketMaxCorner);
 
                             ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize});
                             film.transferFilm(subFilm, bucketMinCorner, bucketSize);
@@ -112,7 +117,10 @@ namespace renderers
                             progressCallback_(float(localCompletedCount) * oneOverTotalBuckets);
                         }
 
-                        stats_.mergeIn(integrator.getStats());
+                        {
+                            std::unique_lock lock{thisMutex_};
+                            stats_.mergeIn(integrator.getStats());
+                        }
                     }
                 };
                 threads.push_back(std::move(thread));

@@ -81,6 +81,7 @@ target_link_libraries(yet_another_raytracer
 
 
 target_compile_options(yet_another_raytracer PRIVATE "-Wno-deprecated-enum-enum-conversion")
+target_link_options(yet_another_raytracer PRIVATE "-municode")
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(yet_another_raytracer PRIVATE "-ffast-math" "-funroll-loops" "-O3" "-Wno-deprecated-enum-enum-conversion")
 endif ()

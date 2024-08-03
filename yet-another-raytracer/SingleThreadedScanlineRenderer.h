@@ -35,7 +35,7 @@ namespace renderers
 
         }
 
-        void Render(Film& film, const Scene& scene, const TAccelerator& accelerator, area_started_reporter_t report_area_started) const override {
+        void Render(Film& film, const Scene& scene, const TAccelerator& accelerator) const override {
             Raytracer raytracer(accelerator.CreateMarcher());
 
             std::vector<const LightSource*> lights(scene.lights().size());

@@ -60,7 +60,12 @@ std::filesystem::path GetPathWithoutExtension(const std::filesystem::path& input
 
 void Render(const std::filesystem::path& scene_file, const std::filesystem::path& output_image_file)
 {
+#if true
     applications::ConsoleApplication application;
+#else
+    applications::NanaApplicaion application;
+#endif
+
 
     application.run(
         [&scene_file, &output_image_file](
@@ -92,7 +97,6 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
             InsertRandomTriangles(scene, 20, 1.0, engine);
             //InsertSkyLight(scene, 128);
 #endif
-
 
             std::mutex coutMutex;
             ProcessTimeStopwatch processTimeStopwatch;
@@ -138,6 +142,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
                         processTotalElapsed
                     ));
                 },
+                reportAeaStarted,
                 reportProgress);
 #else
 	const SingleThreadedScanlineRenderer renderer(
@@ -167,7 +172,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 			progressReporter);
 #endif
 
-            renderer.Render(film, scene, accelerator, reportAeaStarted);
+            renderer.Render(film, scene, accelerator);
 
             reportRenderingFinihsed(film);
 
@@ -179,7 +184,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 }
 
 #if defined(_WIN32)
-int _tmain(int argc, _TCHAR* argv[])
+int wmain(int argc, const wchar_t* argv[])
 {
     if (argc < 2)
         return 0;
