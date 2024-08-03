@@ -44,6 +44,8 @@ add_executable(yet_another_raytracer
         applications/IApplication.h
         applications/ConsoleApplication.h
         SceneGeneration.h
+        applications/NanaApplication.h
+        applications/NanaApplication.cpp
 )
 
 target_include_directories(yet_another_raytracer PRIVATE ".")

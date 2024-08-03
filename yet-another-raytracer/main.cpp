@@ -16,6 +16,7 @@
 
 #include "applications/IApplication.h"
 #include "applications/ConsoleApplication.h"
+// #include "applications/NanaApplication.h"
 
 #include <iostream>
 #include <iomanip>
