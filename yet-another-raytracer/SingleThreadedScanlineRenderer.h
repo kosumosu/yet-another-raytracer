@@ -1,9 +1,11 @@
 #pragma once
 
 #include "IRenderer.h"
+#include "Film.h"
 #include "Hashing.h"
 #include "Scene.h"
 #include "Statistics.h"
+#include "RayIntegrator.h"
 #include "Raytracer.h"
 #include "LightSource.h"
 #include "MonteCarloPathIntegrator.h"
@@ -11,9 +13,6 @@
 
 #include <functional>
 
-class RayIntegrator;
-class Film;
-class Scene;
 
 template <class TAccelerator>
 class SingleThreadedScanlineRenderer final : public IRenderer<TAccelerator>

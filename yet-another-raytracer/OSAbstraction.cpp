@@ -6,7 +6,7 @@
 
 void openImageFileForDisplay(const std::filesystem::path& imageFileName)
 {
-	ShellExecute(nullptr, L"Open", imageFileName.wstring().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+	ShellExecuteW(nullptr, L"Open", imageFileName.wstring().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 #elif defined(__linux__)
