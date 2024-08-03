@@ -63,7 +63,11 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
     applications::ConsoleApplication application;
 
     application.run(
-        [&scene_file, &output_image_file](auto progressReporter, auto print_info)
+        [&scene_file, &output_image_file](
+        const auto& reportProgress,
+        const auto& reportAeaStarted,
+        const auto& reportRenderingFinihsed,
+        const auto& print_info)
         {
             Scene scene;
 
@@ -106,7 +110,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
             KDTreeAccelerator accelerator{scene.objects()};
 
 #if true
-            const BucketRenderer<typeof(accelerator)> renderer(
+            const renderers::BucketRenderer<typeof(accelerator)> renderer(
                 {32, 32},
                 std::make_unique<TopDownSequencer>(),
                 [&]()
@@ -134,7 +138,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
                         processTotalElapsed
                     ));
                 },
-                progressReporter);
+                reportProgress);
 #else
 	const SingleThreadedScanlineRenderer renderer(
 		[&]()
@@ -163,7 +167,9 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 			progressReporter);
 #endif
 
-            renderer.Render(film, scene, accelerator);
+            renderer.Render(film, scene, accelerator, reportAeaStarted);
+
+            reportRenderingFinihsed(film);
 
             renderer.PrintStats(std::wcout);
 

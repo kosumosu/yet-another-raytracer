@@ -21,6 +21,15 @@ namespace applications
                        std::lock_guard guard{cout_mutex_};
                        std::wcout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%\n";
                    },
+                   [](const auto& top_left, const auto& bottom_right)
+                   {
+                       return [](const auto& film)
+                       {
+                       };
+                   },
+                   [](const auto& film)
+                   {
+                   },
                    [this](const std::wstring& text)
                    {
                        std::lock_guard guard{cout_mutex_};
