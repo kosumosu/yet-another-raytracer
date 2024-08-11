@@ -17,6 +17,7 @@ namespace math
 	class vector<TSpace, DIMENSIONS, std::enable_if_t<(DIMENSIONS > 0)>/*, std::index_sequence<Indices2...>*/>
 	{
 	public:
+		using element_t = TSpace;
 
 		using MyT = vector<TSpace, DIMENSIONS, void>;
 

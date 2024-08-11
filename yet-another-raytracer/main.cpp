@@ -16,7 +16,7 @@
 
 #include "applications/IApplication.h"
 #include "applications/ConsoleApplication.h"
-// #include "applications/NanaApplication.h"
+#include "applications/NanaApplication.h"
 
 #include <iostream>
 #include <iomanip>
@@ -61,7 +61,7 @@ std::filesystem::path GetPathWithoutExtension(const std::filesystem::path& input
 
 void Render(const std::filesystem::path& scene_file, const std::filesystem::path& output_image_file)
 {
-#if true
+#if false
     applications::ConsoleApplication application;
 #else
     applications::NanaApplicaion application;
@@ -70,6 +70,8 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 
     application.run(
         [&scene_file, &output_image_file](
+        const auto& stopToken,
+        const auto& initialize,
         const auto& reportProgress,
         const auto& reportAeaStarted,
         const auto& reportRenderingFinihsed,
@@ -108,6 +110,8 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
             Film film({scene.viewport_width(), scene.viewport_height()});
             float processInitTime;
             float realInitTime;
+
+            initialize({scene.viewport_width(), scene.viewport_height()});
 
             scene.PrepareForRendering();
 
@@ -173,7 +177,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 			progressReporter);
 #endif
 
-            renderer.Render(film, scene, accelerator);
+            renderer.Render(film, scene, accelerator, stopToken);
 
             reportRenderingFinihsed(film);
 

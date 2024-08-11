@@ -27,7 +27,7 @@ namespace renderers
     template<class TAccelerator>
     class BucketRenderer final : public IRenderer<TAccelerator> {
     public:
-        using progress_callback = std::function<void(float progress)>;
+        using progress_callback = std::function<void(const size_t nom, const size_t denom)>;
         using initialization_finished_callback = std::function<void()>;
         using rendering_finished_callback = std::function<void()>;
         using area_finished_callback = std::function<void(const Film& result)>;
@@ -63,7 +63,7 @@ namespace renderers
         }
 
 
-        void Render(Film &film, const Scene &scene, const TAccelerator &accelerator) const override {
+        void Render(Film &film, const Scene &scene, const TAccelerator &accelerator, const std::stop_token& stopToken) const override {
 
             std::vector<const LightSource *> lights(scene.lights().size());
             std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights),
@@ -79,7 +79,7 @@ namespace renderers
             const uint_vector2 cropEnd = cropStart + cropSize;
             const uint_vector2 gridSize = math::intDivideRoundUp(cropSize, bucketSize_);
 
-            const float oneOverTotalBuckets = 1.0f / float(gridSize[0] * gridSize[1]); // for timer
+            const auto totalBuckets = gridSize[0] * gridSize[1];
 
             auto sequence = bucketSequencer_->CreateSequence(gridSize);
 
@@ -102,7 +102,11 @@ namespace renderers
 
                         barrier.arrive_and_wait();
 
-                        for (auto bucketCoord = sequence->getNext(); bucketCoord; bucketCoord = sequence->getNext()) {
+                        for (
+                            auto bucketCoord = sequence->getNext();
+                            bucketCoord.has_value() && !stopToken.stop_requested();
+                            bucketCoord = sequence->getNext())
+                        {
                             const uint_vector2 bucketMinCorner = cropStart + bucketSize_ * *bucketCoord;
                             const uint_vector2 bucketMaxCorner = math::min(bucketMinCorner + bucketSize_, cropEnd);
                             const uint_vector2 bucketSize = bucketMaxCorner - bucketMinCorner;
@@ -114,7 +118,7 @@ namespace renderers
                             const auto localCompletedCount = ++completedCount;
 
                             reportAreaFinished(subFilm);
-                            progressCallback_(float(localCompletedCount) * oneOverTotalBuckets);
+                            progressCallback_(localCompletedCount, totalBuckets);
                         }
 
                         {

@@ -31,6 +31,7 @@ using bounding_box3 = math::bounding_box<space_real, 3>;
 using color_real = float;
 using color_rgb = math::vector<color_real, 3>;
 using color_rgbx = math::vector<color_real, 4>;
+using color_u8rgb = math::vector<uint8_t, 3>;
 
 constexpr std::size_t UVS_COUNT = 1;
 using uvs_t = std::array<vector2, UVS_COUNT>;

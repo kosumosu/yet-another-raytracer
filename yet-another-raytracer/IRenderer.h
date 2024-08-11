@@ -1,7 +1,6 @@
 #pragma once
 
-#include <functional>
-#include <ostream>
+#include <stop_token>
 
 class RayIntegrator;
 class Film;
@@ -21,7 +20,7 @@ namespace renderers
 
 		virtual ~IRenderer() = default;
 
-		virtual void Render(Film& film, const Scene& scene, const TAccelerator& accelerator) const = 0;
+		virtual void Render(Film& film, const Scene& scene, const TAccelerator& accelerator, const std::stop_token& stopToken) const = 0;
 
 		virtual void PrintStats(std::wostream& stream) const = 0;
 	};
