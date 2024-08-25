@@ -72,7 +72,7 @@ namespace applications
                             graphics = nana::paint::graphics{{film_size[0], film_size[1]}};
                             form.size({film_size[0], film_size[1] + 16});
                         },
-                        [&progress_bar, &progress_label, this](const size_t nom, const size_t denom)
+                        [&progress_bar, &progress_label, &form, this](const size_t nom, const size_t denom)
                         {
                             std::lock_guard guard{mutex_};
                             progress_bar.amount(denom);
@@ -81,6 +81,8 @@ namespace applications
                             auto progress_text = std::format(L"{:.2f}%", progress_percent);
                             progress_bar.caption(progress_text);
                             progress_label.caption(std::move(progress_text));
+
+                            form.caption(std::format(L"YART {:.2f}%", progress_percent));
                             //std::wcout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%\n";
                         },
                         [&drawing, &graphics, &pb, this](const auto& top_left, const auto& bottom_right)
@@ -92,25 +94,27 @@ namespace applications
 
                             return [&graphics, &pb, &drawing, top_left, bottom_right, this](const Film& film)
                             {
-                                std::unique_lock guard{mutex_};
-                                pb.attach(graphics.handle(), to_nana_rectange(top_left, bottom_right));
+                                std::vector<nana::pixel_color_t> buffer(film.width() * film.height());
 
-                                const auto stride = pb.bytes_per_line() / sizeof(nana::pixel_color_t);
-                                auto line_raw_ptr = pb[0];
-
-                                for (auto y = 0U; y < film.height(); ++y, line_raw_ptr += stride)
+                                for (auto y = 0U; y < film.height(); ++y)
                                 {
                                     for (auto x = 0U; x < film.width(); ++x)
                                     {
                                         const auto color = film.getPixelTonemapped(x, y);
-                                        auto& element = line_raw_ptr[x].element;
+                                        auto& element = buffer[y * film.width() + x].element;
                                         element.red = color[0];
                                         element.green = color[1];
                                         element.blue = color[2];
                                         element.alpha_channel = 255;
-
                                     }
                                 }
+
+                                nana::paint::pixel_buffer pb { film.width(), film.height()};
+
+                                pb.put(reinterpret_cast<const unsigned char*>(buffer.data()), film.width(), film.height(), 32, film.width() * sizeof(nana::pixel_color_t), true);
+
+                                std::unique_lock guard{mutex_};
+                                pb.paste(graphics.handle(), { int(top_left[0]), int(top_left[1]) });
 
                                 graphics.set_changed();
                                 drawing.update();
