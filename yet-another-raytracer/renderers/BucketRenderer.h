@@ -113,12 +113,16 @@ namespace renderers
 
                             auto reportAreaFinished = areaStartedCallback_(bucketMinCorner, bucketMaxCorner);
 
-                            ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize});
+                            ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize}, stopToken);
                             film.transferFilm(subFilm, bucketMinCorner, bucketSize);
-                            const auto localCompletedCount = ++completedCount;
 
                             reportAreaFinished(subFilm);
-                            progressCallback_(localCompletedCount, totalBuckets);
+
+                            {
+                                std::unique_lock lock{thisMutex_};
+                                const auto localCompletedCount = ++completedCount;
+                                progressCallback_(localCompletedCount, totalBuckets);
+                            }
                         }
 
                         {
@@ -150,9 +154,11 @@ namespace renderers
 
         void
         ProcessBucket(Film &film, const uint_vector2 &wholeFilmSize, const Scene &scene, const RayIntegrator &rayIntegrator,
-                      const Bucket &bucket) const {
+                      const Bucket &bucket, const std::stop_token& stopToken) const {
             for (size_t y = 0; y < bucket.size[1]; ++y) {
                 for (size_t x = 0; x < bucket.size[0]; ++x) {
+                    if (stopToken.stop_requested())
+                        return;
                     const uint_vector2 localCoord{x, y};
                     ProcessPixel(film, wholeFilmSize, scene, rayIntegrator, localCoord, bucket.start + localCoord);
                 }

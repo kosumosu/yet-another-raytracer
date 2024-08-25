@@ -4,8 +4,8 @@
 #include "SceneGeneration.h"
 
 #include "OSAbstraction.h"
-#include "SingleThreadedScanlineRenderer.h"
-#include "BucketRenderer.h"
+#include "renderers/SingleThreadedScanlineRenderer.h"
+#include "renderers/BucketRenderer.h"
 #include "TopDownSequencer.h"
 #include "NullAccelerator.h"
 #include "KDTreeAccelerator.h"
