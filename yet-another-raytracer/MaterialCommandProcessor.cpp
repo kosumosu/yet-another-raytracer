@@ -7,17 +7,15 @@
 
 MaterialCommandProcessor::MaterialCommandProcessor(void)
 	: _ambient(color_rgbx::zero())
-	, _emission(color_rgbx::zero())
-	, _diffuse(color_rgbx::fill(1))
-	, _specular(color_rgbx::zero())
-	, _shininess(0)
-	, _translucency(color_rgbx::zero())
-	, _iorInside(1)
-	, _iorOutside(1)
-	, _surfaceTransparency(color_rgbx::zero()) { }
-
-
-MaterialCommandProcessor::~MaterialCommandProcessor(void)
+	  , _emission(color_rgbx::zero())
+	  , _diffuseMap(nullptr)
+      , _diffuse(color_rgbx::fill(1))
+	  , _specular(color_rgbx::zero())
+	  , _shininess(0)
+	  , _translucency(color_rgbx::zero())
+	  , _iorInside(1)
+	  , _iorOutside(1)
+	  , _surfaceTransparency(color_rgbx::zero())
 {
 }
 
@@ -36,7 +34,7 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	}
 	else if (command == "blinn")
 	{
-		const auto id = ParserHelper::ReadId(stream);
+		auto id = ParserHelper::ReadId(stream);
 
 		auto material = std::make_unique<BlinnMaterial>(_emission + _ambient, _diffuseMap, _diffuse, _specular, _shininess, _translucency);
 		const auto materialRawPointer = material.get();

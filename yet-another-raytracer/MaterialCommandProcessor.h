@@ -11,7 +11,6 @@ class MaterialCommandProcessor : public CommandProcessor
 {
 public:
 	MaterialCommandProcessor(void);
-	virtual ~MaterialCommandProcessor(void);
 
 	void PrepareContext(LoadingContext & context) override;
 
