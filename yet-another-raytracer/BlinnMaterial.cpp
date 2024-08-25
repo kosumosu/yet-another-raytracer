@@ -181,7 +181,8 @@ color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(
 	const math::Sampler<space_real>& sampler) const
 {
 	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, sampler);
-	return math::is_obtuse_angle(incidentDirection, normal)
+	const bool isSameSide = math::is_acute_angle(incidentDirection , normal) ^ math::is_acute_angle(outgoingDirection , normal);
+	return isSameSide
 		? diffuseColor * (color_rgbx::fill(1.0) - specular_) * (color_rgbx::fill(1.0) - translucency_)
 		: (color_rgbx::fill(1.0) - specular_) * translucency_;
 }
