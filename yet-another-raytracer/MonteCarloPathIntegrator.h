@@ -7,6 +7,7 @@
 #include "Statistics.h"
 
 #include <functional>
+#include <optional>
 
 class Hit;
 class GeometryObject;
@@ -23,7 +24,7 @@ private:
 
 	mutable statistics::Stats stats_;
 
-	math::discrete_distribution<const LightSource*, color_real> lightDistribution_;
+	std::optional<math::discrete_distribution<const LightSource*, color_real>> lightDistribution_;
 	color_real oneOverTotalPower_;
 
 public:

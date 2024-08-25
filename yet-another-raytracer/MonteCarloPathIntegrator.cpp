@@ -14,7 +14,7 @@
 #include <random>
 #include <utility>
 
-constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
+constexpr space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(1024.0);
 //constexpr space_real BIAS = space_real(0); // std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 
 
@@ -22,24 +22,34 @@ MonteCarloPathIntegrator::MonteCarloPathIntegrator(const Raytracer* raytracer, c
 	: raytracer_(raytracer)
 	, infinityEvaluator_(std::move(infinityEvaluator))
 {
-	std::vector<std::pair<const LightSource*, color_real>> lightsWithWeights;
-	lightsWithWeights.reserve(lights.size());
-
-	color_real totalPower = {0};
-	for (const auto& light : lights)
+	if (lights.empty())
 	{
-		const auto power = light->GetApproximateTotalPower();
-		totalPower += power;
-		if (power > color_real(0.0))
-		{
-			lightsWithWeights.emplace_back(light, power);
-		}
+		oneOverTotalPower_ = 0.0f;
+		lightDistribution_ = std::nullopt;
 	}
+	else
+	{
+		std::vector<std::pair<const LightSource*, color_real>> lightsWithWeights;
+		lightsWithWeights.reserve(lights.size());
 
-	oneOverTotalPower_ = color_real(1.0) / totalPower;
+		color_real totalPower = {0};
+		for (const auto& light : lights)
+		{
+			const auto power = light->GetApproximateTotalPower();
+			totalPower += power;
+			if (power > color_real(0.0))
+			{
+				lightsWithWeights.emplace_back(light, power);
+			}
+		}
 
-	lightDistribution_ = math::discrete_distribution<const LightSource*, color_real>{std::begin(lightsWithWeights), std::end(lightsWithWeights)};
-	// TODO
+		oneOverTotalPower_ = color_real(1.0) / totalPower;
+
+		lightDistribution_ = math::discrete_distribution<const LightSource*, color_real>{
+			std::begin(lightsWithWeights), std::end(lightsWithWeights)
+		};
+		// TODO
+	}
 }
 
 
@@ -50,6 +60,9 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 	const bsdf_distribution& bsdfDistribution,
 	math::Sampler<space_real>& sampler) const
 {
+	if (!lightDistribution_.has_value())
+		return color_rgbx::zero();
+
 	color_rgbx radianceAtCurrentPathVertex{color_rgbx::zero()};
 	const LightingContext context{ hit.object(), hit.point(), hit.normal(), BIAS, 1, false };
 	
@@ -58,7 +71,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRadianceByLightsAtVertex(
 	{
 		return color_real(sampler.Get1D());
 	};
-	const auto sampledLight = lightDistribution_.GetRandomElement(randomFunc);
+	const auto sampledLight = lightDistribution_->GetRandomElement(randomFunc);
 	const auto light = sampledLight.getValue();
 	light->DoWithDistribution(
 		context,
