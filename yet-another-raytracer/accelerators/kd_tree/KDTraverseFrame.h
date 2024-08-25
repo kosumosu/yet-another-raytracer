@@ -2,6 +2,8 @@
 
 #include "Types.h"
 
+namespace accelerators::kd_tree
+{
 class KDTreeNode;
 
 class KDTraverseFrame
@@ -34,3 +36,4 @@ private:
 	const KDTreeNode * m_node;
 };
 
+}

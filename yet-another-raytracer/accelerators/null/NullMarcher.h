@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Marcher.h"
-#include <memory>
 
+namespace accelerators::null {
 class NullMarcher final : public Marcher {
     const std::vector<GeometryObject *> *m_objects;
     bool m_marched;
@@ -20,3 +20,4 @@ public:
     bool IsCorrectIntersectionForCurrentState(space_real dist) const override;
 };
 
+}

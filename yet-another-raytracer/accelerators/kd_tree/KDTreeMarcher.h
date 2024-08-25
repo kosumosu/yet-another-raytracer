@@ -4,13 +4,15 @@
 #include "KDTraverseFrame.h"
 #include <vector>
 
+
+namespace accelerators::kd_tree
+{
 class KDTreeNode;
 
 class KDTreeMarcher : public Marcher
 {
 public:
 	KDTreeMarcher(const bounding_box3 & scene_box, const KDTreeNode * root_node, unsigned int max_depth);
-	~KDTreeMarcher(void);
 
 	void Restart(const ray3 & ray, space_real near, space_real far) override;
 
@@ -32,3 +34,4 @@ private:
 	space_real m_dist_far;
 };
 
+}

@@ -1,16 +1,20 @@
 #pragma once
 
-#include "Accelerator.h"
+#include "../Accelerator.h"
 #include "KDTreeNode.h"
+#include "KDTreeMarcher.h"
 
-class KDTreeAccelerator final: public Accelerator
+namespace accelerators::kd_tree
+{
+
+class KDTreeAccelerator final: public Accelerator<KDTreeMarcher>
 {
 public:
 	KDTreeAccelerator(const ObjectCollection & objects);
 	KDTreeAccelerator(const KDTreeAccelerator & other) = delete;
 	~KDTreeAccelerator() override = default;
 
-	std::unique_ptr<Marcher> CreateMarcher() const override;
+	KDTreeMarcher CreateMarcher() const override;
 
 private:
 	KDTreeNode m_root_node;
@@ -18,3 +22,4 @@ private:
 	unsigned int m_max_depth;
 };
 
+}

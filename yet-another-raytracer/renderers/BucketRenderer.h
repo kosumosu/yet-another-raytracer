@@ -9,13 +9,14 @@
 #include "Types.h"
 #include "ThreadBarrier.hpp"
 #include "Raytracer.h"
-#include "MonteCarloPathIntegrator.h"
+#include "integrators/MonteCarloPathIntegrator.h"
 #include "Film.h"
 
 #include <atomic>
 #include <functional>
 #include <mutex>
 #include <thread>
+#include <accelerators/kd_tree/KDTreeAccelerator.h>
 
 namespace renderers
 {
@@ -55,8 +56,8 @@ namespace renderers
                 progress_callback progressCallback)
                 : bucketSize_(std::move(bucketSize)), bucketSequencer_(std::move(bucketSequencer)),
                   initializationFinishedCallback_(std::move(initializationFinishedCallback)),
-                  renderingFinishedCallback_(std::move(renderingFinishedCallback)),
                   areaStartedCallback_(std::move(areaStartedCallback)),
+                  renderingFinishedCallback_(std::move(renderingFinishedCallback)),
                   progressCallback_(std::move(progressCallback))
         {
 
@@ -94,9 +95,12 @@ namespace renderers
             for (unsigned int i = 0; i < threadCount; ++i) {
                 std::thread thread{
                     [&, sequence = sequence.get()] {
-                        Raytracer raytracer(accelerator.CreateMarcher());
-                        const MonteCarloPathIntegrator integrator{&raytracer, lights,
-                                                                  [&](const ray3 &ray) { return scene.getEnvironmentColor(); }};
+                        auto raytracer = Raytracer{accelerator.CreateMarcher()};
+                        MonteCarloPathIntegrator integrator{
+                            std::move(raytracer),
+                            lights,
+                            [&](const ray3& ray) { return scene.getEnvironmentColor(); }
+                        };
 
                         Film subFilm{bucketSize_};
 
@@ -153,7 +157,7 @@ namespace renderers
     private:
 
         void
-        ProcessBucket(Film &film, const uint_vector2 &wholeFilmSize, const Scene &scene, const RayIntegrator &rayIntegrator,
+        ProcessBucket(Film &film, const uint_vector2 &wholeFilmSize, const Scene &scene, RayIntegrator &rayIntegrator,
                       const Bucket &bucket, const std::stop_token& stopToken) const {
             for (size_t y = 0; y < bucket.size[1]; ++y) {
                 for (size_t x = 0; x < bucket.size[0]; ++x) {
@@ -169,7 +173,7 @@ namespace renderers
                 Film &subFilm,
                 const uint_vector2 &wholeFilmSize,
                 const Scene &scene,
-                const RayIntegrator &rayIntegrator,
+                RayIntegrator &rayIntegrator,
                 const uint_vector2 &subFilmCoord,
                 const uint_vector2 &wholeFilmCoord) const {
             const unsigned seed = xxhash32(wholeFilmCoord);

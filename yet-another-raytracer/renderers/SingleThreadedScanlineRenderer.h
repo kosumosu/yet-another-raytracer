@@ -5,11 +5,11 @@
 #include "Hashing.h"
 #include "Scene.h"
 #include "Statistics.h"
-#include "RayIntegrator.h"
+#include "integrators/RayIntegrator.h"
 #include "Raytracer.h"
 #include "LightSource.h"
-#include "MonteCarloPathIntegrator.h"
-#include "StdHigheResolutionClockStopwatch.h"
+#include "integrators/MonteCarloPathIntegrator.h"
+#include "StdHighResolutionClockStopwatch.h"
 
 #include <functional>
 
@@ -35,7 +35,7 @@ namespace renderers
 
         }
 
-        void Render(Film& film, const Scene& scene, const TAccelerator& accelerator) const override {
+        void Render(Film& film, const Scene& scene, const TAccelerator& accelerator, const std::stop_token& stopToken) const override {
             Raytracer raytracer(accelerator.CreateMarcher());
 
             std::vector<const LightSource*> lights(scene.lights().size());
@@ -56,9 +56,9 @@ namespace renderers
 
 
             timer.Restart();
-            for (unsigned int y = startY; y < endY; ++y)
+            for (unsigned int y = startY; y < endY && !stopToken.stop_requested(); ++y)
             {
-                for (unsigned int x = startX; x < endX; ++x)
+                for (unsigned int x = startX; x < endX && !stopToken.stop_requested(); ++x)
                 {
                     ProcessPixel(film, scene, integrator, x, y);
 
@@ -82,7 +82,7 @@ namespace renderers
         initialization_finished_callback initializationFinishedCallback_;
         rendering_finished_callback renderingFinishedCallback_;
 
-        void ProcessPixel(Film& film, const Scene& scene, const RayIntegrator& rayIntegrator, unsigned int x, unsigned int y) const {
+        void ProcessPixel(Film& film, const Scene& scene, RayIntegrator& rayIntegrator, unsigned int x, unsigned int y) const {
             const unsigned seed = xxhash32({x, y});
             math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
 
@@ -103,6 +103,5 @@ namespace renderers
 
             film.setPixel({x, y}, averageColor);
         }
-
     };
 }

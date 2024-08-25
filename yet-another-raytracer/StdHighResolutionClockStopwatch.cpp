@@ -1,4 +1,4 @@
-#include "StdHigheResolutionClockStopwatch.h"
+#include "StdHighResolutionClockStopwatch.h"
 
 void StdHigheResolutionClockStopwatch::Restart()
 {

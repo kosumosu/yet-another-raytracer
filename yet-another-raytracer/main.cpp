@@ -7,8 +7,8 @@
 #include "renderers/SingleThreadedScanlineRenderer.h"
 #include "renderers/BucketRenderer.h"
 #include "TopDownSequencer.h"
-#include "NullAccelerator.h"
-#include "KDTreeAccelerator.h"
+#include "accelerators/null/NullAccelerator.h"
+#include "accelerators/kd_tree/KDTreeAccelerator.h"
 
 #include "Scene.h"
 #include "SceneLoader.h"
@@ -116,7 +116,7 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
             scene.PrepareForRendering();
 
             //    NullAccelerator accelerator{ scene.objects() };
-            KDTreeAccelerator accelerator{scene.objects()};
+            accelerators::kd_tree::KDTreeAccelerator accelerator{scene.objects()};
 
 #if true
             const renderers::BucketRenderer<typeof(accelerator)> renderer(

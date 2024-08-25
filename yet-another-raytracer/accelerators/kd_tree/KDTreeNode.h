@@ -3,6 +3,8 @@
 #include "GeometryObject.h"
 #include "bounding_box.hpp"
 
+namespace accelerators::kd_tree
+{
 enum class NodeKind
 {
 	Near,
@@ -78,3 +80,4 @@ private:
 	space_real FindSplittingPlane(const bounding_box3 & box, unsigned int axis, const std::vector<GeometryObject*> & sorted_objects) const;
 	unsigned int GenerateSubNodes(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
 };
+}
