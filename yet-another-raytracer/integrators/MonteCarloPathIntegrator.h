@@ -20,7 +20,7 @@ class MonteCarloPathIntegrator final : public RayIntegrator
 {
 public:
     using raytracer_t = Raytracer<TMarcher>;
-    using infinity_func = std::function<color_rgbx(const ray3& ray)>;
+    using infinity_func = std::function<color_rgb(const ray3& ray)>;
 
 private:
     constexpr static space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(1024.0);
@@ -70,11 +70,11 @@ public:
         }
     }
 
-    color_rgbx EvaluateRay(const ray3& ray, unsigned bounceLimit, space_real bias,
+    color_rgb EvaluateRay(const ray3& ray, unsigned bounceLimit, space_real bias,
                            math::Sampler<space_real>& sampler) override
     {
-        color_rgbx integral(color_rgbx::zero());
-        color_rgbx throughput(color_rgbx::fill(1));
+        color_rgb integral(color_rgb::zero());
+        color_rgb throughput(color_rgb::fill(1));
 
         ray3 currentRay = ray;
         bool accountForEmission = true;
@@ -104,7 +104,7 @@ public:
                 [&](const bsdf_distribution& bsdfDistribution)
                 {
                     const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
-                    color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
+                    color_rgb radianceAtCurrentPathVertex(color_rgb::zero());
 
                     if (bsdfDistribution.has_non_delta_component())
                         radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(
@@ -117,7 +117,7 @@ public:
                             hit.normal(),
                             hit.uvs(),
                             currentRay.direction(),
-                            sampler);
+                            sampler).reduce();
 
                     const auto samplePayload = radianceAtCurrentPathVertex * throughput;
                     assert(!math::anyNan(samplePayload));
@@ -210,7 +210,7 @@ public:
                     [&](const bsdf_distribution& bsdfDistribution)
                     {
                         const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
-                        color_rgbx radianceAtCurrentPathVertex(color_rgbx::zero());
+                        color_rgb radianceAtCurrentPathVertex(color_rgb::zero());
                         if (bsdfDistribution.has_non_delta_component())
                             radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(
                                 currentRay, hit, entering, bsdfDistribution, sampler);
@@ -222,7 +222,7 @@ public:
                                 hit.normal(),
                                 hit.uvs(),
                                 currentRay.direction(),
-                                sampler);
+                                sampler).reduce();
 
                         const auto samplePayload = radianceAtCurrentPathVertex * throughput;
                         assert(!math::anyNan(samplePayload));

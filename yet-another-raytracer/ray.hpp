@@ -8,7 +8,7 @@ namespace math
 	class ray
 	{
 	public:
-		ray(void)
+		ray()
 			: m_origin(vector<TSpace, DIMENSIONS>::zero())
 			, m_direction(vector<TSpace, DIMENSIONS>::zero())
 			, m_inversed_direction(vector<TSpace, DIMENSIONS>::zero())
