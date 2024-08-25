@@ -28,7 +28,7 @@ public:
     }
 
     // intersections with objectToIgonore are ignored if (ignoreBackface == true and ray hits it's backface) or (ignoreBackface == false and ray hits frontface).
-    [[nodiscard]] Hit TraceRay(const ray3& ray, space_real minDistance, space_real maxDistance, const GeometryObject* objectToIgnore,
+    [[nodiscard]] Hit TraceRay(const ray3& ray, space_real minDistance, space_real maxDistance, const objects::GeometryObject* objectToIgnore,
                  const vector3& directionToIgnore)
     {
         m_marcher.Restart(ray, minDistance, maxDistance);
@@ -61,7 +61,7 @@ public:
     }
 
     [[nodiscard]] bool DoesIntersect(const ray3& ray, space_real minDistance, space_real maxDistance,
-                       const GeometryObject* objectToIgnore, const vector3& directionToIgnore)
+                       const objects::GeometryObject* objectToIgnore, const vector3& directionToIgnore)
     {
         m_marcher.Restart(ray, minDistance, maxDistance);
         while (m_marcher.MarcheNext())

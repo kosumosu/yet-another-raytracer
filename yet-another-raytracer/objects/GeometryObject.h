@@ -13,6 +13,8 @@
 
 class Material;
 
+namespace objects {
+
 struct surface_point
 {
 	surface_point(vector3 point, vector3 normal, uvs_t uvs)
@@ -68,4 +70,6 @@ private:
 	bounding_box3 boundingBox_;
 };
 
-using ObjectCollection = std::vector<std::shared_ptr<GeometryObject>>;
+}
+
+using ObjectCollection = std::vector<std::shared_ptr<objects::GeometryObject>>;

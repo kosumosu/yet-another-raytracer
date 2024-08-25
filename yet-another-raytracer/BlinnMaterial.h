@@ -57,7 +57,7 @@ public:
 	color_real GetEmissionImportance() const override;
 
 	void WithBsdfDistribution(
-		const GeometryObject& object,
+		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
@@ -66,7 +66,7 @@ public:
 		const bsdf_distribution_func& job) const override;
 
 	color_rgbx EvaluateEmission(
-		const GeometryObject& object,
+		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
@@ -74,7 +74,7 @@ public:
 		const math::Sampler<space_real>& sampler) const override;
 
 	color_rgbx EvaluateNonDeltaScattering(
-		const GeometryObject& object,
+		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
@@ -86,7 +86,7 @@ private:
 	color_real GetReflectionProbability() const;
 
 	color_rgbx EvaluateDiffuseColor(
-		const ::GeometryObject& object,
+		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const vector2& uv,

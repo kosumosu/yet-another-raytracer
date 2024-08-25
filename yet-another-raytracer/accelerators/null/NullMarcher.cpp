@@ -2,7 +2,7 @@
 
 namespace accelerators::null
 {
-    NullMarcher::NullMarcher(const std::vector<GeometryObject *> *objects)
+    NullMarcher::NullMarcher(const std::vector<objects::GeometryObject *> *objects)
             : m_objects(objects), m_marched(false) {
     }
 
@@ -10,7 +10,7 @@ namespace accelerators::null
         m_marched = false;
     }
 
-    const std::vector<GeometryObject *> *NullMarcher::GetCurrentObjects() {
+    const std::vector<objects::GeometryObject *> *NullMarcher::GetCurrentObjects() {
         return m_objects;
     }
 

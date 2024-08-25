@@ -6,7 +6,11 @@
 #include <functional>
 #include <utility>
 
-class GeometryObject;
+namespace objects
+{
+	class GeometryObject;
+}
+
 
 struct bsdf_sample
 {
@@ -32,7 +36,7 @@ public:
 	[[nodiscard]] virtual color_real GetEmissionImportance() const = 0;
 
 	virtual void WithBsdfDistribution(
-		const GeometryObject& object,
+		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
@@ -41,7 +45,7 @@ public:
 		const bsdf_distribution_func& job) const = 0;
 
 	[[nodiscard]] virtual color_rgbx EvaluateEmission(
-		const GeometryObject& object,
+		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,
@@ -49,7 +53,7 @@ public:
 		const math::Sampler<space_real>& sampler) const = 0;
 
 	[[nodiscard]] virtual color_rgbx EvaluateNonDeltaScattering(
-		const GeometryObject& object,
+		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
 		const uvs_t& uvs,

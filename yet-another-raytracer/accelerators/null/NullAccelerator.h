@@ -17,6 +17,6 @@ namespace accelerators::null
 		[[nodiscard]] NullMarcher CreateMarcher() const override;
 
 	private:
-		std::vector<GeometryObject*> m_objects;
+		std::vector<objects::GeometryObject*> m_objects;
 	};
 }

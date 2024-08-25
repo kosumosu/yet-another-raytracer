@@ -17,7 +17,7 @@ color_real BlinnMaterial::GetReflectionProbability() const
 }
 
 color_rgbx BlinnMaterial::EvaluateDiffuseColor(
-	const GeometryObject& object,
+	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
 	const vector2& uv,
@@ -37,7 +37,7 @@ color_rgbx BlinnMaterial::EvaluateDiffuseColor(
 }
 
 void BlinnMaterial::WithBsdfDistribution(
-	const GeometryObject& object,
+	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
 	const uvs_t& uvs,
@@ -154,7 +154,7 @@ void BlinnMaterial::WithBsdfDistribution(
 }
 
 color_rgbx BlinnMaterial::EvaluateEmission(
-	const GeometryObject& object,
+	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
 	const uvs_t& uvs,
@@ -172,7 +172,7 @@ color_rgbx BlinnMaterial::EvaluateEmission(
 }
 
 color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(
-	const GeometryObject& object,
+	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
 	const uvs_t& uvs,

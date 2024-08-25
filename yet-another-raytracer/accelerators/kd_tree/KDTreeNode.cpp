@@ -20,7 +20,7 @@ namespace accelerators::kd_tree
             delete m_objects;
     }
 
-    unsigned int KDTreeNode::Build(const bounding_box3& box, std::vector<GeometryObject*>&& objects)
+    unsigned int KDTreeNode::Build(const bounding_box3& box, std::vector<objects::GeometryObject*>&& objects)
     {
         assert(!box.empty());
         //_ASSERT(objects->size() != 0);
@@ -35,15 +35,15 @@ namespace accelerators::kd_tree
         }
     }
 
-    unsigned int KDTreeNode::BeacomeALeaf(std::vector<GeometryObject*>&& objects)
+    unsigned int KDTreeNode::BeacomeALeaf(std::vector<objects::GeometryObject*>&& objects)
     {
         m_leaf = true;
-        m_objects = new std::vector<GeometryObject*>(std::move(objects));
+        m_objects = new std::vector<objects::GeometryObject*>(std::move(objects));
 
         return 1;
     }
 
-    unsigned int KDTreeNode::BecomeABranch(const bounding_box3& box, std::vector<GeometryObject*>&& objects)
+    unsigned int KDTreeNode::BecomeABranch(const bounding_box3& box, std::vector<objects::GeometryObject*>&& objects)
     {
         m_split_axis = GetSplittingAxis(box, objects);
         //SortObjects(objects);
@@ -55,7 +55,7 @@ namespace accelerators::kd_tree
     }
 
     unsigned int KDTreeNode::GetSplittingAxis(const bounding_box3& box,
-                                              const std::vector<GeometryObject*>& objects) const
+                                              const std::vector<objects::GeometryObject*>& objects) const
     {
 #if true
         auto diff = box.max_corner() - box.min_corner();
@@ -101,7 +101,7 @@ namespace accelerators::kd_tree
     }
 
 
-    void KDTreeNode::SortObjects(std::vector<GeometryObject*>& objects)
+    void KDTreeNode::SortObjects(std::vector<objects::GeometryObject*>& objects)
     {
         std::sort(objects.begin(), objects.end(),
                   [&](const auto& obj0, const auto& obj1)
@@ -113,7 +113,7 @@ namespace accelerators::kd_tree
 
 
     space_real KDTreeNode::FindSplittingPlane(const bounding_box3& box, unsigned int axis,
-                                              const std::vector<GeometryObject*>& objects) const
+                                              const std::vector<objects::GeometryObject*>& objects) const
     {
         return (box.min_corner()[axis] + box.max_corner()[axis]) * space_real(0.5);
 
@@ -121,13 +121,13 @@ namespace accelerators::kd_tree
         //return (*sorted_objects)[split_index]->bounding_box().min_corner()[m_split_axis];
     }
 
-    unsigned int KDTreeNode::GenerateSubNodes(const bounding_box3& box, std::vector<GeometryObject*>&& objects)
+    unsigned int KDTreeNode::GenerateSubNodes(const bounding_box3& box, std::vector<objects::GeometryObject*>&& objects)
     {
         bounding_box3 left_box, right_box;
         box.Split(m_split_axis, m_split_coord, left_box, right_box);
 
-        std::vector<GeometryObject*> left_objects;
-        std::vector<GeometryObject*> right_objects;
+        std::vector<objects::GeometryObject*> left_objects;
+        std::vector<objects::GeometryObject*> right_objects;
         left_objects.reserve(objects.size());
         right_objects.reserve(objects.size());
 

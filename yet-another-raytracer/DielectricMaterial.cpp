@@ -143,7 +143,7 @@ color_real DielectricMaterial::GetEmissionImportance() const
 }
 
 void DielectricMaterial::WithBsdfDistribution(
-	const GeometryObject& object,
+	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
 	const uvs_t& uvs,
@@ -208,7 +208,7 @@ void DielectricMaterial::WithBsdfDistribution(
 }
 
 color_rgbx DielectricMaterial::EvaluateEmission(
-	const GeometryObject& object,
+	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
 	const uvs_t& uvs,
@@ -219,7 +219,7 @@ color_rgbx DielectricMaterial::EvaluateEmission(
 }
 
 color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(
-	const GeometryObject& object,
+	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
 	const uvs_t& uvs,

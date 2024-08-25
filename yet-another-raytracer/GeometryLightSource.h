@@ -3,9 +3,8 @@
 #include "LightSource.h"
 #include "discrete_distribution.hpp"
 #include "Types.h"
-#include "GeometryObject.h"
+#include "objects/GeometryObject.h"
 
-class GeometryObject;
 
 class GeometryLightSource : public LightSource
 {
@@ -19,7 +18,7 @@ public:
 
 	color_real GetApproximateTotalPower() const override;
 private:
-	math::discrete_distribution<const GeometryObject*, color_real> _distribution;
-	std::vector<const GeometryObject*> _objects;
+	math::discrete_distribution<const objects::GeometryObject*, color_real> _distribution;
+	std::vector<const objects::GeometryObject*> _objects;
 	color_real _totalPower;
 };

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Camera.h"
-#include "GeometryObject.h"
+#include "objects/GeometryObject.h"
 #include "LightSource.h"
+#include "Material.h"
 #include "Texture.h"
 
 #include <map>

@@ -16,7 +16,7 @@ public:
 
 	void Restart(const ray3 & ray, space_real near, space_real far) override;
 
-	const std::vector<GeometryObject*> * GetCurrentObjects() override;
+	const std::vector<objects::GeometryObject*> * GetCurrentObjects() override;
 
 	bool MarcheNext() override;
 

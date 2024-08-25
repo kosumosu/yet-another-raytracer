@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GeometryObject.h"
+#include "objects/GeometryObject.h"
 #include "bounding_box.hpp"
 
 namespace accelerators::kd_tree
@@ -25,7 +25,7 @@ class KDTreeNode
 
         struct
         {
-            const std::vector<GeometryObject*> * m_objects;
+            const std::vector<objects::GeometryObject*> * m_objects;
         };
     };
 
@@ -43,7 +43,7 @@ public:
 
 	KDTreeNode * right_node() const { return m_subnodes[1]; }
 
-	const std::vector<GeometryObject*> * objects() const { return m_objects; }
+	const std::vector<objects::GeometryObject*> * objects() const { return m_objects; }
 
 	const KDTreeNode * GetNearSubnode(const vector3 & direction) const
 	{
@@ -70,14 +70,14 @@ public:
 	}
 
 	// Returns maximum levels of subtree. Node becomes objects owner!
-	unsigned int Build(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
+	unsigned int Build(const bounding_box3 & box, std::vector<objects::GeometryObject*> && objects);
 
 private:
-	unsigned int BeacomeALeaf(std::vector<GeometryObject*> && objects);
-	unsigned int BecomeABranch(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
-	unsigned int GetSplittingAxis(const bounding_box3 & box, const std::vector<GeometryObject*> & objects) const;
-	void SortObjects(std::vector<GeometryObject*> & objects);
-	space_real FindSplittingPlane(const bounding_box3 & box, unsigned int axis, const std::vector<GeometryObject*> & sorted_objects) const;
-	unsigned int GenerateSubNodes(const bounding_box3 & box, std::vector<GeometryObject*> && objects);
+	unsigned int BeacomeALeaf(std::vector<objects::GeometryObject*> && objects);
+	unsigned int BecomeABranch(const bounding_box3 & box, std::vector<objects::GeometryObject*> && objects);
+	unsigned int GetSplittingAxis(const bounding_box3 & box, const std::vector<objects::GeometryObject*> & objects) const;
+	void SortObjects(std::vector<objects::GeometryObject*> & objects);
+	space_real FindSplittingPlane(const bounding_box3 & box, unsigned int axis, const std::vector<objects::GeometryObject*> & sorted_objects) const;
+	unsigned int GenerateSubNodes(const bounding_box3 & box, std::vector<objects::GeometryObject*> && objects);
 };
 }

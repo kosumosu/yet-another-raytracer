@@ -6,7 +6,7 @@ using lighting_functional_distribution = FunctionalDistribution<std::optional<li
 
 GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 {
-	std::vector<std::pair<const GeometryObject*, color_real>> objectsWithWeights;
+	std::vector<std::pair<const objects::GeometryObject*, color_real>> objectsWithWeights;
 
 	color_real totalPower = { 0 };
 	for (const auto & object : objects)
@@ -21,7 +21,7 @@ GeometryLightSource::GeometryLightSource(const ObjectCollection & objects)
 	}
 
 	_totalPower = totalPower;
-	_distribution = math::discrete_distribution<const GeometryObject*, color_real>(std::begin(objectsWithWeights), std::end(objectsWithWeights));
+	_distribution = math::discrete_distribution<const objects::GeometryObject*, color_real>(std::begin(objectsWithWeights), std::end(objectsWithWeights));
 }
 
 void GeometryLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const

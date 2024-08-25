@@ -2,7 +2,8 @@
 
 #include "GeometryObject.h"
 #include "Types.h"
-#include <exception>
+
+namespace objects {
 
 class TransfromableGeometryObject : public GeometryObject
 {
@@ -21,11 +22,6 @@ public:
 		, m_inverse_transform(math::inverse(transform))
 	{
 	}
-
-	virtual ~TransfromableGeometryObject(void)
-	{
-	}
-	
 	
 	void transform(const matrix4 & value)
 	{
@@ -46,3 +42,4 @@ private:
 	matrix4 m_inverse_transform;
 
 };
+}

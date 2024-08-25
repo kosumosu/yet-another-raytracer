@@ -11,7 +11,7 @@ add_executable(yet_another_raytracer
         DielectricMaterial.cpp
         DirectionalLightSource.cpp
         Film.cpp
-        FlatTriangleObject.cpp
+        objects/FlatTriangleObject.cpp
         GeometryLightSource.cpp
         accelerators/kd_tree/KDTreeAccelerator.cpp
         accelerators/kd_tree/KDTreeMarcher.cpp
@@ -32,7 +32,7 @@ add_executable(yet_another_raytracer
         SettingsCommandFactory.cpp
         SettingsCommandProcessor.cpp
         SkyLightSource.cpp
-        SphereObject.cpp
+        objects/SphereObject.cpp
         StdHighResolutionClockStopwatch.cpp
         TextureCommandFactory.cpp
         TextureCommandProcessor.cpp
@@ -46,6 +46,7 @@ add_executable(yet_another_raytracer
         applications/NanaApplication.cpp
         cloudscape/cloudscape_scene.h
         cloudscape/cloudscape_integrator.h
+        cloudscape/prepared_scene.h
 )
 
 target_include_directories(yet_another_raytracer PRIVATE ".")

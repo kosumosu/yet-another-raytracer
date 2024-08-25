@@ -9,7 +9,6 @@ class ObjectCommandProcessor : public CommandProcessor
 {
 public:
 	ObjectCommandProcessor(void);
-	virtual ~ObjectCommandProcessor(void);
 
 	void PrepareContext(LoadingContext & context) override;
 

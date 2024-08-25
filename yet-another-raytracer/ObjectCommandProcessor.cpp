@@ -1,18 +1,14 @@
 #include "ObjectCommandProcessor.h"
 
-#include "FlatTriangleObject.h"
-#include "SphereObject.h"
+#include "objects/FlatTriangleObject.h"
+#include "objects/SphereObject.h"
 #include "ParserHelper.h"
 #include <memory>
 
-ObjectCommandProcessor::ObjectCommandProcessor(void)
+ObjectCommandProcessor::ObjectCommandProcessor()
 {
 }
 
-
-ObjectCommandProcessor::~ObjectCommandProcessor(void)
-{
-}
 
 void ObjectCommandProcessor::PrepareContext( LoadingContext & context )
 {
@@ -53,10 +49,10 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 
 		uvs_t zeroUVs({ vector2::zero() });
 
-		FlatTriangleObject * triangle = new FlatTriangleObject(vertex0, vertex1, vertex2, zeroUVs, zeroUVs, zeroUVs);
+		auto triangle = std::make_shared<objects::FlatTriangleObject>(vertex0, vertex1, vertex2, zeroUVs, zeroUVs, zeroUVs);
 		triangle->material(context.material());
 
-		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(triangle));
+		context.scene()->objects().push_back(std::move(triangle));
 	}
 	else if (command == "triUV")
 	{
@@ -76,10 +72,10 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 		const vector2 vertex1uv = _uvs[uvIndex1];
 		const vector2 vertex2uv = _uvs[uvIndex2];
 
-		FlatTriangleObject * triangle = new FlatTriangleObject(vertex0, vertex1, vertex2, uvs_t({vertex0uv}), uvs_t({ vertex1uv }), uvs_t({ vertex2uv }));
+		auto triangle = std::make_shared<objects::FlatTriangleObject>(vertex0, vertex1, vertex2, uvs_t({vertex0uv}), uvs_t({ vertex1uv }), uvs_t({ vertex2uv }));
 		triangle->material(context.material());
 
-		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(triangle));
+		context.scene()->objects().push_back(std::move(triangle));
 	}
 	else if (command == "trinormal")
 	{
@@ -89,13 +85,13 @@ void ObjectCommandProcessor::ProcessCommand( LoadingContext & context, const std
 	{
 		auto center = ParserHelper::ReadVec3(stream);
 		space_real radius = ParserHelper::ReadSpaceReal(stream);
-		SphereObject * sphere = new SphereObject();
+		auto sphere = std::make_shared<objects::SphereObject>();
 		sphere->center(center);
 		sphere->radius(radius);
 		sphere->transform(context.transform());
 		sphere->material(context.material());
 
-		context.scene()->objects().push_back(std::shared_ptr<GeometryObject>(sphere));
+		context.scene()->objects().push_back(std::move(sphere));
 	}
 	else
 	{

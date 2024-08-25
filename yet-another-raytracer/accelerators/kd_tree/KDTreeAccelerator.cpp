@@ -7,7 +7,7 @@ namespace accelerators::kd_tree
     KDTreeAccelerator::KDTreeAccelerator(const ObjectCollection& objects)
     {
         bounding_box3 scene_box;
-        std::vector<GeometryObject*> objects_copy(objects.size());
+        std::vector<objects::GeometryObject*> objects_copy(objects.size());
         std::transform(std::begin(objects), std::end(objects), std::begin(objects_copy),
                        [](auto objectPtr) { return objectPtr.get(); });
 

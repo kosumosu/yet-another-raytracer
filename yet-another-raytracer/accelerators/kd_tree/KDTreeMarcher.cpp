@@ -34,7 +34,7 @@ namespace accelerators::kd_tree
 		m_stack.emplace_back(biased_near, biased_far, m_root_node);
 	}
 
-	const std::vector<GeometryObject*> * KDTreeMarcher::GetCurrentObjects()
+	const std::vector<objects::GeometryObject*> * KDTreeMarcher::GetCurrentObjects()
 	{
 		return m_current_leaf->objects();
 	}
