@@ -10,7 +10,7 @@ namespace statistics::detail
 	class Statistics
 	{
 	public:
-		void registerPath(bool carriesLight)
+		void registerPath(bool carriesLight, size_t length)
 		{
 			if (carriesLight)
 			{
@@ -20,6 +20,7 @@ namespace statistics::detail
 			{
 				derived().registerNonLightCarryingPathImpl();
 			}
+			derived().registerPathLength(length);
 		}
 
 		void registerBundle(bool carriesLight)
@@ -76,7 +77,11 @@ namespace statistics::detail
 		{
 		}
 
-		void mergeInImpl(const NopStatistics& stats)
+		void registerPathLength(std::size_t /*length*/)
+		{
+		}
+
+		void mergeInImpl(const NopStatistics& /*stats*/)
 		{
 		}
 
@@ -92,6 +97,8 @@ namespace statistics::detail
 		std::size_t nonLightCarryingPaths_ = 0;
 		std::size_t lightCarryingBundles_ = 0;
 		std::size_t nonLightCarryingBundles_ = 0;
+		std::size_t pathLengthSum_ = 0;
+		std::size_t maxPathLength_ = 0;
 	protected:
 		void registerLightCarryingPathImpl()
 		{
@@ -113,23 +120,35 @@ namespace statistics::detail
 			++nonLightCarryingBundles_;
 		}
 
+		void registerPathLength(std::size_t length)
+		{
+			pathLengthSum_ += length;
+			maxPathLength_ = std::max(maxPathLength_, length);
+		}
+
 		void mergeInImpl(const ActualStatistics& stats)
 		{
 			lightCarryingPaths_ += stats.lightCarryingPaths_;
 			nonLightCarryingPaths_ += stats.nonLightCarryingPaths_;
 			lightCarryingBundles_ += stats.lightCarryingBundles_;
 			nonLightCarryingBundles_ += stats.nonLightCarryingBundles_;
+
+			pathLengthSum_ += stats.pathLengthSum_;
+			maxPathLength_ = std::max(maxPathLength_, stats.maxPathLength_);
 		}
 
 		void printResultImpl(std::wostream& stream) const
 		{
+			const auto pathCount = lightCarryingPaths_ + nonLightCarryingPaths_;
 			stream << "Stats:\n";
-			stream << "Total paths: " << std::setprecision(3) << double(lightCarryingPaths_ + nonLightCarryingPaths_) / 1'000'000'000.0 << " bln\n";
+			stream << "Total paths: " << std::setprecision(3) << double(pathCount) / 1'000'000'000.0 << " bln\n";
 			stream << "Total bundles: " << std::setprecision(3) << double(lightCarryingBundles_ + nonLightCarryingBundles_) / 1'000'000'000.0 << " bln\n";
-			stream << "Light carrying paths: " << std::setprecision(3) << double(lightCarryingPaths_) / double(lightCarryingPaths_ + nonLightCarryingPaths_) *
+			stream << "Light carrying paths: " << std::setprecision(3) << double(lightCarryingPaths_) / double(pathCount) *
 				100.0 << "%\n";
 			stream << "Light carrying bundles: " << std::setprecision(3) << double(lightCarryingBundles_) / double(
 				lightCarryingBundles_ + nonLightCarryingBundles_) * 100.0 << "%\n";
+			stream << "Average path length: " << std::setprecision(3) << double(pathLengthSum_) / double(pathCount) << '\n';
+			stream << "Max path length: " << maxPathLength_ << '\n';
 		}
 	};
 }

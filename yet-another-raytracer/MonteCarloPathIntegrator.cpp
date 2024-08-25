@@ -128,7 +128,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
 			assert(!math::anyNan(infinityPayload));
 			integral += infinityPayload;
-			stats_.registerPath(!math::isZero(infinityPayload));
+			stats_.registerPath(!math::isZero(infinityPayload), bounce);
 			earlyExit = true;
 			break;
 		}
@@ -161,7 +161,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 				assert(!math::anyNan(samplePayload));
 
 				integral += samplePayload;
-				stats_.registerPath(!math::isZero(samplePayload));
+				stats_.registerPath(!math::isZero(samplePayload), bounce + 1);
 				
 				assert(math::max_element(integral) < 20000.0f);
 
@@ -232,7 +232,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 			const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
 			assert(!math::anyNan(infinityPayload));
 			integral += infinityPayload;
-			stats_.registerPath(!math::isZero(infinityPayload));
+			stats_.registerPath(!math::isZero(infinityPayload), bounceLimit);
 		}
 		else
 		{
@@ -262,7 +262,7 @@ color_rgbx MonteCarloPathIntegrator::EvaluateRay(
 					const auto samplePayload = radianceAtCurrentPathVertex * throughput;
 					assert(!math::anyNan(samplePayload));
 					integral += samplePayload;
-					stats_.registerPath(!math::isZero(samplePayload));
+					stats_.registerPath(!math::isZero(samplePayload), bounceLimit + 1);
 				});
 		}
 	}
