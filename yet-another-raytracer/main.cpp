@@ -118,8 +118,14 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
             //    NullAccelerator accelerator{ scene.objects() };
             accelerators::kd_tree::KDTreeAccelerator accelerator{scene.objects()};
 
+            std::vector<const LightSource*> lights(scene.lights().size());
+            std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights),
+                           [](const auto& lightPtr) { return lightPtr.get(); });
+
+            using integrator_t = MonteCarloPathIntegrator<accelerators::kd_tree::KDTreeMarcher>;
+
 #if true
-            const renderers::BucketRenderer<typeof(accelerator)> renderer(
+            const renderers::BucketRenderer<typeof(integrator_t)> renderer(
                 {32, 32},
                 std::make_unique<TopDownSequencer>(),
                 [&]()
@@ -177,7 +183,17 @@ void Render(const std::filesystem::path& scene_file, const std::filesystem::path
 			progressReporter);
 #endif
 
-            renderer.Render(film, scene, accelerator, stopToken);
+            renderer.Render(film, scene, [&accelerator, &scene, &lights]
+            {
+                auto raytracer = Raytracer{accelerator.CreateMarcher()};
+                MonteCarloPathIntegrator<accelerators::kd_tree::KDTreeMarcher> integrator(
+                    std::move(raytracer),
+                    lights,
+                    [&](const ray3& ray) { return scene.getEnvironmentColor(); }
+                );
+
+                return integrator;
+            }, stopToken);
 
             reportRenderingFinihsed(film);
 

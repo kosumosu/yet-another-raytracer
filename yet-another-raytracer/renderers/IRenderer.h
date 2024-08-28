@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <stop_token>
 
 class RayIntegrator;
@@ -8,10 +9,12 @@ class Scene;
 
 namespace renderers
 {
-	template <class TAccelerator>
+	template <class TRayIntegrator>
 	class IRenderer
 	{
 	public:
+		using ray_integrator_factory_t = std::function<TRayIntegrator()>;
+
 		IRenderer() = default;
 		IRenderer(IRenderer&&) = default;
 		IRenderer(const IRenderer& other) = delete;
@@ -20,7 +23,7 @@ namespace renderers
 
 		virtual ~IRenderer() = default;
 
-		virtual void Render(Film& film, const Scene& scene, const TAccelerator& accelerator, const std::stop_token& stopToken) const = 0;
+		virtual void Render(Film& film, const Scene& scene, ray_integrator_factory_t rayIntegratorFactory, const std::stop_token& stopToken) const = 0;
 
 		virtual void PrintStats(std::wostream& stream) const = 0;
 	};

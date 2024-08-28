@@ -20,23 +20,28 @@
 
 namespace renderers
 {
-    struct Bucket {
+
+    struct Bucket
+    {
         const uint_vector2 start;
         const uint_vector2 size;
     };
 
-    template<class TAccelerator>
-    class BucketRenderer final : public IRenderer<TAccelerator> {
+    template <class TRayIntegrator>
+    class BucketRenderer final : public IRenderer<TRayIntegrator>
+    {
     public:
         using progress_callback = std::function<void(const size_t nom, const size_t denom)>;
         using initialization_finished_callback = std::function<void()>;
         using rendering_finished_callback = std::function<void()>;
         using area_finished_callback = std::function<void(const Film& result)>;
-        using area_started_callback = std::function<area_finished_callback(const uint_vector2& top_left, const uint_vector2& bottom_right)>;
+        using area_started_callback = std::function<area_finished_callback(
+            const uint_vector2& top_left, const uint_vector2& bottom_right)>;
 
     private:
-        uint_vector2 bucketSize_;
-        std::unique_ptr<IBucketSequencer> bucketSequencer_;
+        const uint_vector2 bucketSize_;
+        const std::unique_ptr<IBucketSequencer> bucketSequencer_;
+
         initialization_finished_callback initializationFinishedCallback_;
         area_started_callback areaStartedCallback_;
         rendering_finished_callback renderingFinishedCallback_;
@@ -48,35 +53,40 @@ namespace renderers
     public:
         // progressCallback must support concurrent multithreaded calls
         BucketRenderer(
-                uint_vector2 bucketSize,
-                std::unique_ptr<IBucketSequencer> bucketSequencer,
-                initialization_finished_callback initializationFinishedCallback,
-                rendering_finished_callback renderingFinishedCallback,
-                area_started_callback areaStartedCallback,
-                progress_callback progressCallback)
-                : bucketSize_(std::move(bucketSize)), bucketSequencer_(std::move(bucketSequencer)),
-                  initializationFinishedCallback_(std::move(initializationFinishedCallback)),
-                  areaStartedCallback_(std::move(areaStartedCallback)),
-                  renderingFinishedCallback_(std::move(renderingFinishedCallback)),
-                  progressCallback_(std::move(progressCallback))
+            uint_vector2 bucketSize,
+            std::unique_ptr<IBucketSequencer> bucketSequencer,
+            initialization_finished_callback initializationFinishedCallback,
+            rendering_finished_callback renderingFinishedCallback,
+            area_started_callback areaStartedCallback,
+            progress_callback progressCallback)
+            : bucketSize_(std::move(bucketSize))
+              , bucketSequencer_(std::move(bucketSequencer))
+              , initializationFinishedCallback_(std::move(initializationFinishedCallback))
+              , areaStartedCallback_(std::move(areaStartedCallback))
+              , renderingFinishedCallback_(std::move(renderingFinishedCallback))
+              , progressCallback_(std::move(progressCallback))
         {
-
         }
 
 
-        void Render(Film &film, const Scene &scene, const TAccelerator &accelerator, const std::stop_token& stopToken) const override {
 
-            std::vector<const LightSource *> lights(scene.lights().size());
+
+        void Render(Film& film, const Scene& scene, typename IRenderer<TRayIntegrator>::ray_integrator_factory_t rayIntegratorFactory,
+                    const std::stop_token& stopToken) const override
+        {
+            std::vector<const LightSource*> lights(scene.lights().size());
             std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights),
-                           [](const auto &lightPtr) { return lightPtr.get(); });
+                           [](const auto& lightPtr) { return lightPtr.get(); });
 
             const bool isCropped = scene.getCropWidth() > 0 && scene.getCropHeight() > 0;
 
             const uint_vector2 viewportSize{scene.viewport_width(), scene.viewport_height()};
-            const uint_vector2 cropStart = isCropped ? uint_vector2{scene.getCropX(), scene.getCropY()}
-            : uint_vector2::zero();
-            const uint_vector2 cropSize = isCropped ? uint_vector2{scene.getCropWidth(), scene.getCropHeight()}
-            : viewportSize;
+            const uint_vector2 cropStart = isCropped
+                                               ? uint_vector2{scene.getCropX(), scene.getCropY()}
+                                               : uint_vector2::zero();
+            const uint_vector2 cropSize = isCropped
+                                              ? uint_vector2{scene.getCropWidth(), scene.getCropHeight()}
+                                              : viewportSize;
             const uint_vector2 cropEnd = cropStart + cropSize;
             const uint_vector2 gridSize = math::intDivideRoundUp(cropSize, bucketSize_);
 
@@ -92,15 +102,12 @@ namespace renderers
 
             ThreadBarrier barrier{threadCount};
 
-            for (unsigned int i = 0; i < threadCount; ++i) {
+            for (unsigned int i = 0; i < threadCount; ++i)
+            {
                 std::thread thread{
-                    [&, sequence = sequence.get()] {
-                        auto raytracer = Raytracer{accelerator.CreateMarcher()};
-                        MonteCarloPathIntegrator integrator{
-                            std::move(raytracer),
-                            lights,
-                            [&](const ray3& ray) { return scene.getEnvironmentColor(); }
-                        };
+                    [&, sequence = sequence.get()]
+                    {
+                        auto integrator = rayIntegratorFactory();
 
                         Film subFilm{bucketSize_};
 
@@ -117,7 +124,8 @@ namespace renderers
 
                             auto reportAreaFinished = areaStartedCallback_(bucketMinCorner, bucketMaxCorner);
 
-                            ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize}, stopToken);
+                            ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize},
+                                          stopToken);
                             film.transferFilm(subFilm, bucketMinCorner, bucketSize);
 
                             reportAreaFinished(subFilm);
@@ -142,25 +150,28 @@ namespace renderers
 
             initializationFinishedCallback_();
 
-            for (auto &thread: threads) {
+            for (auto& thread : threads)
+            {
                 thread.join();
             }
 
             renderingFinishedCallback_();
         }
 
-        void PrintStats(std::wostream &stream) const override {
+        void PrintStats(std::wostream& stream) const override
+        {
             stats_.printResult(stream);
         }
 
-
     private:
-
         void
-        ProcessBucket(Film &film, const uint_vector2 &wholeFilmSize, const Scene &scene, RayIntegrator &rayIntegrator,
-                      const Bucket &bucket, const std::stop_token& stopToken) const {
-            for (size_t y = 0; y < bucket.size[1]; ++y) {
-                for (size_t x = 0; x < bucket.size[0]; ++x) {
+        ProcessBucket(Film& film, const uint_vector2& wholeFilmSize, const Scene& scene, RayIntegrator& rayIntegrator,
+                      const Bucket& bucket, const std::stop_token& stopToken) const
+        {
+            for (size_t y = 0; y < bucket.size[1]; ++y)
+            {
+                for (size_t x = 0; x < bucket.size[0]; ++x)
+                {
                     if (stopToken.stop_requested())
                         return;
                     const uint_vector2 localCoord{x, y};
@@ -170,12 +181,13 @@ namespace renderers
         }
 
         void ProcessPixel(
-                Film &subFilm,
-                const uint_vector2 &wholeFilmSize,
-                const Scene &scene,
-                RayIntegrator &rayIntegrator,
-                const uint_vector2 &subFilmCoord,
-                const uint_vector2 &wholeFilmCoord) const {
+            Film& subFilm,
+            const uint_vector2& wholeFilmSize,
+            const Scene& scene,
+            RayIntegrator& rayIntegrator,
+            const uint_vector2& subFilmCoord,
+            const uint_vector2& wholeFilmCoord) const
+        {
             const unsigned seed = xxhash32(wholeFilmCoord);
             math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
 
@@ -184,26 +196,28 @@ namespace renderers
             color_rgb averageColor = color_rgb::zero();
             const vector2 pixelLeftBottomCoord = wholeFilmCoord;
             const vector2 sizeNormalizationFactor =
-                    vector2(1.0, 1.0) / wholeFilmSize; //(1.0 / subFilm.width(), 1.0 / subFilm.height());
+                vector2(1.0, 1.0) / wholeFilmSize; //(1.0 / subFilm.width(), 1.0 / subFilm.height());
             const auto aspectRatio = space_real(wholeFilmSize[0]) / space_real(wholeFilmSize[1]);
 
-            for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++) {
-                const auto shiftInsidePixel = doJitter ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0),
-                                                                          pixelPersonalSampler) : vector2(0.5, 0.5);
+            for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++)
+            {
+                const auto shiftInsidePixel = doJitter
+                                                  ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0),
+                                                                     pixelPersonalSampler)
+                                                  : vector2(0.5, 0.5);
                 const auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
 
                 const auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, aspectRatio);
 
                 const auto rayPayload =
-                        rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalSampler) *
-                        sampleWeight;
+                    rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalSampler) *
+                    sampleWeight;
                 assert(!std::isnan(rayPayload[0]) && !std::isnan(rayPayload[1]) && !std::isnan(rayPayload[2]) &&
-                       !std::isnan(rayPayload[3]));
+                    !std::isnan(rayPayload[3]));
                 averageColor += rayPayload;
             }
 
             subFilm.setPixel(subFilmCoord, averageColor);
         }
-
     };
 }

@@ -15,8 +15,8 @@
 
 namespace renderers
 {
-    template <class TAccelerator>
-    class SingleThreadedScanlineRenderer final : public IRenderer<TAccelerator>
+    template <class TRayIntegrator>
+    class SingleThreadedScanlineRenderer final : public IRenderer<TRayIntegrator>
     {
         mutable statistics::Stats stats_;
     public:
@@ -35,12 +35,8 @@ namespace renderers
 
         }
 
-        void Render(Film& film, const Scene& scene, const TAccelerator& accelerator, const std::stop_token& stopToken) const override {
-            Raytracer raytracer(accelerator.CreateMarcher());
-
-            std::vector<const LightSource*> lights(scene.lights().size());
-            std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights), [](const auto& lightPtr) { return lightPtr.get(); });
-            const MonteCarloPathIntegrator integrator{&raytracer, std::move(lights), [&](const ray3& ray) { return scene.getEnvironmentColor(); }};
+        void Render(Film& film, const Scene& scene, typename IRenderer<TRayIntegrator>::ray_integrator_factory_t rayIntegratorFactory, const std::stop_token& stopToken) const override {
+            auto integrator = rayIntegratorFactory();
 
             const bool isCropped = scene.getCropWidth() > 0 && scene.getCropHeight() > 0;
 
