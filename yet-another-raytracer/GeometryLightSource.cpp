@@ -49,29 +49,31 @@ void GeometryLightSource::DoWithDistribution(const LightingContext & context, ma
 
 				const auto geometricFactor = std::max(color_real(0), color_real(-math::dot(pointSample.getValue().normal, direction)));
 
-				const auto pdf = objectSample.getPdf() * pointSample.getPdf() * (distance * distance) / geometricFactor;
+				if (geometricFactor > space_real(0.0))
+				{
+					const auto pdf = objectSample.getPdf() * pointSample.getPdf() * (distance * distance) / geometricFactor;
 
-				assert(pdf > 1e-5f);
+					assert(std::isfinite(pdf));
+					assert(pdf > 1e-5f);
 
-				return math::random_sample<std::optional<light_sample>, space_real>(
-					light_sample(
-						direction,
-						distance,
-						[=, &sampler]()
-						{
-							return objectSample.getValue()->material()->EvaluateEmission(*objectSample.getValue(), pointSample.getValue().point, pointSample.getValue().normal, pointSample.getValue().uvs, direction, sampler);
-						}
-					),
-					pdf,
-					false);
+					return math::random_sample<std::optional<light_sample>, space_real>(
+						light_sample(
+							direction,
+							distance,
+							[=, &sampler]()
+							{
+								return objectSample.getValue()->material()->EvaluateEmission(*objectSample.getValue(), pointSample.getValue().point, pointSample.getValue().normal, pointSample.getValue().uvs, direction, sampler);
+							}
+						),
+						pdf,
+						false);
+				}
 			}
-			else
-			{
-				return math::random_sample<std::optional<light_sample>, space_real>(
-					std::nullopt,
-					objectSample.getPdf(),
-					false);
-			}
+
+			return math::random_sample<std::optional<light_sample>, space_real>(
+				std::nullopt,
+				objectSample.getPdf(),
+				false);
 		},
 		[&](const vector3 & sample)
 		{
