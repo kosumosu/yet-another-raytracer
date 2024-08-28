@@ -14,14 +14,14 @@ namespace objects
 
 struct bsdf_sample
 {
-	bsdf_sample(vector3 outgoingDirection, std::function<color_rgbx()> evaluate)
+	bsdf_sample(vector3 outgoingDirection, std::function<color_rgb()> evaluate)
 		: outgoingDirection(std::move(outgoingDirection))
 		, evaluate(std::move(evaluate))
 	{
 	}
 
 	vector3 outgoingDirection;
-	std::function<color_rgbx()> evaluate;
+	std::function<color_rgb()> evaluate;
 };
 
 using bsdf_distribution = Distribution<const bsdf_sample, const vector3, space_real>;
@@ -44,7 +44,7 @@ public:
 		const math::Sampler<space_real>& sampler,
 		const bsdf_distribution_func& job) const = 0;
 
-	[[nodiscard]] virtual color_rgbx EvaluateEmission(
+	[[nodiscard]] virtual color_rgb EvaluateEmission(
 		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,
@@ -52,7 +52,7 @@ public:
 		const vector3& incidentDirection,
 		const math::Sampler<space_real>& sampler) const = 0;
 
-	[[nodiscard]] virtual color_rgbx EvaluateNonDeltaScattering(
+	[[nodiscard]] virtual color_rgb EvaluateNonDeltaScattering(
 		const objects::GeometryObject& object,
 		const vector3& hitPoint,
 		const vector3& normal,

@@ -8,7 +8,7 @@
 namespace math
 {
 	template <typename T, std::size_t N>
-	T dot( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr T dot( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		static_assert(N > 0, "Vector must have at least one component.");
 

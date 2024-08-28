@@ -25,7 +25,7 @@ void Film::SaveAsPng(const std::filesystem::path& filename) const
     {
         for (unsigned int x = 0; x < width(); x++)
         {
-            const auto gammaCorrected = linear_to_storage(getPixel(x, y).reduce());
+            const auto gammaCorrected = linear_to_storage(getPixel(x, y));
             const auto clamped = math::clamp(gammaCorrected, color_0, color_1);
 
             setToInteger(image[y][x].red, clamped[0]);

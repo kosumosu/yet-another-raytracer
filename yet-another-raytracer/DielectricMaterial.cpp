@@ -180,7 +180,7 @@ void DielectricMaterial::WithBsdfDistribution(
 							reflection.reflectedDirection,
 							[=]()
 							{
-								return color_rgbx::fill(reflectance / std::abs(color_real(reflection.reflectedRayToNormalCos)));
+								return color_rgb::fill(reflectance / std::abs(color_real(reflection.reflectedRayToNormalCos)));
 							}),
 						space_real(reflectance),
 						true);
@@ -207,7 +207,7 @@ void DielectricMaterial::WithBsdfDistribution(
 			}));
 }
 
-color_rgbx DielectricMaterial::EvaluateEmission(
+color_rgb DielectricMaterial::EvaluateEmission(
 	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
@@ -215,10 +215,10 @@ color_rgbx DielectricMaterial::EvaluateEmission(
 	const vector3& incidentDirection,
 	const math::Sampler<space_real>& sampler) const
 {
-	return color_rgbx::zero();
+	return color_rgb::zero();
 }
 
-color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(
+color_rgb DielectricMaterial::EvaluateNonDeltaScattering(
 	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
@@ -227,5 +227,5 @@ color_rgbx DielectricMaterial::EvaluateNonDeltaScattering(
 	const vector3& outgoingDirection,
 	const math::Sampler<space_real>& sampler) const
 {
-	return color_rgbx::zero();
+	return color_rgb::zero();
 }

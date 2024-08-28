@@ -10,24 +10,24 @@ class DielectricMaterial;
 class MaterialCommandProcessor : public CommandProcessor
 {
 public:
-	MaterialCommandProcessor(void);
+	MaterialCommandProcessor();
 
 	void PrepareContext(LoadingContext & context) override;
 
 	void ProcessCommand(LoadingContext & context, const std::string & command, std::istream & stream) override;
 
 private:
-	color_rgbx _ambient;
-	color_rgbx _emission;
+	color_rgb _ambient;
+	color_rgb _emission;
 	const Texture *  _diffuseMap;
-	color_rgbx _diffuse;
-	color_rgbx _specular;
+	color_rgb _diffuse;
+	color_rgb _specular;
 	color_real _shininess;
-	color_rgbx _translucency;
+	color_rgb _translucency;
 
 	space_real _iorInside;
 	space_real _iorOutside;
-	color_rgbx _surfaceTransparency;
+	color_rgb _surfaceTransparency;
 
 };
 

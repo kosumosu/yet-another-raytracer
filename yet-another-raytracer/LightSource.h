@@ -23,7 +23,7 @@ struct light_sample
 
 	vector3 direction;
 	space_real distance;
-	const std::function<color_rgbx()> evaluate;
+	const std::function<color_rgb()> evaluate;
 };
 
 // TSample is optional because light can sometimes beforehand tell it will not return light from this sample.

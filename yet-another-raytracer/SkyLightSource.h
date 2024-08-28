@@ -14,8 +14,8 @@ public:
 		m_samples = val;
 	}
 
-	const color_rgbx & color() const { return m_color; }
-	void color(const color_rgbx & val)
+	const color_rgb & color() const { return m_color; }
+	void color(const color_rgb & val)
 	{
 		m_color = val;
 	}
@@ -26,6 +26,6 @@ public:
 	color_real GetApproximateTotalPower() const override;
 private:
 	unsigned int m_samples;
-	color_rgbx m_color;
+	color_rgb m_color;
 };
 

@@ -117,7 +117,7 @@ public:
                             hit.normal(),
                             hit.uvs(),
                             currentRay.direction(),
-                            sampler).reduce();
+                            sampler);
 
                     const auto samplePayload = radianceAtCurrentPathVertex * throughput;
                     assert(!math::anyNan(samplePayload));
@@ -222,7 +222,7 @@ public:
                                 hit.normal(),
                                 hit.uvs(),
                                 currentRay.direction(),
-                                sampler).reduce();
+                                sampler);
 
                         const auto samplePayload = radianceAtCurrentPathVertex * throughput;
                         assert(!math::anyNan(samplePayload));
@@ -245,7 +245,7 @@ public:
     }
 
 private:
-    color_rgbx EvaluateRadianceByLightsAtVertex(
+    color_rgb EvaluateRadianceByLightsAtVertex(
         const ray3& currentRay,
         const Hit& hit,
         bool entering,
@@ -253,9 +253,9 @@ private:
         math::Sampler<space_real>& sampler)
     {
         if (!lightDistribution_.has_value())
-            return color_rgbx::zero();
+            return color_rgb::zero();
 
-        color_rgbx radianceAtCurrentPathVertex{color_rgbx::zero()};
+        color_rgb radianceAtCurrentPathVertex{color_rgb::zero()};
         const LightingContext context{hit.object(), hit.point(), hit.normal(), BIAS, 1, false};
 
         // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
@@ -287,9 +287,12 @@ private:
 
                         if (!isOccluded)
                         {
-                            const auto geometricTerm = color_real(
+                            auto geometricTerm = color_real(
                                 std::abs(math::dot(lightSample.direction, hit.normal())));
-                            const auto radianceByLight = lightSample.evaluate() * hit.object()->material()->
+
+                            auto lightValue = lightSample.evaluate();
+
+                            auto brdfValue = hit.object()->material()->
                                 EvaluateNonDeltaScattering(
                                     *hit.object(),
                                     hit.point(),
@@ -297,8 +300,14 @@ private:
                                     hit.uvs(),
                                     currentRay.direction(),
                                     lightSample.direction,
-                                    sampler) * geometricTerm * color_real(math::oneOverPi) / color_real(
-                                    optionalLightSample.getPdf());
+                                    sampler);
+
+                            const auto lightSamplePdf = color_real(optionalLightSample.getPdf());
+
+                            auto radianceByLight = lightValue * brdfValue
+                                * geometricTerm * color_real(math::oneOverPi)
+                            / lightSamplePdf
+                            ;
 
                             //if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
                             //	throw std::exception();

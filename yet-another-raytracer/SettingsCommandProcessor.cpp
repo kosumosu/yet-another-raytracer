@@ -36,7 +36,7 @@ void SettingsCommandProcessor::ProcessCommand( LoadingContext & context, const s
 	}
 	else if (command == "background")
 	{
-		context.scene()->setEnvironmentColor(color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0));
+		context.scene()->setEnvironmentColor(ParserHelper::ReadColorRgb(stream));
 	}
 	else if (command == "samples")
 	{

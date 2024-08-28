@@ -5,23 +5,23 @@
 #include "ParserHelper.h"
 #include <typeinfo>
 
-MaterialCommandProcessor::MaterialCommandProcessor(void)
-	: _ambient(color_rgbx::zero())
-	  , _emission(color_rgbx::zero())
+MaterialCommandProcessor::MaterialCommandProcessor()
+	: _ambient(color_rgb::zero())
+	  , _emission(color_rgb::zero())
 	  , _diffuseMap(nullptr)
-      , _diffuse(color_rgbx::fill(1))
-	  , _specular(color_rgbx::zero())
+      , _diffuse(color_rgb::fill(1))
+	  , _specular(color_rgb::zero())
 	  , _shininess(0)
-	  , _translucency(color_rgbx::zero())
+	  , _translucency(color_rgb::zero())
 	  , _iorInside(1)
 	  , _iorOutside(1)
-	  , _surfaceTransparency(color_rgbx::zero())
+	  , _surfaceTransparency(color_rgb::zero())
 {
 }
 
 void MaterialCommandProcessor::PrepareContext(LoadingContext & context)
 {
-	_ambient = color_rgbx::fill(0.2f);
+	_ambient = color_rgb::fill(0.2f);
 	context.material(nullptr);
 }
 
@@ -45,11 +45,11 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	}
 	else if (command == "ambient")
 	{
-		_ambient = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
+		_ambient = ParserHelper::ReadColorRgb(stream);
 	}
 	else if (command == "emission")
 	{
-		_emission = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
+		_emission = ParserHelper::ReadColorRgb(stream);
 	}
 	else if (command == "diffuseMap")
 	{
@@ -58,11 +58,11 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	}
 	else if (command == "diffuse")
 	{
-		_diffuse = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
+		_diffuse = ParserHelper::ReadColorRgb(stream);
 	}
 	else if (command == "specular")
 	{
-		_specular = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
+		_specular = ParserHelper::ReadColorRgb(stream);
 	}
 	else if (command == "shininess")
 	{
@@ -70,12 +70,12 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	}
 	else if (command == "translucency")
 	{
-		_translucency = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
+		_translucency = ParserHelper::ReadColorRgb(stream);
 	}
 	
 	else if (command == "dielectric")
 	{
-		const auto id = ParserHelper::ReadId(stream);
+		auto id = ParserHelper::ReadId(stream);
 
 		auto material = std::make_unique<DielectricMaterial>(_iorInside, _iorOutside, _surfaceTransparency);
 		const auto materialRawPointer = material.get();
@@ -94,7 +94,7 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	}
 	else if (command == "surfaceTransparency")
 	{
-		_surfaceTransparency = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
+		_surfaceTransparency = ParserHelper::ReadColorRgb(stream);
 	}
 	else
 	{

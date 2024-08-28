@@ -10,31 +10,31 @@ class Film
     static constexpr color_rgb color_1 = {1.0f, 1.0f, 1.0f};
 
     const uint_vector2 size_;
-    std::vector<color_rgbx> pixels_;
+    std::vector<color_rgb> pixels_;
 
 public:
     Film(uint_vector2 size)
         : size_{std::move(size)}
-          , pixels_{std::size_t(size_[0]) * size_[1], color_rgbx::zero()}
+          , pixels_{std::size_t(size_[0]) * size_[1], color_rgb::zero()}
     {
     }
 
     [[nodiscard]] unsigned int width() const { return size_[0]; }
     [[nodiscard]] unsigned int height() const { return size_[1]; }
 
-    [[nodiscard]] const std::vector<color_rgbx>& pixels() const { return pixels_; }
+    [[nodiscard]] const std::vector<color_rgb>& pixels() const { return pixels_; }
 
-    [[nodiscard]] const color_rgbx& getPixel(unsigned int x, unsigned int y) const
+    [[nodiscard]] const color_rgb& getPixel(unsigned int x, unsigned int y) const
     {
         return pixels_[std::size_t(y) * width() + x];
     }
 
     [[nodiscard]] color_u8rgb getPixelTonemapped(unsigned int x, unsigned int y) const
     {
-        return math::clamp(linear_to_storage(getPixel(x, y).reduce()), color_0, color_1) * std::numeric_limits<color_u8rgb::element_t>::max();
+        return math::clamp(linear_to_storage(getPixel(x, y)), color_0, color_1) * std::numeric_limits<color_u8rgb::element_t>::max();
     }
 
-    void setPixel(uint_vector2 coord, const color_rgbx& value)
+    void setPixel(uint_vector2 coord, const color_rgb& value)
     {
         pixels_[std::size_t(coord[1]) * width() + coord[0]] = value;
     }

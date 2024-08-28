@@ -7,7 +7,7 @@
 using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;
 
 
-DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const color_rgbx & color, const Scene & scene) 
+DirectionalLightSource::DirectionalLightSource(const vector3 & direction, const color_rgb & color, const Scene & scene)
 	: _direction(direction)
 	, _color(color)
 {

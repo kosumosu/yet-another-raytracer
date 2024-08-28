@@ -16,7 +16,7 @@ color_real BlinnMaterial::GetReflectionProbability() const
 	return color::get_importance(specular_);
 }
 
-color_rgbx BlinnMaterial::EvaluateDiffuseColor(
+color_rgb BlinnMaterial::EvaluateDiffuseColor(
 	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
@@ -32,7 +32,7 @@ color_rgbx BlinnMaterial::EvaluateDiffuseColor(
 	}
 	else
 	{
-		return diffuseMap_->Sample(TextureCoords{hitPoint, normal, {uv}});
+		return diffuseMap_->Sample(TextureCoords{hitPoint, normal, {uv}}).reduce();
 	}
 }
 
@@ -71,7 +71,7 @@ void BlinnMaterial::WithBsdfDistribution(
 					direction,
 					[=, this]()
 					{
-						return translucency_ * (color_rgbx::fill(1.0) - specular_);
+						return translucency_ * (color_rgb::fill(1.0) - specular_);
 					}),
 				pdf * (color_real(1.0) - GetReflectionProbability()) * translucenceProbability,
 				false);
@@ -83,18 +83,18 @@ void BlinnMaterial::WithBsdfDistribution(
 					direction,
 					[=, this]()
 					{
-						return diffuseColor * (color_rgbx::fill(1.0) - specular_) * (color_rgbx::fill(1.0) - translucency_);
+						return diffuseColor * (color_rgb::fill(1.0) - specular_) * (color_rgb::fill(1.0) - translucency_);
 					}),
 				pdf * (color_real(1.0) - GetReflectionProbability()) * (color_real(1.0) - translucenceProbability),
 				false);
 		}
 	};
 
-	bsdf_functional_distribution::generate_sample_func generateDiffuseFunc = diffuseColor == color_rgbx::zero() || specular_ == color_rgbx::fill(1.0)
+	bsdf_functional_distribution::generate_sample_func generateDiffuseFunc = diffuseColor == color_rgb::zero() || specular_ == color_rgb::fill(1.0)
 		? bsdf_functional_distribution::generate_sample_func(nullptr)
 		: generateDiffuseFuncImpl;
 
-	bsdf_functional_distribution::evaluate_pdf_func evaluateDiffusePdfFunc = diffuseColor == color_rgbx::zero() || specular_ == color_rgbx::fill(1.0)
+	bsdf_functional_distribution::evaluate_pdf_func evaluateDiffusePdfFunc = diffuseColor == color_rgb::zero() || specular_ == color_rgb::fill(1.0)
 		? bsdf_functional_distribution::evaluate_pdf_func(nullptr)
 		: [&](const vector3& direction)
 		{
@@ -127,11 +127,11 @@ void BlinnMaterial::WithBsdfDistribution(
 			true);
 	};
 
-	bsdf_functional_distribution::generate_sample_func generateReflectionFunc = specular_ == color_rgbx::zero()
+	bsdf_functional_distribution::generate_sample_func generateReflectionFunc = specular_ == color_rgb::zero()
 		? bsdf_functional_distribution::generate_sample_func(nullptr)
 		: generateReflectionFuncImpl;
 
-	bsdf_functional_distribution::generate_sample_func generateSampleFunc = specular_ == color_rgbx::zero() && diffuseColor == color_rgbx::zero()
+	bsdf_functional_distribution::generate_sample_func generateSampleFunc = specular_ == color_rgb::zero() && diffuseColor == color_rgb::zero()
 		? bsdf_functional_distribution::generate_sample_func(nullptr)
 		: [&]()
 		{
@@ -146,14 +146,14 @@ void BlinnMaterial::WithBsdfDistribution(
 
 	job(
 		bsdf_functional_distribution(
-			specular_ == color_rgbx::zero() ? 0U : 1U,
+			specular_ == color_rgb::zero() ? 0U : 1U,
 			std::move(generateReflectionFunc),
 			std::move(generateDiffuseFunc),
 			std::move(evaluateDiffusePdfFunc),
 			std::move(generateSampleFunc)));
 }
 
-color_rgbx BlinnMaterial::EvaluateEmission(
+color_rgb BlinnMaterial::EvaluateEmission(
 	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
@@ -167,11 +167,11 @@ color_rgbx BlinnMaterial::EvaluateEmission(
 	}
 	else
 	{
-		return emission_ * diffuseMap_->Sample(TextureCoords{hitPoint, normal, uvs});
+		return emission_ * diffuseMap_->Sample(TextureCoords{hitPoint, normal, uvs}).reduce();
 	}
 }
 
-color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(
+color_rgb BlinnMaterial::EvaluateNonDeltaScattering(
 	const objects::GeometryObject& object,
 	const vector3& hitPoint,
 	const vector3& normal,
@@ -183,6 +183,6 @@ color_rgbx BlinnMaterial::EvaluateNonDeltaScattering(
 	const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, sampler);
 	const bool isSameSide = math::is_acute_angle(incidentDirection , normal) ^ math::is_acute_angle(outgoingDirection , normal);
 	return isSameSide
-		? diffuseColor * (color_rgbx::fill(1.0) - specular_) * (color_rgbx::fill(1.0) - translucency_)
-		: (color_rgbx::fill(1.0) - specular_) * translucency_;
+		? diffuseColor * (color_rgb::fill(1.0) - specular_) * (color_rgb::fill(1.0) - translucency_)
+		: (color_rgb::fill(1.0) - specular_) * translucency_;
 }

@@ -27,7 +27,7 @@ public:
 		, cropHeight_(0)
 		, maxTraceDepth_(4)
 		, camera_(std::make_shared<Camera>())
-		, environmentColor_(color_rgbx::zero())
+		, environmentColor_(color_rgb::zero())
 		, samplesPerPixel_(1)
 	{
 	}
@@ -53,8 +53,8 @@ public:
 	[[nodiscard]] const LightSourceCollection& lights() const { return lights_; }
 	LightSourceCollection& lights() { return lights_; }
 
-	[[nodiscard]] color_rgbx getEnvironmentColor() const { return environmentColor_; }
-	void setEnvironmentColor(const color_rgbx& color) { environmentColor_ = color; }
+	[[nodiscard]] color_rgb getEnvironmentColor() const { return environmentColor_; }
+	void setEnvironmentColor(const color_rgb& color) { environmentColor_ = color; }
 
 	[[nodiscard]] std::size_t getSamplesPerPixel() const { return samplesPerPixel_; }
 	void setSamplesPerPixel(std::size_t samplesPerPixel) { samplesPerPixel_ = samplesPerPixel; }
@@ -105,6 +105,6 @@ private:
 	MaterialCollection materials_;
 	MapCollection maps_;
 
-	color_rgbx environmentColor_;
+	color_rgb environmentColor_;
 	std::size_t samplesPerPixel_;
 };

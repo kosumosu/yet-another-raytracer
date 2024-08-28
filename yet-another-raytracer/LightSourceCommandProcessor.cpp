@@ -27,7 +27,7 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 	if (command == "directional")
 	{
 		const auto direction = ParserHelper::ReadVec3(stream);
-		const auto color = color_rgbx(ParserHelper::ReadColorRgb(stream), color_real(0.0));
+		const auto color = ParserHelper::ReadColorRgb(stream);
 
 		DirectionalLightSource * light = new DirectionalLightSource(
 			(context.transform() * vector4(direction, space_real(0.0))).reduce(),
@@ -40,7 +40,7 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 	else if (command == "point")
 	{
 		const auto position = ParserHelper::ReadVec3(stream);
-		const auto color = color_rgbx(ParserHelper::ReadColorRgb(stream), 0.0f);
+		const auto color = ParserHelper::ReadColorRgb(stream);
 
         auto light = std::make_shared<PointLightSource>();
         light->position((context.transform() * vector4(position, space_real(1.0))).reduce());

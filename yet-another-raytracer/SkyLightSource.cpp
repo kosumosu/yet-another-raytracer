@@ -7,7 +7,7 @@ using lighting_functional_distribution = FunctionalDistribution<std::optional<li
 
 SkyLightSource::SkyLightSource()
 	: m_samples(20)
-	, m_color(color_rgbx::fill(0.5)) {}
+	, m_color(color_rgb::fill(0.5)) {}
 
 
 

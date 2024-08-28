@@ -6,7 +6,7 @@ using lighting_functional_distribution = FunctionalDistribution<std::optional<li
 
 PointLightSource::PointLightSource()
 	: m_position(vector3::zero())
-	, m_color(color_rgbx::zero())
+	, m_color(color_rgb::zero())
 	, m_attenuation(1.0f, 0.0f, 0.0f) {}
 
 

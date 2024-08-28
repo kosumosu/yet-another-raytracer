@@ -181,7 +181,7 @@ namespace renderers
 
             const bool doJitter = scene.getSamplesPerPixel() > 1;
             const color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
-            color_rgbx averageColor = color_rgbx::zero();
+            color_rgb averageColor = color_rgb::zero();
             const vector2 pixelLeftBottomCoord = wholeFilmCoord;
             const vector2 sizeNormalizationFactor =
                     vector2(1.0, 1.0) / wholeFilmSize; //(1.0 / subFilm.width(), 1.0 / subFilm.height());
