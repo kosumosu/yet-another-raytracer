@@ -9,6 +9,12 @@ class Scene;
 
 namespace renderers
 {
+	struct Rect
+	{
+		uint_vector2 top_left;
+		uint_vector2 size;
+	};
+
 	template <class TRayIntegrator>
 	class IRenderer
 	{
@@ -23,7 +29,14 @@ namespace renderers
 
 		virtual ~IRenderer() = default;
 
-		virtual void Render(Film& film, const Scene& scene, ray_integrator_factory_t rayIntegratorFactory, const std::stop_token& stopToken) const = 0;
+		virtual void Render(
+			Film& film,
+			const Rect& rectToRender,
+			const Camera& camera,
+			std::size_t samplesPerPixel,
+			ray_integrator_factory_t rayIntegratorFactory,
+			const std::stop_token& stopToken
+			) const = 0;
 
 		virtual void PrintStats(std::wostream& stream) const = 0;
 	};

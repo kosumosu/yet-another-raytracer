@@ -39,14 +39,7 @@ add_executable(yet_another_raytracer
         TransformCommandFactory.cpp
         TransformCommandProcessor.cpp
         main.cpp
-        applications/IApplication.h
-        applications/ConsoleApplication.h
-        SceneGeneration.h
-        applications/NanaApplication.h
         applications/NanaApplication.cpp
-        cloudscape/cloudscape_scene.h
-        cloudscape/cloudscape_integrator.h
-        cloudscape/prepared_scene.h
 )
 
 target_include_directories(yet_another_raytracer PRIVATE ".")

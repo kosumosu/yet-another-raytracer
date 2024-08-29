@@ -6,6 +6,7 @@
 
 #include "Hit.h"
 #include "Material.h"
+#include "Raytracer.h"
 #include "Statistics.h"
 
 #include "color_functions.hpp"
@@ -27,6 +28,7 @@ private:
     //constexpr space_real BIAS = space_real(0); // std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 
     raytracer_t raytracer_;
+    const std::size_t maxTraceDepth_;
     const infinity_func infinityEvaluator_;
 
     mutable statistics::Stats stats_;
@@ -36,8 +38,10 @@ private:
 
 public:
     MonteCarloPathIntegrator(raytracer_t raytracer, const std::vector<const LightSource*>& lights,
+                             std::size_t maxTraceDepth,
                              infinity_func infinityEvaluator)
         : raytracer_{std::move(raytracer)}
+          , maxTraceDepth_{maxTraceDepth}
           , infinityEvaluator_(std::move(infinityEvaluator))
     {
         if (lights.empty())
@@ -70,8 +74,8 @@ public:
         }
     }
 
-    color_rgb EvaluateRay(const ray3& ray, unsigned bounceLimit, space_real bias,
-                           math::Sampler<space_real>& sampler) override
+    color_rgb EvaluateRay(const ray3& ray, space_real bias,
+                          math::Sampler<space_real>& sampler) override
     {
         color_rgb integral(color_rgb::zero());
         color_rgb throughput(color_rgb::fill(1));
@@ -82,7 +86,7 @@ public:
 
         Hit hit = raytracer_.TraceRay(ray, bias);
 
-        for (unsigned bounce = 0; bounce < bounceLimit - 1; ++bounce)
+        for (unsigned bounce = 0; bounce < maxTraceDepth_ - 1; ++bounce)
         {
             if (!hit.has_occurred())
             {
@@ -189,14 +193,14 @@ public:
         }
 
         // last bounce is a special case
-        if (bounceLimit > 0 && !earlyExit)
+        if (maxTraceDepth_ > 0 && !earlyExit)
         {
             if (!hit.has_occurred())
             {
                 const auto infinityPayload = infinityEvaluator_(currentRay) * throughput;
                 assert(!math::anyNan(infinityPayload));
                 integral += infinityPayload;
-                stats_.registerPath(!math::isZero(infinityPayload), bounceLimit);
+                stats_.registerPath(!math::isZero(infinityPayload), maxTraceDepth_);
             }
             else
             {
@@ -227,7 +231,7 @@ public:
                         const auto samplePayload = radianceAtCurrentPathVertex * throughput;
                         assert(!math::anyNan(samplePayload));
                         integral += samplePayload;
-                        stats_.registerPath(!math::isZero(samplePayload), bounceLimit + 1);
+                        stats_.registerPath(!math::isZero(samplePayload), maxTraceDepth_ + 1);
                     });
             }
         }
@@ -293,21 +297,20 @@ private:
                             auto lightValue = lightSample.evaluate();
 
                             auto brdfValue = hit.object()->material()->
-                                EvaluateNonDeltaScattering(
-                                    *hit.object(),
-                                    hit.point(),
-                                    hit.normal(),
-                                    hit.uvs(),
-                                    currentRay.direction(),
-                                    lightSample.direction,
-                                    sampler);
+                                                 EvaluateNonDeltaScattering(
+                                                     *hit.object(),
+                                                     hit.point(),
+                                                     hit.normal(),
+                                                     hit.uvs(),
+                                                     currentRay.direction(),
+                                                     lightSample.direction,
+                                                     sampler);
 
                             const auto lightSamplePdf = color_real(optionalLightSample.getPdf());
 
                             auto radianceByLight = lightValue * brdfValue
                                 * geometricTerm * color_real(math::oneOverPi)
-                            / lightSamplePdf
-                            ;
+                                / lightSamplePdf;
 
                             //if (radianceByLight[0] < color_real(0.0) || radianceByLight[1] < color_real(0.0) || radianceByLight[2] < color_real(0.0))
                             //	throw std::exception();

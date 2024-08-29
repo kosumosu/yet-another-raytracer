@@ -20,7 +20,6 @@
 
 namespace renderers
 {
-
     struct Bucket
     {
         const uint_vector2 start;
@@ -69,26 +68,18 @@ namespace renderers
         }
 
 
-
-
-        void Render(Film& film, const Scene& scene, typename IRenderer<TRayIntegrator>::ray_integrator_factory_t rayIntegratorFactory,
-                    const std::stop_token& stopToken) const override
+        void Render(
+            Film& film,
+            const Rect& rectToRender,
+            const Camera& camera,
+            const std::size_t samplesPerPixel,
+            typename IRenderer<TRayIntegrator>::ray_integrator_factory_t rayIntegratorFactory,
+            const std::stop_token& stopToken) const override
         {
-            std::vector<const LightSource*> lights(scene.lights().size());
-            std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights),
-                           [](const auto& lightPtr) { return lightPtr.get(); });
+            const auto cropStart = rectToRender.top_left;
+            const auto cropEnd = rectToRender.top_left + rectToRender.size;
 
-            const bool isCropped = scene.getCropWidth() > 0 && scene.getCropHeight() > 0;
-
-            const uint_vector2 viewportSize{scene.viewport_width(), scene.viewport_height()};
-            const uint_vector2 cropStart = isCropped
-                                               ? uint_vector2{scene.getCropX(), scene.getCropY()}
-                                               : uint_vector2::zero();
-            const uint_vector2 cropSize = isCropped
-                                              ? uint_vector2{scene.getCropWidth(), scene.getCropHeight()}
-                                              : viewportSize;
-            const uint_vector2 cropEnd = cropStart + cropSize;
-            const uint_vector2 gridSize = math::intDivideRoundUp(cropSize, bucketSize_);
+            const uint_vector2 gridSize = math::intDivideRoundUp(rectToRender.size, bucketSize_);
 
             const auto totalBuckets = gridSize[0] * gridSize[1];
 
@@ -124,7 +115,7 @@ namespace renderers
 
                             auto reportAreaFinished = areaStartedCallback_(bucketMinCorner, bucketMaxCorner);
 
-                            ProcessBucket(subFilm, film.size(), scene, integrator, Bucket{bucketMinCorner, bucketSize},
+                            ProcessBucket(subFilm, film.size(), camera, samplesPerPixel, integrator, Bucket{bucketMinCorner, bucketSize},
                                           stopToken);
                             film.transferFilm(subFilm, bucketMinCorner, bucketSize);
 
@@ -165,8 +156,14 @@ namespace renderers
 
     private:
         void
-        ProcessBucket(Film& film, const uint_vector2& wholeFilmSize, const Scene& scene, RayIntegrator& rayIntegrator,
-                      const Bucket& bucket, const std::stop_token& stopToken) const
+        ProcessBucket(
+            Film& film,
+            const uint_vector2& wholeFilmSize,
+            const Camera& camera,
+            const std::size_t samplesPerPixel,
+            RayIntegrator& rayIntegrator,
+            const Bucket& bucket,
+            const std::stop_token& stopToken) const
         {
             for (size_t y = 0; y < bucket.size[1]; ++y)
             {
@@ -175,7 +172,8 @@ namespace renderers
                     if (stopToken.stop_requested())
                         return;
                     const uint_vector2 localCoord{x, y};
-                    ProcessPixel(film, wholeFilmSize, scene, rayIntegrator, localCoord, bucket.start + localCoord);
+                    ProcessPixel(film, wholeFilmSize, camera, samplesPerPixel, rayIntegrator, localCoord,
+                                 bucket.start + localCoord);
                 }
             }
         }
@@ -183,7 +181,8 @@ namespace renderers
         void ProcessPixel(
             Film& subFilm,
             const uint_vector2& wholeFilmSize,
-            const Scene& scene,
+            const Camera& camera,
+            const std::size_t samplesPerPixel,
             RayIntegrator& rayIntegrator,
             const uint_vector2& subFilmCoord,
             const uint_vector2& wholeFilmCoord) const
@@ -191,15 +190,15 @@ namespace renderers
             const unsigned seed = xxhash32(wholeFilmCoord);
             math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
 
-            const bool doJitter = scene.getSamplesPerPixel() > 1;
-            const color_real sampleWeight = color_real(1.0) / color_real(scene.getSamplesPerPixel());
+            const bool doJitter = samplesPerPixel > 1U;
+            const color_real sampleWeight = color_real(1.0) / color_real(samplesPerPixel);
             color_rgb averageColor = color_rgb::zero();
             const vector2 pixelLeftBottomCoord = wholeFilmCoord;
             const vector2 sizeNormalizationFactor =
                 vector2(1.0, 1.0) / wholeFilmSize; //(1.0 / subFilm.width(), 1.0 / subFilm.height());
             const auto aspectRatio = space_real(wholeFilmSize[0]) / space_real(wholeFilmSize[1]);
 
-            for (std::size_t i = 0; i < scene.getSamplesPerPixel(); i++)
+            for (std::size_t i = 0; i < samplesPerPixel; i++)
             {
                 const auto shiftInsidePixel = doJitter
                                                   ? math::linearRand(vector2(0.0, 0.0), vector2(1.0, 1.0),
@@ -207,10 +206,10 @@ namespace renderers
                                                   : vector2(0.5, 0.5);
                 const auto jitteredCoord = pixelLeftBottomCoord + shiftInsidePixel;
 
-                const auto ray = scene.camera()->GetViewRay(jitteredCoord * sizeNormalizationFactor, aspectRatio);
+                const auto ray = camera.GetViewRay(jitteredCoord * sizeNormalizationFactor, aspectRatio);
 
                 const auto rayPayload =
-                    rayIntegrator.EvaluateRay(ray, scene.max_trace_depth(), space_real(0.0), pixelPersonalSampler) *
+                    rayIntegrator.EvaluateRay(ray, space_real(0.0), pixelPersonalSampler) *
                     sampleWeight;
                 assert(!std::isnan(rayPayload[0]) && !std::isnan(rayPayload[1]) && !std::isnan(rayPayload[2]) &&
                     !std::isnan(rayPayload[3]));
