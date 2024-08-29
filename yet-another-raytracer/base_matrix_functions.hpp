@@ -140,7 +140,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	base_matrix<T, ROWS, COLS> transpose(const base_matrix<T, COLS, ROWS> & mat)
+	constexpr base_matrix<T, ROWS, COLS> transpose(const base_matrix<T, COLS, ROWS> & mat)
 	{
 		base_matrix<T, ROWS, COLS> res = base_matrix<T, ROWS, COLS>::identity();
 		for (std::size_t j = 0; j < ROWS; j++)

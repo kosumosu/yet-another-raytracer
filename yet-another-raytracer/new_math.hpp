@@ -7,6 +7,7 @@
 #include "vector_functions.hpp"
 //#include "base_vector3.hpp"
 #include "vector3_operations.hpp"
+#include "vector3_functions.hpp"
 //#include "vector4.hpp"
 #if defined(MATH_ENABLE_SSE)
 #include "sse_float_vector3.hpp"
