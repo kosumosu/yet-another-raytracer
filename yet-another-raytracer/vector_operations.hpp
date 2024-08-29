@@ -12,7 +12,7 @@
 namespace math
 {
 	template <typename T, std::size_t N>
-	bool operator ==( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr bool operator ==( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		bool equals = true;
 		iterate<0, N - 1>([&](std::size_t i)
@@ -23,13 +23,13 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	bool operator !=( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr bool operator !=( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		return !(one == another);
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> operator +( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr vector<T, N> operator +( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -50,7 +50,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> operator -( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr vector<T, N> operator -( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -82,7 +82,7 @@ namespace math
 	}
 
 	template <typename T1, typename T2, std::size_t N>
-	auto operator *(const vector<T1, N>& one, const vector<T2, N>& another)
+	constexpr auto operator *(const vector<T1, N>& one, const vector<T2, N>& another)
 	{
 		using TResult = decltype(one[0] * another[0]);
 		auto res = vector<TResult, N>::zero();
@@ -104,7 +104,7 @@ namespace math
 	}
 
 	template <typename T1, typename T2, std::size_t N>
-	auto operator *(const vector<T1, N>& one, const T2& scalar)
+	constexpr auto operator *(const vector<T1, N>& one, const T2& scalar)
 	{
 		using TResult = decltype(one[0] * scalar);
 		auto res = vector<TResult, N>::zero();
@@ -126,7 +126,7 @@ namespace math
 	}
 
 	template <typename T1, typename T2, std::size_t N>
-	auto operator *( const T1 & scalar, const vector<T2, N> & another)
+	constexpr auto operator *( const T1 & scalar, const vector<T2, N> & another)
 	{
 		using TResult = decltype(scalar * another[0]);
 		auto res = vector<TResult, N>::zero();
@@ -139,7 +139,7 @@ namespace math
 
 
 	template <typename T1, typename T2, std::size_t N>
-	auto operator /(const vector<T1, N>& one, const vector<T2, N>& another)
+	constexpr auto operator /(const vector<T1, N>& one, const vector<T2, N>& another)
 	{
 		using TResult = decltype(one[0] / another[0]);
 		auto res = vector<TResult, N>::zero();
@@ -151,7 +151,7 @@ namespace math
 	}
 
 	template <typename T1, typename T2, std::size_t N>
-	auto operator /(const vector<T1, N>& one, const T2& scalar)
+	constexpr auto operator /(const vector<T1, N>& one, const T2& scalar)
 	{
 		using TResult = decltype(one[0] / scalar);
 		auto res = vector<TResult, N>::zero();
@@ -163,7 +163,7 @@ namespace math
 	}
 
 	template <typename T1, typename T2, std::size_t N>
-	auto operator /(const T1& scalar, const vector<T2, N>& another)
+	constexpr auto operator /(const T1& scalar, const vector<T2, N>& another)
 	{
 		using TResult = decltype(scalar * another[0]);
 		auto res = vector<TResult, N>::zero();
@@ -175,7 +175,7 @@ namespace math
 	}
 
 	template <typename T1, typename T2, std::size_t N>
-	auto operator %(const vector<T1, N>& one, const vector<T2, N>& another)
+	constexpr auto operator %(const vector<T1, N>& one, const vector<T2, N>& another)
 	{
 		using TResult = decltype(one[0] % another[0]);
 		auto res = vector<TResult, N>::zero();

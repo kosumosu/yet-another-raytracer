@@ -22,20 +22,20 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	bool is_acute_angle(const vector<T, N> & one, const vector<T, N> & another)
+	constexpr bool is_acute_angle(const vector<T, N> & one, const vector<T, N> & another)
 	{
 		return dot(one, another) > 0;
 	}
 
 	template <typename T, std::size_t N>
-	bool is_obtuse_angle(const vector<T, N> & one, const vector<T, N> & another)
+	constexpr bool is_obtuse_angle(const vector<T, N> & one, const vector<T, N> & another)
 	{
 		return dot(one, another) < 0;
 	}
 
 	// Computes dot product and populates vector with this value.
 	template <typename T, std::size_t N>
-	vector<T, N> dot_vec( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr vector<T, N> dot_vec( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		static_assert(N > 0, "Vector must have at least one component.");
 
@@ -43,64 +43,64 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	T length2( const vector<T, N> & one )
+	constexpr T length2( const vector<T, N> & one )
 	{
 		return dot(one, one);
 	}
 
 	template <typename T, std::size_t N>
-	T length( const vector<T, N> & one )
+	constexpr T length( const vector<T, N> & one )
 	{
 		return std::sqrt(length2(one));
 	}
 
 	// Not guaranteed to be precise but may be faster.
 	template <typename T, std::size_t N>
-	T fast_length( const vector<T, N> & one )
+	constexpr T fast_length( const vector<T, N> & one )
 	{
 		return length(one);
 	}
 
 	template <typename T, std::size_t N>
-	T inv_length( const vector<T, N> & one )
+	constexpr T inv_length( const vector<T, N> & one )
 	{
 		return T(1) / length(one);
 	}
 
 	// Not guaranteed to be precise but may be faster.
 	template <typename T, std::size_t N>
-	T fast_inv_length( const vector<T, N> & one )
+	constexpr T fast_inv_length( const vector<T, N> & one )
 	{
 		return T(1) / fast_length(one);
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> normalize( const vector<T, N> & one )
+	constexpr vector<T, N> normalize( const vector<T, N> & one )
 	{
 		return one * inv_length(one);
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> fast_normalize( const vector<T, N> & one )
+	constexpr vector<T, N> fast_normalize( const vector<T, N> & one )
 	{
 		return one * fast_inv_length(one);
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> reciprocal( const vector<T, N> & one )
+	constexpr vector<T, N> reciprocal( const vector<T, N> & one )
 	{
 		return T(1) / one;
 	}
 
 	// Not guaranteed to be precise but may be faster.
 	template <typename T, std::size_t N>
-	vector<T, N> fast_reciprocal( const vector<T, N> & one )
+	constexpr vector<T, N> fast_reciprocal( const vector<T, N> & one )
 	{
 		return reciprocal(one);
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> max( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr vector<T, N> max( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -111,7 +111,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> min( const vector<T, N> & one, const vector<T, N> & another)
+	constexpr vector<T, N> min( const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -122,7 +122,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	T max_element(const vector<T, N> & one)
+	constexpr T max_element(const vector<T, N> & one)
 	{
 		T res = one[0];
 		iterate<1, N - 1>([&](std::size_t i)
@@ -133,7 +133,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	T min_element(const vector<T, N> & one)
+	constexpr T min_element(const vector<T, N> & one)
 	{
 		T res = one[0];
 		iterate<1, N - 1>([&](std::size_t i)
@@ -144,13 +144,13 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> clamp(const vector<T, N> & vec, const vector<T, N> & low, const vector<T, N> & high)
+	constexpr vector<T, N> clamp(const vector<T, N> & vec, const vector<T, N> & low, const vector<T, N> & high)
 	{
 		return min(high, max(low, vec));
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> abs(const vector<T, N> & one)
+	constexpr vector<T, N> abs(const vector<T, N> & one)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -199,7 +199,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> blend( const vector<T, N> & one, const vector<T, N> & another, const T & fraction)
+	constexpr vector<T, N> blend( const vector<T, N> & one, const vector<T, N> & another, const T & fraction)
 	{
 		const T inv_fraction = T(1) - fraction;
 		vector<T, N> res = vector<T, N>::zero();
@@ -211,7 +211,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> blend( const vector<T, N> & one, const vector<T, N> & another, const vector<T, N> & fractions)
+	constexpr vector<T, N> blend( const vector<T, N> & one, const vector<T, N> & another, const vector<T, N> & fractions)
 	{
 		const auto inv_fraction = vector<T, N>::fill(1) - fractions;
 		vector<T, N> res = one * inv_fraction + another * fractions;
@@ -219,7 +219,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> pow(const vector<T, N> & one, const T & power)
+	constexpr vector<T, N> pow(const vector<T, N> & one, const T & power)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -230,7 +230,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> pow(const vector<T, N> & one, const vector<T, N> & another)
+	constexpr vector<T, N> pow(const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -241,7 +241,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	vector<T, N> intDivideRoundUp(const vector<T, N> & one, const vector<T, N> & another)
+	constexpr vector<T, N> intDivideRoundUp(const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res = vector<T, N>::zero();
 		iterate<0, N - 1>([&](std::size_t i)
@@ -252,7 +252,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
-	bool anyNan(const vector<T, N>& one)
+	constexpr bool anyNan(const vector<T, N>& one)
 	{
 		bool isNan = false;
 		iterate<0, N - 1>([&](std::size_t i)
@@ -263,7 +263,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t N, typename TCallable>
-	auto mapElements(const vector<T, N>& one, TCallable&& callable)
+	constexpr auto mapElements(const vector<T, N>& one, TCallable&& callable)
 	{
 		using TResult = std::invoke_result_t<TCallable, const T&>;
 		auto res = vector<TResult, N>::zero();
@@ -276,25 +276,25 @@ namespace math
 
 
 	template <typename T, std::size_t N>
-	auto floor(const vector<T, N>& one)
+	constexpr auto floor(const vector<T, N>& one)
 	{
 		return mapElements(one, [](const auto& val) { return std::floor(val); });
 	}
 
 	template <typename TInt, typename T, std::size_t N>
-	auto fast_floor_int(const vector<T, N>& one)
+	constexpr auto fast_floor_int(const vector<T, N>& one)
 	{
 		return mapElements(one, [](const auto& val) { return static_cast<TInt>(std::floor(val)); });
 	}
 
 	template <typename TResult, typename T, std::size_t N>
-	auto cast(const vector<T, N>& one)
+	constexpr auto cast(const vector<T, N>& one)
 	{
 		return mapElements(one, [](const auto& val) { return static_cast<TResult>(val); });
 	}
 
 	template <typename T, std::size_t N>
-	bool isZero(const vector<T, N>& one)
+	constexpr bool isZero(const vector<T, N>& one)
 	{
 		bool isZero = true;
 		iterate<0, N - 1>([&](std::size_t i)
