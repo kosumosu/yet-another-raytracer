@@ -1,7 +1,7 @@
 #include "DirectionalLightSource.h"
 #include "LightingContext.h"
 #include "Scene.h"
-#include "color_functions.hpp"
+#include "color/color_functions.hpp"
 #include <limits>
 
 using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;

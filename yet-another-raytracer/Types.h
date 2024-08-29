@@ -1,8 +1,8 @@
 #pragma once
 
 #include "new_math.hpp"
-#include "ray.hpp"
-#include "bounding_box.hpp"
+#include "math/ray.hpp"
+#include "math/bounding_box.hpp"
 
 #include <cstdint>
 

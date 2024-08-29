@@ -1,6 +1,6 @@
 #include "BlinnMaterial.h"
 #include "Texture.h"
-#include "color_functions.hpp"
+#include "color/color_functions.hpp"
 
 #define ENABLE_IMPORTANCE_SAMPLING true
 

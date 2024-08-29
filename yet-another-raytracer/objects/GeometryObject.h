@@ -2,7 +2,7 @@
 
 #include "Hit.h"
 #include "Types.h"
-#include "random_sample.hpp"
+#include "math/random_sample.hpp"
 #include "Sampler.h"
 
 #include <memory>

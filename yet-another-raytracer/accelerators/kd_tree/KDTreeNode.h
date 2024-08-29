@@ -1,7 +1,7 @@
 #pragma once
 
 #include "objects/GeometryObject.h"
-#include "bounding_box.hpp"
+#include "math/bounding_box.hpp"
 
 namespace accelerators::kd_tree
 {

@@ -2,14 +2,14 @@
 
 #include "RayIntegrator.h"
 
-#include "discrete_distribution.hpp"
+#include "math/discrete_distribution.hpp"
 
 #include "Hit.h"
 #include "Material.h"
 #include "Raytracer.h"
 #include "Statistics.h"
 
-#include "color_functions.hpp"
+#include "color/color_functions.hpp"
 
 #include <functional>
 #include <LightingContext.h>

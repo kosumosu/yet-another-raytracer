@@ -1,15 +1,9 @@
 #include "SphereObject.h"
 
-#include "ray_functions.hpp"
+#include "math/ray_functions.hpp"
 
 namespace objects
 {
-	SphereObject::SphereObject()
-		: m_center(vector3(0.0, 0.0, 0.0))
-		, m_radius(1.0)
-	{
-	}
-
 	Hit SphereObject::FindHit(const ray3& ray, space_real minDistance, space_real maxDistance) const
 	{
 		const auto inversed_ray = math::transform3by4x4(ray, this->inverse_transform());

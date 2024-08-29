@@ -1,7 +1,7 @@
 #pragma once
 
 #include "LightSource.h"
-#include "discrete_distribution.hpp"
+#include "math/discrete_distribution.hpp"
 #include "Types.h"
 #include "objects/GeometryObject.h"
 

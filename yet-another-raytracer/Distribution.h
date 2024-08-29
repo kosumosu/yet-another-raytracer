@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <utility>
-#include "random_sample.hpp"
+#include "math/random_sample.hpp"
 
 template <typename TSample, typename TPdfSample, typename TProbability>
 class Distribution

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ray.hpp"
 #include "Types.h"
 
 #include <utility>

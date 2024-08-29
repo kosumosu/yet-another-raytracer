@@ -2,12 +2,12 @@
 
 #include "atmosphere_math.h"
 
-#include "color_functions.hpp"
+#include "color/color_functions.hpp"
 
 #include "prepared_scene.h"
 
 #include "integrators/RayIntegrator.h"
-#include "ray.hpp"
+#include "math/ray.hpp"
 
 #include <limits>
 
@@ -63,7 +63,7 @@ namespace cloudscape
             for (size_t i = 0; i < scene_.scene.rendering.samples; ++i)
             {
                 const math::ray current_ray{current_pos, ray.origin()};
-                const auto dist_to_planet_center2 = math::length2(current_pos - scene_.planet_pos);
+                const auto dist_to_planet_center2 = math::length2(current_pos - scene_.planet.center());
 
                 if (dist_to_planet_center2 < lower_cloud_bound2 || dist_to_planet_center2 > upper_cloud_bound2)
                 {
@@ -148,7 +148,7 @@ namespace cloudscape
                     //         scene_.scene.rendering.step
                     //     );
 
-                    if (color::get_importance(transp) < scene_.scene.optimizations.optimizations_cutoffthresshold)
+                    if (color::get_importance(transp) < scene_.scene.optimizations.cutoffthresshold)
                         break;
                 }
             }

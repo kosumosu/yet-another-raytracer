@@ -8,11 +8,11 @@ namespace cloudscape
     {
         float turbidity;
         float samples;
-        float groundcolor;
+        uint32_t groundcolor;
         float dispersion;
         float atmosradius;
         float airdensity;
-        float aircolor;
+        uint32_t aircolor;
         float planetradius;
     };
 
@@ -25,14 +25,14 @@ namespace cloudscape
 
     struct optimizations
     {
-        float optimizations_cutoffthresshold;
-        float optimizations_stepfalloff;
-        float optimizations_detailfalloff;
-        uint32_t optimizations_maxsubdivs;
-        uint32_t optimizations_maxshadowsubdivs;
-        float optimizations_subdivthresshold;
-        float optimizations_shadowstep;
-        uint32_t optimizations_shadowsamples;
+        float cutoffthresshold;
+        float stepfalloff;
+        float detailfalloff;
+        uint32_t maxsubdivs;
+        uint32_t maxshadowsubdivs;
+        float subdivthresshold;
+        float shadowstep;
+        uint32_t shadowsamples;
     };
 
     struct rendering
