@@ -44,6 +44,7 @@ add_executable(yet_another_raytracer
 
 target_include_directories(yet_another_raytracer PRIVATE ".")
 include_directories(${PNGPP_INCLUDE_DIR})
+include_directories(../3rdparty)
 
 #find_package(ZLIB REQUIRED)
 
@@ -88,8 +89,6 @@ target_link_libraries(yet_another_raytracer PRIVATE
         png_static
         nana
 )
-
-
 
 
 target_compile_options(yet_another_raytracer PRIVATE "-Wno-deprecated-enum-enum-conversion")
