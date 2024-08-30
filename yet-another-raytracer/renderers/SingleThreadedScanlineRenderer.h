@@ -2,7 +2,7 @@
 
 #include "IRenderer.h"
 #include "Film.h"
-#include "Hashing.h"
+#include "hashing/hashing.h"
 #include "Scene.h"
 #include "Statistics.h"
 #include "integrators/RayIntegrator.h"
@@ -92,7 +92,7 @@ namespace renderers
             RayIntegrator& rayIntegrator,
             const uint_vector2& wholeFilmCoord) const
         {
-            const unsigned seed = xxhash32(wholeFilmCoord);
+            const unsigned seed = hashing::default_1d_hash(wholeFilmCoord);
             math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
 
             const bool doJitter = samplesPerPixel > 1;

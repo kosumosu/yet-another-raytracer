@@ -2,7 +2,7 @@
 
 #include "IBucketSequencer.h"
 #include "IRenderer.h"
-#include "Hashing.h"
+#include "hashing/hashing.h"
 #include "LightSource.h"
 #include "Scene.h"
 #include "Statistics.h"
@@ -187,7 +187,7 @@ namespace renderers
             const uint_vector2& subFilmCoord,
             const uint_vector2& wholeFilmCoord) const
         {
-            const unsigned seed = xxhash32(wholeFilmCoord);
+            const unsigned seed = hashing::default_1d_hash(wholeFilmCoord);
             math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
 
             const bool doJitter = samplesPerPixel > 1U;
