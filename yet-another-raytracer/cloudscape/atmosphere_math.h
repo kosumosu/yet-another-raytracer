@@ -62,11 +62,24 @@ namespace cloudscape
         return optmass(x1, x2, y, density, planet_radius, height_scale);
     }
 
-    constexpr space_real rayleigh_extinction(space_real wavelength)
+    // From https://www.shadertoy.com/view/X3fXRn
+    // Returns Mie volume-scattering coefficient (scalar, assumed
+    // wavelength-independent), in m^-1.
+    constexpr space_real turbidity_to_mie_extinction(space_real extinction_at_550nm, space_real rayleigh_scale_height, space_real mie_scale_height, space_real turbidity)
     {
-        constexpr auto sea_level_concentration = space_real(666.0);
-        return space_real(8.0) * pi_cube * square(ior_air_sqr - space_real(1.0)) / (space_real(3.0) * sea_level_concentration * square(square(wavelength)));
+        // NOTE: the vertical optical depth is just B*H.
+        return (turbidity - space_real(1.0)) * extinction_at_550nm * rayleigh_scale_height / mie_scale_height;
     }
+
+    // Using the reference value of Rayleigh volume-scattering
+    // coefficient at 550 nm.
+    // See https://www.shadertoy.com/view/43j3zm.
+    constexpr float turbidity_to_mie_extinction(space_real rayleigh_scale_height, space_real mie_scale_height, space_real turbidity)
+    {
+        return turbidity_to_mie_extinction(1.149e-5, rayleigh_scale_height, mie_scale_height, turbidity);
+    }
+
+
 
 
     // constexpr static space_real beta_total_rayleigh(space_real lambda, space_real pressure)

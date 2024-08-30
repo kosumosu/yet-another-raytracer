@@ -26,6 +26,8 @@
 #include <iomanip>
 #include <memory>
 #include <mutex>
+
+#include "cloudscape/presets.h"
 #if defined(_WIN32)
 #include <tchar.h>
 #endif
@@ -79,14 +81,9 @@ renderers::Rect getCroppedRectToRender(const Scene scene)
     return {std::move(cropStart), std::move(cropSize)};
 }
 
-enum class RenderMode
-{
-    Regular,
-    Cloudscape
-};
-
-void Render(RenderMode renderMode, const std::filesystem::path& scene_file,
-            const std::filesystem::path& output_image_file)
+void RenderRegular(const std::filesystem::path& scene_file,
+                   const std::filesystem::path& output_image_file
+)
 {
 #if false
     applications::ConsoleApplication application;
@@ -100,7 +97,7 @@ void Render(RenderMode renderMode, const std::filesystem::path& scene_file,
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
-        const auto& reportAeaStarted,
+        const auto& reportAreaStarted,
         const auto& reportRenderingFinihsed,
         const auto& print_info)
         {
@@ -182,7 +179,7 @@ void Render(RenderMode renderMode, const std::filesystem::path& scene_file,
                         processTotalElapsed
                     ));
                 },
-                reportAeaStarted,
+                reportAreaStarted,
                 reportProgress);
 #else
 	const SingleThreadedScanlineRenderer renderer(
@@ -239,6 +236,104 @@ void Render(RenderMode renderMode, const std::filesystem::path& scene_file,
     );
 }
 
+void RenderCloudscape(const std::filesystem::path& scene_file,
+                      const std::filesystem::path& output_image_file
+)
+{
+#if false
+    applications::ConsoleApplication application;
+#else
+    applications::NanaApplicaion application;
+#endif
+
+
+    application.run(
+        [&scene_file, &output_image_file](
+        const auto& stopToken,
+        const auto& initialize,
+        const auto& reportProgress,
+        const auto& reportAreaStarted,
+        const auto& reportRenderingFinihsed,
+        const auto& print_info)
+        {
+            cloudscape::cloudscape_scene scene{};
+
+            if constexpr (false)
+            {
+                //LoadFromFile(scene, scene_file);
+            }
+            else
+            {
+                cloudscape::LoadThickAntarctica(scene);
+            }
+
+            const auto prepared_scene = cloudscape::prepare_scene(scene);
+
+            std::mutex coutMutex;
+            ProcessTimeStopwatch processTimeStopwatch;
+            StdHigheResolutionClockStopwatch realTimeStopwatch;
+            processTimeStopwatch.Restart();
+            realTimeStopwatch.Restart();
+
+            Film film({scene.rendering.width, scene.rendering.height});
+            float processInitTime;
+            float realInitTime;
+
+            initialize({scene.rendering.width, scene.rendering.height});
+
+            using integrator_t = cloudscape::CloudscapeIntegrator;
+
+            const renderers::BucketRenderer<typeof(integrator_t)> renderer(
+                {scene.rendering.bucketwidth, scene.rendering.bucketheight},
+                std::make_unique<TopDownSequencer>(),
+                [&]()
+                {
+                    processInitTime = processTimeStopwatch.Sample();
+                    realInitTime = realTimeStopwatch.Sample();
+
+                    print_info(std::format(L"Initialization finished. Real time={:.3f}sec. Process time={:.3f}sec\n",
+                                           realInitTime, processInitTime));
+                },
+                [&]()
+                {
+                    const auto processTotalElapsed = processTimeStopwatch.Sample();
+                    const auto realTotalElapsed = realTimeStopwatch.Sample();
+
+                    print_info(std::format(
+                        L"Rendering finished.\n"
+                        "Real time : {:.3f}sec\n"
+                        "Total real time : {:.3f}sec\n"
+                        "Process time : {:.3f}sec\n"
+                        "Total process time : {:.3f}sec\n",
+                        realTotalElapsed - realInitTime,
+                        realTotalElapsed,
+                        processTotalElapsed - processInitTime,
+                        processTotalElapsed
+                    ));
+                },
+                reportAreaStarted,
+                reportProgress);
+
+            renderer.Render(
+                film,
+                { uint_vector2::zero(), film.size()},
+                // { uint_vector2 { 320, 240 }, {1, 1}},
+                prepared_scene.camera,
+                1,
+                [&prepared_scene]
+                {
+                    return cloudscape::CloudscapeIntegrator{prepared_scene};
+                }, stopToken);
+
+            reportRenderingFinihsed(film);
+
+            // renderer.PrintStats(std::wcout);
+
+            film.SaveAsPng(output_image_file);
+        }
+    );
+}
+
 #if defined(_WIN32)
 int wmain(int argc, const wchar_t* argv[])
 {
@@ -251,7 +346,7 @@ int wmain(int argc, const wchar_t* argv[])
         auto image_path = std::filesystem::path(scene_path);
         image_path.replace_extension(".png");
 
-        Render(RenderMode::Cloudscape, std::filesystem::path(argv[2]), image_path);
+        RenderCloudscape(std::filesystem::path(argv[2]), image_path);
 
         openImageFileForDisplay(image_path.c_str());
     }
@@ -260,7 +355,7 @@ int wmain(int argc, const wchar_t* argv[])
         const auto scene_path = std::filesystem::path(argv[1]);
         auto image_path = std::filesystem::path(scene_path);
         image_path.replace_extension(".png");
-        Render(RenderMode::Regular, std::filesystem::path(argv[1]), image_path);
+        RenderRegular(std::filesystem::path(argv[1]), image_path);
 
         openImageFileForDisplay(image_path.c_str());
     }

@@ -9,6 +9,8 @@
 #include "integrators/RayIntegrator.h"
 #include "math/ray.hpp"
 
+#include <PerlinNoise.hpp>
+
 #include <limits>
 
 namespace cloudscape
@@ -31,28 +33,42 @@ namespace cloudscape
         float distance_after;
     };
 
+    struct atmospheric_sample
+    {
+        color_rgb inscatter;
+        color_rgb transparency;
+    };
+
     class CloudscapeIntegrator final : public RayIntegrator
     {
         constexpr static space_real EPS = std::numeric_limits<float>::epsilon() * 1.0f;
         constexpr static float MAX_DIST = std::numeric_limits<float>::max();
 
         const prepared_scene scene_;
+        const siv::PerlinNoise noise_;
         //std::vector<sample> samples_;
 
     public:
-        explicit CloudscapeIntegrator(prepared_scene scene): scene_(std::move(scene))
+        explicit CloudscapeIntegrator(prepared_scene scene)
+            : scene_(std::move(scene))
+              , noise_{1234}
         {
         }
 
         color_rgb EvaluateRay(const ray3& ray, space_real bias,
                               math::Sampler<space_real>& sampler) override
         {
-            //samples_.clear();
+            return EvaluateRayImpl(ray, bias, sampler, 2);
+        }
 
-            const auto lower_cloud_bound2 = square(
-                scene_.scene.planet.planetradius + scene_.scene.clouds.height - scene_.scene.clouds.thickness);
-            const auto upper_cloud_bound2 = square(
-                scene_.scene.planet.planetradius + scene_.scene.clouds.height + scene_.scene.clouds.thickness);
+        color_rgb EvaluateRayImpl(const ray3& ray, space_real bias,
+                              math::Sampler<space_real>& sampler, size_t depth_left) const
+        {
+            if (depth_left == 0)
+                return color_rgb::zero();
+
+            const auto lower_cloud_bound2 = square(scene_.lower_cloud_bound.radius());
+            const auto upper_cloud_bound2 = square(scene_.upper_cloud_bound.radius());
 
             color_rgb total_color = color_rgb::zero();
             color_rgb transp = color_rgb::fill(1.0);
@@ -62,7 +78,7 @@ namespace cloudscape
 
             for (size_t i = 0; i < scene_.scene.rendering.samples; ++i)
             {
-                const math::ray current_ray{current_pos, ray.origin()};
+                const math::ray current_ray{current_pos, ray.direction()};
                 const auto dist_to_planet_center2 = math::length2(current_pos - scene_.planet.center());
 
                 if (dist_to_planet_center2 < lower_cloud_bound2 || dist_to_planet_center2 > upper_cloud_bound2)
@@ -73,7 +89,7 @@ namespace cloudscape
                                                 : scene_.upper_cloud_bound.FindHit(
                                                     current_ray, 0.0f, MAX_DIST);
 
-                    const auto planet_hit = scene_.planet.FindHit(current_ray, 0.0f, MAX_DIST);
+                    const auto planet_hit = scene_.planet.FindHit(current_ray, 0.1f, MAX_DIST);
 
                     if (planet_hit.has_occurred() &&
                         (
@@ -81,22 +97,20 @@ namespace cloudscape
                             || !clouds_hit.has_occurred()
                         ))
                     {
-                        current_pos = planet_hit.point(); // bias ?
+                        const auto atmos_sample = EvaluateAtmosphere(current_pos, planet_hit.point());
 
-                        const auto sun_light_color = EvaluateLightRay({current_pos, scene_.sun_direction});
-                        const auto geom_factor = math::dot(planet_hit.normal(), scene_.sun_direction);
-                        const auto vertex_color = scene_.ground_color * (scene_.ambient_light_color + sun_light_color *
+                        total_color += atmos_sample.inscatter * transp;
+                        transp *= atmos_sample.transparency;
+
+                        const auto sun_light_color = EvaluateLightRay({planet_hit.point(), scene_.sun_direction}, bias, sampler, depth_left - 1);
+                        const auto geom_factor = std::max(space_real(0.0),
+                                                          math::dot(planet_hit.normal(), scene_.sun_direction));
+                        constexpr auto norm_factor = std::numbers::inv_pi_v<color_real>;
+                        const auto vertex_color = scene_.ground_color * (scene_.ambient_light_color + norm_factor * sun_light_color *
                             geom_factor);
 
                         total_color += vertex_color * transp;
 
-                        // samples_.emplace_back(
-                        //     currnet_pos,
-                        //     color_rgbx{total_color, 0.0f},
-                        //     samples_.size() + 1,
-                        //     samples_.size() - 1,
-                        //     scene_.scene.rendering.step
-                        // );
                         break;
                     }
                     else if (clouds_hit.has_occurred() &&
@@ -105,73 +119,100 @@ namespace cloudscape
                             || !planet_hit.has_occurred()
                         ))
                     {
+                        const auto atmos_sample = EvaluateAtmosphere(current_pos, clouds_hit.point());
+                        total_color += atmos_sample.inscatter * transp;
+                        transp *= atmos_sample.transparency;
+
                         current_pos = clouds_hit.point() + clouds_hit.point() * EPS;
                         total_distance += clouds_hit.distance();
                     }
                     else
                     {
-                        total_color += EvaluateAtmosphere(current_ray) * transp;
+                        const auto atmos_sample = EvaluateAtmosphere(current_ray);
+                        total_color += atmos_sample.inscatter * transp;
+                        transp *= atmos_sample.transparency;
                         break; // went to space
                     }
                 }
                 else
                 {
-                    // if (!samples_.empty())
-                    // {
-                    // const auto distance = samples_[samples_.size() - 1].distance_after;
                     const auto distance = scene_.scene.rendering.step;
-                    current_pos = current_pos + ray.direction() * distance;
+                    const auto new_pos = current_pos + ray.direction() * distance;
+
+                    const auto atmos_sample = EvaluateAtmosphere(current_pos, new_pos);
+                    total_color += atmos_sample.inscatter * transp;
+                    transp *= atmos_sample.transparency;
+
+                    current_pos = new_pos;
                     total_distance += distance;
-                    // }
-                    // else
-                    // {
-                    //     current_pos += ray.direction() * current_pos * EPS;
-                    //}
 
-                    // const auto actual_step = scene_.scene.rendering.step * std::pow(
-                    //     total_distance, scene_.scene.optimizations.optimizations_stepfalloff);
+                    const auto sun_light_color = EvaluateLightRay({current_pos, scene_.sun_direction}, bias, sampler, depth_left - 1);
+                    const auto color = scene_.cloud_color * sun_light_color * CloudPhaseFunction(
+                        math::dot(scene_.sun_direction, current_ray.direction()));
 
-                    const auto color = SampleVolume({ current_pos, ray.direction()});
+                    const auto density = SampleVolume(current_pos);
 
-                    const auto optical_density = color[3] * scene_.scene.rendering.step;
+                    const auto optical_density = density * scene_.scene.rendering.step;
                     const auto sample_transparency = std::exp(-optical_density);
                     const auto sample_opacity = 1.0f - sample_transparency;
 
-                    total_color += color.reduce() * sample_opacity * transp;
+                    total_color += color * sample_opacity * transp;
                     transp *= sample_transparency;
-
-                    // samples_.emplace_back(
-                    //         currnet_pos,
-                    //         color,
-                    //         samples_.size() + 1,
-                    //         samples_.size() - 1,
-                    //         scene_.scene.rendering.step
-                    //     );
 
                     if (color::get_importance(transp) < scene_.scene.optimizations.cutoffthresshold)
                         break;
                 }
             }
 
+            return total_color;
+        }
 
+        // TODO get rid of this
+        statistics::Stats getStats() const
+        {
+            return {};
         }
 
     private:
-        [[nodiscard]] color_rgb EvaluateLightRay(const ray3& ray) const
+        [[nodiscard]] color_rgb EvaluateLightRay(const ray3& ray, space_real bias,
+                              math::Sampler<space_real>& sampler, size_t depth_left) const
         {
-            return color_rgb::fill(0.5);
+            return EvaluateRayImpl(ray, bias, sampler, depth_left);
+            //return color_rgb::fill(0.5);
         }
 
         // result[3] is density, not transparency!
-        [[nodiscard]] color_rgbx SampleVolume(const ray3& ray) const
+        [[nodiscard]] space_real SampleVolume(const vector3& position) const
         {
-            return color_rgbx::fill(0.5);
+            const auto scaled_pos = position / scene_.scene.noise.size;
+            //return scene_.scene.clouds.fog * std::max(space_real(0.0), space_real(noise_.normalizedOctave3D(scaled_pos[0], scaled_pos[1], scaled_pos[2], 2)) - scene_.scene.clouds.coverage);
+
+            return
+                scene_.scene.clouds.fog
+                * std::max(space_real(0.0),
+                           space_real(
+                               space_real(scene_.scene.clouds.coverage - 0.5) * space_real(2.0) + noise_.
+                               normalizedOctave3D(scaled_pos[0], scaled_pos[1], scaled_pos[2],
+                                                  int(scene_.scene.noise.detail),
+                                                  scene_.scene.noise.multiplier)));
+        }
+
+        [[nodiscard]] space_real CloudPhaseFunction(space_real cosTheta) const
+        {
+            // Uniform for now
+            return space_real(0.25) * std::numbers::inv_pi_v<space_real>;
         }
 
         // should include sun
-        [[nodiscard]] color_rgb EvaluateAtmosphere(const ray3& ray) const
+        [[nodiscard]] atmospheric_sample EvaluateAtmosphere(const ray3& ray) const
         {
-            return color_rgb(0.5, 0.55, 0.8);
+            constexpr auto sun_angular_size_cos = std::cos(math::deg_to_rad(1.0));
+            const auto sun_cos = math::dot(ray.direction(), scene_.sun_direction);
+            const auto sun_addition = sun_cos >= sun_angular_size_cos ? scene_.sun_color : color_rgb::zero();
+            return {
+                color_rgb(0.5, 0.55, 0.8) + sun_addition,
+                color_rgb::zero()
+            };
 
             // auto beta_rayleigh = scene_.beta_total_rayleigh;
             // auto beta_mie = scene_.beta_total_mie;
@@ -179,5 +220,18 @@ namespace cloudscape
             //
         }
 
+        [[nodiscard]] atmospheric_sample EvaluateAtmosphere(const vector3& start, const vector3& end) const
+        {
+            auto transparency = math::exp(-color_rgb(0.00010, 0.00015, 0.0002) * math::length(end - start));
+            return {
+                color_rgb(0.5, 0.55, 0.8) * (color_rgb::fill(1.0) - transparency),
+                std::move(transparency)
+            };
+
+            // auto beta_rayleigh = scene_.beta_total_rayleigh;
+            // auto beta_mie = scene_.beta_total_mie;
+            //
+            //
+        }
     };
 }
