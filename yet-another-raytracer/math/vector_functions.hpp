@@ -241,6 +241,17 @@ namespace math
 	}
 
 	template <typename T, std::size_t N>
+	constexpr vector<T, N> exp(const vector<T, N> & powers)
+	{
+		vector<T, N> res = vector<T, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+		{
+			res[i] = std::exp(powers[i]);
+		});
+		return res;
+	}
+
+	template <typename T, std::size_t N>
 	constexpr vector<T, N> intDivideRoundUp(const vector<T, N> & one, const vector<T, N> & another)
 	{
 		vector<T, N> res = vector<T, N>::zero();

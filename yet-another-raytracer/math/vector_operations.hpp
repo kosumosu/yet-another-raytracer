@@ -186,4 +186,27 @@ namespace math
 		return res;
 	}
 
+	template <typename T1, typename T2, std::size_t N>
+	constexpr auto operator ^(const vector<T1, N>& one, const vector<T2, N>& another)
+	{
+		using TResult = decltype(one[0] % another[0]);
+		auto res = vector<TResult, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+		{
+			res[i] = one[i] ^ another[i];
+		});
+		return res;
+	}
+
+	template <typename T1, typename T2, std::size_t N>
+	constexpr auto operator >>(const vector<T1, N>& one, const T2& scalar)
+	{
+		using TResult = decltype(one[0] >> scalar);
+		auto res = vector<TResult, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+		{
+			res[i] = one[i] >> scalar;
+		});
+		return res;
+	}
 }

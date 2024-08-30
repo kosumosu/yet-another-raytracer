@@ -99,7 +99,7 @@ namespace math
 			return m_elements[index];
 		}
 
-		TSpace& operator[](std::size_t index)
+		constexpr TSpace& operator[](std::size_t index)
 		{
 			return m_elements[index];
 		}
