@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "objects/GeometryObject.h"
 #include "LightSource.h"
-#include "Material.h"
+#include "materials/Material.h"
 #include "Texture.h"
 
 #include <map>
@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-using MaterialCollection = std::map<std::string, std::shared_ptr<Material>>;
+using MaterialCollection = std::map<std::string, std::shared_ptr<materials::Material>>;
 using MapCollection = std::map<std::string, std::shared_ptr<Texture>>;
 
 class Scene

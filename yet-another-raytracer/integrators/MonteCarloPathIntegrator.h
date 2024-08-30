@@ -5,7 +5,7 @@
 #include "math/discrete_distribution.hpp"
 
 #include "Hit.h"
-#include "Material.h"
+#include "materials/Material.h"
 #include "Raytracer.h"
 #include "Statistics.h"
 
@@ -105,7 +105,7 @@ public:
                 hit.uvs(),
                 currentRay.direction(),
                 sampler,
-                [&](const bsdf_distribution& bsdfDistribution)
+                [&](const materials::bsdf_distribution& bsdfDistribution)
                 {
                     const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
                     color_rgb radianceAtCurrentPathVertex(color_rgb::zero());
@@ -211,7 +211,7 @@ public:
                     hit.uvs(),
                     currentRay.direction(),
                     sampler,
-                    [&](const bsdf_distribution& bsdfDistribution)
+                    [&](const materials::bsdf_distribution& bsdfDistribution)
                     {
                         const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
                         color_rgb radianceAtCurrentPathVertex(color_rgb::zero());
@@ -253,7 +253,7 @@ private:
         const ray3& currentRay,
         const Hit& hit,
         bool entering,
-        const bsdf_distribution& bsdfDistribution,
+        const materials::bsdf_distribution& bsdfDistribution,
         math::Sampler<space_real>& sampler)
     {
         if (!lightDistribution_.has_value())

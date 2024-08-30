@@ -1,5 +1,5 @@
 #include "GeometryLightSource.h"
-#include "Material.h"
+#include "materials/Material.h"
 #include "LightingContext.h"
 
 using lighting_functional_distribution = FunctionalDistribution<std::optional<light_sample>, vector3, space_real>;

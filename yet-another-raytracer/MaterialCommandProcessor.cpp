@@ -1,7 +1,7 @@
 #include "MaterialCommandProcessor.h"
 
-#include "BlinnMaterial.h"
-#include "DielectricMaterial.h"
+#include "materials/BlinnMaterial.h"
+#include "materials/DielectricMaterial.h"
 #include "ParserHelper.h"
 #include <typeinfo>
 
@@ -36,7 +36,7 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	{
 		auto id = ParserHelper::ReadId(stream);
 
-		auto material = std::make_unique<BlinnMaterial>(_emission + _ambient, _diffuseMap, _diffuse, _specular, _shininess, _translucency);
+		auto material = std::make_unique<materials::BlinnMaterial>(_emission + _ambient, _diffuseMap, _diffuse, _specular, _shininess, _translucency);
 		const auto materialRawPointer = material.get();
 		context.scene()->getMaterials().insert(std::make_pair(std::move(id), std::move(material)));
 
@@ -77,7 +77,7 @@ void MaterialCommandProcessor::ProcessCommand(LoadingContext & context, const st
 	{
 		auto id = ParserHelper::ReadId(stream);
 
-		auto material = std::make_unique<DielectricMaterial>(_iorInside, _iorOutside, _surfaceTransparency);
+		auto material = std::make_unique<materials::DielectricMaterial>(_iorInside, _iorOutside, _surfaceTransparency);
 		const auto materialRawPointer = material.get();
 		context.scene()->getMaterials().insert(std::make_pair(std::move(id), std::move(material)));
 

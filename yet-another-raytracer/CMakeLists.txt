@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(yet_another_raytracer
         BitmapTexture.cpp
-        BlinnMaterial.cpp
+        materials/BlinnMaterial.cpp
         CameraCommandFactory.cpp
         CameraCommandProcessor.cpp
-        DielectricMaterial.cpp
+        materials/DielectricMaterial.cpp
         DirectionalLightSource.cpp
         Film.cpp
         objects/FlatTriangleObject.cpp

@@ -11,7 +11,10 @@
 #include <vector>
 
 
-class Material;
+namespace materials
+{
+	class Material;
+}
 
 namespace objects {
 
@@ -59,14 +62,14 @@ public:
 	// Pick random point that lits given point on itself. illuminatedPointOnSelf should probably have uv or st coords.
 	[[nodiscard]] virtual std::optional<math::random_sample<surface_point, space_real>> PickRandomPointOnSurfaceForLighting(const vector3& illuminatedPointOnSelf, math::Sampler<space_real>& engine) const = 0;
 
-	[[nodiscard]] const Material* material() const { return material_; }
-	void material(const Material* val) { material_ = val; }
+	[[nodiscard]] const materials::Material* material() const { return material_; }
+	void material(const materials::Material* val) { material_ = val; }
 
 protected:
 	void bounding_box(const bounding_box3& val) { boundingBox_ = val; }
 
 private:
-	const Material* material_ = nullptr;
+	const materials::Material* material_ = nullptr;
 	bounding_box3 boundingBox_;
 };
 

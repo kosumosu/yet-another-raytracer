@@ -7,6 +7,8 @@
 
 class Texture;
 
+namespace materials {
+
 class BlinnMaterial final : public Material
 {
 	color_rgb emission_;
@@ -93,3 +95,5 @@ private:
 		const vector3& incidentDirection,
 		const math::Sampler<space_real>& sampler) const;
 };
+
+}
