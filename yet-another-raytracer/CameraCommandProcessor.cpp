@@ -34,7 +34,7 @@ void CameraCommandProcessor::ProcessCommand( LoadingContext & context, const std
 		context.scene()->camera()->position((context.transform() * vector4(position, 1.0f)).reduce());
 		context.scene()->camera()->target((context.transform() * vector4(target, 1.0f)).reduce());
 		context.scene()->camera()->up((context.transform() * vector4(corrected_up, 0.0f)).reduce());
-		context.scene()->camera()->fovy(fovy);
+		context.scene()->camera()->fovy_degrees(fovy);
 	}
 	else
 	{

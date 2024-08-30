@@ -1,5 +1,6 @@
 #pragma once
 
+#include "color/color_functions.hpp"
 #include "Types.h"
 
 #include <filesystem>
@@ -13,7 +14,7 @@ class Film
     std::vector<color_rgb> pixels_;
 
 public:
-    Film(uint_vector2 size)
+    explicit Film(uint_vector2 size)
         : size_{std::move(size)}
           , pixels_{std::size_t(size_[0]) * size_[1], color_rgb::zero()}
     {
@@ -70,34 +71,11 @@ private:
 
     static constexpr TrcMode TRC_MODE = TrcMode::sRGB;
 
-
-    [[nodiscard]] static color_real linear_to_storage(color_real val)
-    {
-        if constexpr (TRC_MODE == TrcMode::sRGB)
-        {
-            return val < 0.0031308f
-                       ? val * 12.92f
-                       : 1.055f * powf(val, 1.0f / 2.4f) - 0.055f;
-        }
-        else if (TRC_MODE == TrcMode::Gamma_22)
-        {
-            return std::pow(val, color_real(1.0f / 2.2f));
-        }
-        else
-        {
-            throw;
-        }
-    }
-
     [[nodiscard]] static color_rgb linear_to_storage(const color_rgb& val)
     {
         if constexpr (TRC_MODE == TrcMode::sRGB)
         {
-            return color_rgb{
-                linear_to_storage(val[0]),
-                linear_to_storage(val[1]),
-                linear_to_storage(val[2])
-            };
+            return color::linear_to_srgb(val);
         }
         else if (TRC_MODE == TrcMode::Gamma_22)
         {
