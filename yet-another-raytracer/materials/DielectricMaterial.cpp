@@ -6,8 +6,10 @@
 
 namespace materials
 {
-	using bsdf_functional_distribution = FunctionalDistribution<const bsdf_sample, const vector3, space_real>;
-
+	namespace
+	{
+		using bsdf_functional_distribution = FunctionalDistribution<const bsdf_sample, const vector3, space_real>;
+	}
 
 	namespace
 	{
@@ -149,12 +151,13 @@ namespace materials
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::Sampler<space_real>& sampler,
+		math::Sampler<space_real>& sampler,
 		const bsdf_distribution_func& job) const
 	{
 		job(
 			bsdf_functional_distribution(
 				2U,
+				false,
 				// generate delta sample
 				[&]()
 				{
@@ -178,6 +181,7 @@ namespace materials
 
 						return math::random_sample<const bsdf_sample, space_real>(
 							bsdf_sample(
+								false,
 								reflection.reflectedDirection,
 								[=]()
 								{
@@ -195,12 +199,13 @@ namespace materials
 
 						return math::random_sample<const bsdf_sample, space_real>(
 							bsdf_sample(
+								true,
 								refraction.refractedDirection,
 								[=, this]()
 								{
 									return surfaceTransparency_ * color_real(
-										transmission * color_real((iorFrom * iorFrom) / (iorTo * iorTo)) / std::abs(
-											color_real(refraction.refractedRayToNormalCos)));
+										transmission * (iorFrom * iorFrom) / (iorTo * iorTo) / std::abs(
+											refraction.refractedRayToNormalCos));
 								}),
 							space_real(transmission),
 							true);
@@ -214,7 +219,7 @@ namespace materials
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::Sampler<space_real>& sampler) const
+		math::Sampler<space_real>& sampler) const
 	{
 		return color_rgb::zero();
 	}
@@ -226,8 +231,14 @@ namespace materials
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
 		const vector3& outgoingDirection,
-		const math::Sampler<space_real>& sampler) const
+		math::Sampler<space_real>& sampler) const
 	{
 		return color_rgb::zero();
+	}
+
+	color_rgb DielectricMaterial::EvaluateTransmittance(const objects::GeometryObject& object, const vector3& hitPoint,
+		const vector3& normal, const uvs_t& uvs, const vector3& direction, math::Sampler<space_real>& sampler) const
+	{
+		return (_iorInside == _iorOutside) ? color_rgb::one() : color_rgb::zero();
 	}
 }

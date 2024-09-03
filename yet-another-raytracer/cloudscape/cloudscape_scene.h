@@ -21,6 +21,8 @@ namespace cloudscape
         float multiplier;
         uint32_t detail;
         float size;
+
+        uint32_t seed;
     };
 
     struct optimizations

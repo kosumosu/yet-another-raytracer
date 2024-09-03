@@ -16,6 +16,11 @@ namespace materials
 	class Material;
 }
 
+namespace participating_media
+{
+	class ParticipatingMedium;
+}
+
 namespace objects {
 
 struct surface_point
@@ -65,11 +70,25 @@ public:
 	[[nodiscard]] const materials::Material* material() const { return material_; }
 	void material(const materials::Material* val) { material_ = val; }
 
+	[[nodiscard]] const participating_media::ParticipatingMedium* inner_medium() const
+	{
+		return inner_medium_;
+	}
+
+	void inner_medium(const participating_media::ParticipatingMedium* value)
+	{
+		inner_medium_ = value;
+	}
+
+
 protected:
 	void bounding_box(const bounding_box3& val) { boundingBox_ = val; }
 
 private:
 	const materials::Material* material_ = nullptr;
+	const participating_media::ParticipatingMedium* inner_medium_ = nullptr;
+
+private:
 	bounding_box3 boundingBox_;
 };
 

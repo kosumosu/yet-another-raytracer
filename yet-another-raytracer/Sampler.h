@@ -35,9 +35,9 @@ namespace math
 		virtual ~Sampler() = default;
 
 		// Samples a uniformly distributed random number in the range [0; 1)
-		[[nodiscard]] virtual TValue Get1D() const = 0;
+		[[nodiscard]] virtual TValue Get1D() = 0;
 
-		[[nodiscard]] virtual math::vector<TValue, 2> Get2D() const = 0;
+		[[nodiscard]] virtual math::vector<TValue, 2> Get2D() = 0;
 	};
 
 	template <typename TValue, typename TEngine/*, class = typename std::enable_if_t<std::is_same<TValue, typename TEngine::result_type>::value>*/>
@@ -52,14 +52,14 @@ namespace math
 		{
 		}
 
-		TValue Get1D() const override
+		TValue Get1D() override
 		{
 			auto number =  distr_(engine_);
 			assert(number < 1.0 - 1e-40);
 			return number;
 		}
 
-		math::vector<TValue, 2> Get2D() const override
+		math::vector<TValue, 2> Get2D() override
 		{
 			return { Get1D(), Get1D() };
 		}

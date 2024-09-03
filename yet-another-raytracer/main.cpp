@@ -28,6 +28,7 @@
 #include <mutex>
 
 #include "cloudscape/presets.h"
+#include "participating_media/VoidMedium.h"
 #if defined(_WIN32)
 #include <tchar.h>
 #endif
@@ -267,7 +268,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
                 cloudscape::LoadThickAntarctica(scene);
             }
 
-            const auto prepared_scene = cloudscape::prepare_scene(scene);
+            auto prepared_scene = cloudscape::prepare_scene(scene);
 
             std::mutex coutMutex;
             ProcessTimeStopwatch processTimeStopwatch;
@@ -281,7 +282,13 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
 
             initialize({scene.rendering.width, scene.rendering.height});
 
-            using integrator_t = cloudscape::CloudscapeIntegrator;
+            std::vector<objects::GeometryObject*> objects = {
+                &prepared_scene.planet, &prepared_scene.lower_cloud_bound, &prepared_scene.upper_cloud_bound
+            };
+
+            accelerators::null::NullAccelerator accelerator{objects};
+
+            using integrator_t = cloudscape::CloudscapeIntegrator<accelerators::null::NullMarcher>;
 
             const renderers::BucketRenderer<typeof(integrator_t)> renderer(
                 {scene.rendering.bucketwidth, scene.rendering.bucketheight},
@@ -314,15 +321,22 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
                 reportAreaStarted,
                 reportProgress);
 
+            participating_media::VoidMedium atmospheric_medium;
+            participating_media::VoidMedium cloud_medium;
+
             renderer.Render(
                 film,
-                { uint_vector2::zero(), film.size()},
-                // { uint_vector2 { 320, 240 }, {1, 1}},
+                {uint_vector2::zero(), film.size()},
+                //{ uint_vector2 { 320, 240 }, {1, 1}},
                 prepared_scene.camera,
-                1,
-                [&prepared_scene]
+                256,
+                [&prepared_scene, &accelerator, &atmospheric_medium, &cloud_medium]
                 {
-                    return cloudscape::CloudscapeIntegrator{prepared_scene};
+                    auto raytracer = Raytracer{accelerator.CreateMarcher()};
+                    return cloudscape::CloudscapeIntegrator{
+                        prepared_scene,
+                        raytracer
+                    };
                 }, stopToken);
 
             reportRenderingFinihsed(film);

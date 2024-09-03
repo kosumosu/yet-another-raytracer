@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-//#define DOUBLE_PRECISION
+#define DOUBLE_PRECISION
 
 #if defined (DOUBLE_PRECISION)
 
@@ -15,6 +15,7 @@ using space_real = double;
 #else
 
 using space_real = float;
+using space_real_precise = double;
 
 #endif
 

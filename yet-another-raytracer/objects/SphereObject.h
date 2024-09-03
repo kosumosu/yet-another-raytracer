@@ -12,12 +12,14 @@ namespace objects
         SphereObject()
             : m_center(vector3::zero())
               , m_radius(1.0)
+              , normal_scalar_for_inversion_(1.0)
         {
         }
 
-        SphereObject(vector3 center, space_real radius)
+        SphereObject(vector3 center, space_real radius, bool inverted = false)
             : m_center(std::move(center))
               , m_radius(radius)
+              , normal_scalar_for_inversion_(inverted ? -1.0 : 1.0)
         {
         }
 
@@ -46,5 +48,6 @@ namespace objects
     private:
         vector3 m_center;
         space_real m_radius;
+        space_real normal_scalar_for_inversion_; // 1.0 if sphere is not inverted, -1.0 for inside-out sphere.
     };
 }

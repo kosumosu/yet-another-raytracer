@@ -13,7 +13,9 @@ namespace objects
 
 		space_real a = math::length2(inversed_ray.direction());
 		space_real b = space_real(2.0) * math::dot(inversed_ray.direction(), center_to_origin);
-		space_real c = math::length2(center_to_origin) - m_radius * m_radius;
+		const auto center_to_origin_len2 = math::length2(center_to_origin);
+		const auto radius_squader = m_radius * m_radius;
+		space_real c = center_to_origin_len2 - radius_squader;
 
 		space_real d = b * b - space_real(4.0) * a * c;
 
@@ -41,7 +43,7 @@ namespace objects
 					return Hit();
 
 				auto world_space_hit_point = inversed_ray.origin() + inversed_ray.direction() * x;
-				auto normal = world_space_hit_point - m_center; // normal is non-normalized
+				auto normal = (world_space_hit_point - m_center) * normal_scalar_for_inversion_; // normal is non-normalized
 
 				auto transformed_hit_point = (this->transform() * vector4(world_space_hit_point, 1.0)).reduce();
 				auto transformed_normal = math::normalize((this->normal_transform() * vector4(normal, space_real(0.0))).reduce());

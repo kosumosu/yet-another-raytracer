@@ -31,6 +31,18 @@ namespace math
 		return low + (high - low) * sampler.Get1D();
 	}
 
+	template <typename TValue>
+	TValue sampleExponential(const TValue& random_value, const TValue& a)
+	{
+		return -std::log(TValue(1.0) - random_value) / a;
+	}
+
+	template <typename TValue>
+	TValue exponentialPDF(const TValue& value, const TValue& a)
+	{
+		return a * std::exp(-a * value);
+	}
+
 
 	template <typename TValue, typename TSampler>
 	vector<TValue, 3> sphericalRand(TSampler& sampler)

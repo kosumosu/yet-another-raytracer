@@ -14,10 +14,10 @@ class RayEvaluator;
 struct light_sample
 {
 	template <class TDirection, class TDistance, class TEvaluate>
-	light_sample(TDirection&& direction, TDistance&& distance, TEvaluate&& evaluate)
-		: direction(std::forward<TDirection>(direction)),
-		  distance(std::forward<TDistance>(distance)),
-		  evaluate(std::forward<TEvaluate>(evaluate))
+	light_sample(TDirection direction, TDistance distance, TEvaluate evaluate)
+		: direction(std::move(direction)),
+		  distance(std::move(distance)),
+		  evaluate(std::move(evaluate))
 	{
 	}
 
@@ -41,7 +41,10 @@ public:
 	virtual void DoWithDistribution(const LightingContext& context, math::Sampler<space_real>& sampler,
 	                                const distibution_func& job) const = 0;
 
-	virtual color_real GetApproximateTotalPower() const = 0;
+	virtual void DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
+								const distibution_func& job) const = 0;
+
+	[[nodiscard]] virtual color_real GetApproximateTotalPower() const = 0;
 };
 
 typedef std::vector<std::shared_ptr<LightSource>> LightSourceCollection;

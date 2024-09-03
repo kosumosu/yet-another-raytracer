@@ -23,6 +23,7 @@ namespace math
 
 		constexpr static MyT fill(const TSpace& value) { return vector<TSpace, DIMENSIONS>{value, std::make_index_sequence<DIMENSIONS>()}; }
 		constexpr static MyT zero() { return fill(0); }
+		constexpr static MyT one() { return fill(1); }
 
 		constexpr static std::size_t dimensions() { return DIMENSIONS; }
 

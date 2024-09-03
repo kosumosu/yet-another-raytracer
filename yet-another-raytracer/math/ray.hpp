@@ -50,7 +50,16 @@ namespace math
 			m_inversed_direction = val;
 		}
 
+		vector<TSpace, DIMENSIONS> point_along(const TSpace& distance) const
+		{
+			return m_origin + m_direction * distance;
+		}
 
+		ray<TSpace, DIMENSIONS> ray_along(const TSpace& distance) const
+		{
+			return {m_origin + m_direction * distance, m_direction};
+		}
+	
 	private:
 		vector<TSpace, DIMENSIONS> m_origin;
 		vector<TSpace, DIMENSIONS> m_direction;

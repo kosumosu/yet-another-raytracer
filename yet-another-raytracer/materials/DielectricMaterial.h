@@ -40,7 +40,7 @@ namespace materials
 			const vector3& normal,
 			const uvs_t& uvs,
 			const vector3& incidentDirection,
-			const math::Sampler<space_real>& sampler,
+			math::Sampler<space_real>& sampler,
 			const bsdf_distribution_func& job) const override;
 
 		color_rgb EvaluateEmission(
@@ -49,7 +49,7 @@ namespace materials
 			const vector3& normal,
 			const uvs_t& uvs,
 			const vector3& incidentDirection,
-			const math::Sampler<space_real>& sampler) const override;
+			math::Sampler<space_real>& sampler) const override;
 
 		color_rgb EvaluateNonDeltaScattering(
 			const objects::GeometryObject& object,
@@ -58,6 +58,10 @@ namespace materials
 			const uvs_t& uvs,
 			const vector3& incidentDirection,
 			const vector3& outgoingDirection,
-			const math::Sampler<space_real>& sampler) const override;
+			math::Sampler<space_real>& sampler) const override;
+
+		[[nodiscard]] color_rgb EvaluateTransmittance(const objects::GeometryObject& object, const vector3& hitPoint,
+			const vector3& normal, const uvs_t& uvs, const vector3& direction,
+			math::Sampler<space_real>& sampler) const override;
 	};
 }

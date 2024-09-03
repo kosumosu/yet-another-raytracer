@@ -20,8 +20,6 @@ add_executable(yet_another_raytracer
         LightSourceCommandProcessor.cpp
         MaterialCommandFactory.cpp
         MaterialCommandProcessor.cpp
-        accelerators/null/NullAccelerator.cpp
-        accelerators/null/NullMarcher.cpp
         OSAbstraction.cpp
         ObjectCommandFactory.cpp
         ObjectCommandProcessor.cpp

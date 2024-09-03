@@ -60,3 +60,13 @@ private:
 	space_real _distance;
 	uvs_t _uvs;
 };
+
+
+inline bool operator<(const Hit& lhs, const Hit& rhs)
+{
+	return lhs.has_occurred() &&
+				(
+					rhs.has_occurred() && lhs.distance() < rhs.distance()
+					|| !rhs.has_occurred()
+				);
+}

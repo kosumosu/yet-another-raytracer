@@ -20,6 +20,9 @@ public:
 
 	void DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const override;
 
+	void DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
+		const distibution_func& job) const override;
+
 	color_real GetApproximateTotalPower() const override;
 private:
 	vector3 m_position;

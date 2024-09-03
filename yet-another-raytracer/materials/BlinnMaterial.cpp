@@ -6,7 +6,10 @@ namespace materials
 {
 #define ENABLE_IMPORTANCE_SAMPLING true
 
-	using bsdf_functional_distribution = FunctionalDistribution<const bsdf_sample, const vector3, space_real>;
+	namespace
+	{
+		using bsdf_functional_distribution = FunctionalDistribution<const bsdf_sample, const vector3, space_real>;
+	}
 
 	color_real BlinnMaterial::GetEmissionImportance() const
 	{
@@ -24,7 +27,7 @@ namespace materials
 		const vector3& normal,
 		const vector2& uv,
 		const vector3& incidentDirection,
-		const math::Sampler<space_real>& sampler) const
+		math::Sampler<space_real>& sampler) const
 	{
 		//return math::dot(incidentDirection, normal) < 0 ? color_rgbx(1.0, 0.0, 0.0, 0.0) : color_rgbx(0.0, 1.0, 1.0, 0.0);
 
@@ -44,7 +47,7 @@ namespace materials
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::Sampler<space_real>& sampler,
+		math::Sampler<space_real>& sampler,
 		const bsdf_distribution_func& job) const
 	{
 		const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, sampler);
@@ -70,6 +73,7 @@ namespace materials
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
+						true,
 						direction,
 						[=, this]()
 						{
@@ -82,6 +86,7 @@ namespace materials
 			{
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
+						false,
 						direction,
 						[=, this]()
 						{
@@ -120,6 +125,7 @@ namespace materials
 			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * cosTheta);
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(
+					false,
 					reflected_direction,
 					[=, this]()
 					{
@@ -149,9 +155,10 @@ namespace materials
 		job(
 			bsdf_functional_distribution(
 				specular_ == color_rgb::zero() ? 0U : 1U,
-				std::move(generateReflectionFunc),
-				std::move(generateDiffuseFunc),
-				std::move(evaluateDiffusePdfFunc),
+				true,
+				//std::move(generateReflectionFunc),
+				//std::move(generateDiffuseFunc),
+				//std::move(evaluateDiffusePdfFunc),
 				std::move(generateSampleFunc)));
 	}
 
@@ -161,7 +168,7 @@ namespace materials
 		const vector3& normal,
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
-		const math::Sampler<space_real>& sampler) const
+		math::Sampler<space_real>& sampler) const
 	{
 		if (diffuseMap_ == nullptr)
 		{
@@ -180,12 +187,18 @@ namespace materials
 		const uvs_t& uvs,
 		const vector3& incidentDirection,
 		const vector3& outgoingDirection,
-		const math::Sampler<space_real>& sampler) const
+		math::Sampler<space_real>& sampler) const
 	{
 		const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, sampler);
 		const bool isSameSide = math::is_acute_angle(incidentDirection , normal) ^ math::is_acute_angle(outgoingDirection , normal);
 		return isSameSide
 			? diffuseColor * (color_rgb::fill(1.0) - specular_) * (color_rgb::fill(1.0) - translucency_)
 			: (color_rgb::fill(1.0) - specular_) * translucency_;
+	}
+
+	color_rgb BlinnMaterial::EvaluateTransmittance(const objects::GeometryObject& object, const vector3& hitPoint,
+		const vector3& normal, const uvs_t& uvs, const vector3& direction, math::Sampler<space_real>& sampler) const
+	{
+		return translucency_;
 	}
 }

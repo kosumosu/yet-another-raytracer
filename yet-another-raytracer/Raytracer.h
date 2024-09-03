@@ -46,7 +46,8 @@ public:
                 {
                     if (!nearest_hit.has_occurred() || hit.distance() < nearest_hit.distance())
                     {
-                        if (object != objectToIgnore || math::is_obtuse_angle(ray.direction(), directionToIgnore))
+                        // This condition seems invalid for complex objects like spheres.
+                        // if (object != objectToIgnore || math::is_obtuse_angle(ray.direction(), directionToIgnore))
                             nearest_hit = hit;
                     }
                 }
