@@ -1,8 +1,8 @@
 #include "LightSourceCommandProcessor.h"
 
-#include "DirectionalLightSource.h"
-#include "PointLightSource.h"
-#include "GeometryLightSource.h"
+#include "lights/DirectionalLightSource.h"
+#include "lights/PointLightSource.h"
+#include "lights/GeometryLightSource.h"
 #include "ParserHelper.h"
 #include "Types.h"
 
@@ -29,20 +29,20 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 		const auto direction = ParserHelper::ReadVec3(stream);
 		const auto color = ParserHelper::ReadColorRgb(stream);
 
-		DirectionalLightSource * light = new DirectionalLightSource(
+		lights::DirectionalLightSource * light = new lights::DirectionalLightSource(
 			(context.transform() * vector4(direction, space_real(0.0))).reduce(),
 			color,
 			*context.scene()
 			);
 
-		context.scene()->lights().push_back(std::shared_ptr<LightSource>(light));
+		context.scene()->lights().push_back(std::shared_ptr<lights::LightSource>(light));
 	}
 	else if (command == "point")
 	{
 		const auto position = ParserHelper::ReadVec3(stream);
 		const auto color = ParserHelper::ReadColorRgb(stream);
 
-        auto light = std::make_shared<PointLightSource>();
+        auto light = std::make_shared<lights::PointLightSource>();
         light->position((context.transform() * vector4(position, space_real(1.0))).reduce());
         light->color(color);
         light->attenuation(m_attenuation);
@@ -58,7 +58,7 @@ void LightSourceCommandProcessor::ProcessCommand( LoadingContext & context, cons
 	}
 	else if (command == "geometryLight")
 	{
-		std::shared_ptr<GeometryLightSource> light(new GeometryLightSource(context.scene()->objects()));
+		std::shared_ptr<lights::GeometryLightSource> light(new lights::GeometryLightSource(context.scene()->objects()));
 
 		context.scene()->lights().push_back(std::move(light));
 	}

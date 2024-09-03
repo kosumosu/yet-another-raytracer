@@ -64,7 +64,7 @@ namespace cloudscape
         const participating_media::ParticipatingMedium& atmosphericMedium_;
         const participating_media::ParticipatingMedium& cloudsMedium_;
 
-        const DirectionalLightSource& sun_;
+        const lights::DirectionalLightSource& sun_;
 
         const siv::PerlinNoise noise_; //TODO each thread has it's own noise
 
@@ -140,7 +140,7 @@ namespace cloudscape
                     sun_.DoWithDistribution(
                         scatter->new_ray.origin(),
                         sampler,
-                        [&](const light_distribution& lightDistribution)
+                        [&](const lights::light_distribution& lightDistribution)
                         {
                             if (lightDistribution.delta_components() != 0 || lightDistribution.
                                 has_non_delta_component())
@@ -518,13 +518,13 @@ namespace cloudscape
             math::Sampler<space_real>& sampler)
         {
             color_rgb radianceAtCurrentPathVertex{color_rgb::zero()};
-            const LightingContext context{hit.object(), hit.point(), hit.normal(), BIAS, 1, false};
+            const lights::LightingContext context{hit.object(), hit.point(), hit.normal(), BIAS, 1, false};
 
             const auto& light = sun_;
             light.DoWithDistribution(
                 context,
                 sampler,
-                [&](const light_distribution& lightDistribution)
+                [&](const lights::light_distribution& lightDistribution)
                 {
                     if (lightDistribution.delta_components() != 0 || lightDistribution.has_non_delta_component())
                     {

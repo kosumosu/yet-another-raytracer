@@ -7,7 +7,7 @@
 #include "Statistics.h"
 #include "integrators/RayIntegrator.h"
 #include "Raytracer.h"
-#include "LightSource.h"
+#include "lights/LightSource.h"
 #include "integrators/MonteCarloPathIntegrator.h"
 #include "StdHighResolutionClockStopwatch.h"
 

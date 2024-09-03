@@ -3,7 +3,7 @@
 #include "IBucketSequencer.h"
 #include "IRenderer.h"
 #include "hashing/hashing.h"
-#include "LightSource.h"
+#include "lights/LightSource.h"
 #include "Scene.h"
 #include "Statistics.h"
 #include "Types.h"

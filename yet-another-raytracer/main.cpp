@@ -145,7 +145,7 @@ void RenderRegular(const std::filesystem::path& scene_file,
             //    NullAccelerator accelerator{ scene.objects() };
             accelerators::kd_tree::KDTreeAccelerator accelerator{scene.objects()};
 
-            std::vector<const LightSource*> lights(scene.lights().size());
+            std::vector<const lights::LightSource*> lights(scene.lights().size());
             std::transform(std::begin(scene.lights()), std::end(scene.lights()), std::begin(lights),
                            [](const auto& lightPtr) { return lightPtr.get(); });
 

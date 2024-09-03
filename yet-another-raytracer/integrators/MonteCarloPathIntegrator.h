@@ -8,12 +8,12 @@
 #include "materials/Material.h"
 #include "Raytracer.h"
 #include "Statistics.h"
+#include "lights/LightingContext.h"
+#include "lights/LightSource.h"
 
 #include "color/color_functions.hpp"
 
 #include <functional>
-#include <LightingContext.h>
-#include <LightSource.h>
 #include <optional>
 
 template <Marcher_c TMarcher>
@@ -33,11 +33,11 @@ private:
 
     mutable statistics::Stats stats_;
 
-    std::optional<math::discrete_distribution<const LightSource*, color_real>> lightDistribution_;
+    std::optional<math::discrete_distribution<const lights::LightSource*, color_real>> lightDistribution_;
     color_real oneOverTotalPower_;
 
 public:
-    MonteCarloPathIntegrator(raytracer_t raytracer, const std::vector<const LightSource*>& lights,
+    MonteCarloPathIntegrator(raytracer_t raytracer, const std::vector<const lights::LightSource*>& lights,
                              std::size_t maxTraceDepth,
                              infinity_func infinityEvaluator)
         : raytracer_{std::move(raytracer)}
@@ -51,7 +51,7 @@ public:
         }
         else
         {
-            std::vector<std::pair<const LightSource*, color_real>> lightsWithWeights;
+            std::vector<std::pair<const lights::LightSource*, color_real>> lightsWithWeights;
             lightsWithWeights.reserve(lights.size());
 
             color_real totalPower = {0};
@@ -67,7 +67,7 @@ public:
 
             oneOverTotalPower_ = color_real(1.0) / totalPower;
 
-            lightDistribution_ = math::discrete_distribution<const LightSource*, color_real>{
+            lightDistribution_ = math::discrete_distribution<const lights::LightSource*, color_real>{
                 std::begin(lightsWithWeights), std::end(lightsWithWeights)
             };
             // TODO
@@ -260,7 +260,7 @@ private:
             return color_rgb::zero();
 
         color_rgb radianceAtCurrentPathVertex{color_rgb::zero()};
-        const LightingContext context{hit.object(), hit.point(), hit.normal(), BIAS, 1, false};
+        const lights::LightingContext context{hit.object(), hit.point(), hit.normal(), BIAS, 1, false};
 
         // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
         const auto randomFunc = [&]()
@@ -272,7 +272,7 @@ private:
         light->DoWithDistribution(
             context,
             sampler,
-            [&](const light_distribution& lightDistribution)
+            [&](const lights::light_distribution& lightDistribution)
             {
                 if (lightDistribution.delta_components() != 0 || lightDistribution.has_non_delta_component())
                 {

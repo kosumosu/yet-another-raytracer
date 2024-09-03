@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include "objects/GeometryObject.h"
-#include "LightSource.h"
+#include "lights/LightSource.h"
 #include "materials/Material.h"
 #include "Texture.h"
 
@@ -50,8 +50,8 @@ public:
 	ObjectCollection& objects() { return objects_; }
 	[[nodiscard]] const ObjectCollection& objects() const { return objects_; }
 
-	[[nodiscard]] const LightSourceCollection& lights() const { return lights_; }
-	LightSourceCollection& lights() { return lights_; }
+	[[nodiscard]] const lights::LightSourceCollection& lights() const { return lights_; }
+	lights::LightSourceCollection& lights() { return lights_; }
 
 	[[nodiscard]] color_rgb getEnvironmentColor() const { return environmentColor_; }
 	void setEnvironmentColor(const color_rgb& color) { environmentColor_ = color; }
@@ -101,7 +101,7 @@ private:
 	std::shared_ptr<Camera> camera_;
 
 	ObjectCollection objects_;
-	LightSourceCollection lights_;
+	lights::LightSourceCollection lights_;
 	MaterialCollection materials_;
 	MapCollection maps_;
 

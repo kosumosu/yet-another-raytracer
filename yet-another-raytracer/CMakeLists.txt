@@ -9,10 +9,10 @@ add_executable(yet_another_raytracer
         CameraCommandFactory.cpp
         CameraCommandProcessor.cpp
         materials/DielectricMaterial.cpp
-        DirectionalLightSource.cpp
+        lights/DirectionalLightSource.cpp
         Film.cpp
         objects/FlatTriangleObject.cpp
-        GeometryLightSource.cpp
+        lights/GeometryLightSource.cpp
         accelerators/kd_tree/KDTreeAccelerator.cpp
         accelerators/kd_tree/KDTreeMarcher.cpp
         accelerators/kd_tree/KDTreeNode.cpp
@@ -24,12 +24,12 @@ add_executable(yet_another_raytracer
         ObjectCommandFactory.cpp
         ObjectCommandProcessor.cpp
         Parser.cpp
-        PointLightSource.cpp
+        lights/PointLightSource.cpp
         ProcessTimeStopwatch.cpp
         SceneLoader.cpp
         SettingsCommandFactory.cpp
         SettingsCommandProcessor.cpp
-        SkyLightSource.cpp
+        lights/SkyLightSource.cpp
         objects/SphereObject.cpp
         StdHighResolutionClockStopwatch.cpp
         TextureCommandFactory.cpp

@@ -38,7 +38,7 @@ namespace cloudscape
         objects::SphereObject lower_cloud_bound;
         objects::SphereObject upper_cloud_bound;
 
-        DirectionalLightSource sun;
+        lights::DirectionalLightSource sun;
 
         Camera camera;
     };
@@ -87,7 +87,7 @@ namespace cloudscape
         upper_clouds_bound.material(null_material.get());
         upper_clouds_bound.inner_medium(cloud_medium.get());
 
-        DirectionalLightSource sun{
+        lights::DirectionalLightSource sun{
             math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation)),
             color::srgb_to_linear(color::from_bgr_int(scene.sun.color)) * scene.sun.multiplier
         };
