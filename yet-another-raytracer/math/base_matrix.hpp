@@ -7,6 +7,10 @@ namespace math
 	template <typename T, std::size_t COLS, std::size_t ROWS>
 	class base_matrix
 	{
+		vector<T, COLS> m_rows[ROWS];
+
+		struct internal_tag {};
+
 	public:
 
 		constexpr static std::size_t columns() { return COLS; }
@@ -29,17 +33,23 @@ namespace math
 		//	}
 		//}
 
+		// template <typename TOther>
+		// constexpr base_matrix(const base_matrix<TOther, COLS, ROWS>& other)
+		// 	: base_matrix(internal_tag(), other, std::make_index_sequence<ROWS>())
+		// {
+		// }
+		//
+		// constexpr base_matrix(base_matrix<T, COLS, ROWS> && other) noexcept
+		// 	: m_rows{ std::move(other.m_rows) }
+		// {
+		// }
+
 		template <typename TFirst, typename... TRows/*, class = std::enable_if_t<sizeof...(TRows) == ROWS>*/>
-		constexpr base_matrix(TFirst && first, TRows &&... rows)
-			: m_rows{ std::forward<TFirst>(first), std::forward<TRows>(rows)... }
+		constexpr explicit base_matrix(vector<TFirst, COLS> first, vector<TRows, COLS> ... rows)
+			: m_rows{ std::move(first), std::move(rows)... }
 		{
 		}
 
-		template<typename TOther>
-		constexpr base_matrix(const base_matrix<TOther, COLS, ROWS> & other)
-			: base_matrix(internal_tag(), other, std::make_index_sequence<ROWS>())
-		{
-		}
 
 		vector<T, COLS> & operator[](std::size_t index)
 		{
@@ -57,9 +67,6 @@ namespace math
 		}
 
 	private:
-		vector<T, COLS> m_rows[ROWS];
-
-		struct internal_tag {};
 
 		template<typename TOther, std::size_t... Indices>
 		constexpr base_matrix(internal_tag, const base_matrix<TOther, COLS, ROWS> & other, std::index_sequence<Indices...>)

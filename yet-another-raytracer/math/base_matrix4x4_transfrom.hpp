@@ -9,7 +9,7 @@
 namespace math
 {
 	template <typename T>
-	constexpr base_matrix<T, 4, 4> translate(const vector<T, 3> & vec)
+	constexpr base_matrix<T, 4, 4> translate4x4(const vector<T, 3> & vec)
 	{
 		return base_matrix<T, 4, 4>
 		{
@@ -21,7 +21,7 @@ namespace math
 	}
 
 	template <typename T>
-	constexpr base_matrix<T, 4, 4> scale(const vector<T, 3> & vec)
+	constexpr base_matrix<T, 4, 4> scale4x4(const vector<T, 3> & vec)
 	{
 		return base_matrix<T, 4, 4>
 		{
@@ -33,7 +33,7 @@ namespace math
 	}
 
 	template <typename T>
-	base_matrix<T, 4, 4> rotate(const vector<T, 3> & axis, T radians)
+	base_matrix<T, 4, 4> rotate4x4(const vector<T, 3> & axis, T radians)
 	{
 		T sinTheta = std::sin(radians);
 		T cosTheta = std::cos(radians);
@@ -58,9 +58,9 @@ namespace math
 	}
 
 	template <typename T>
-	base_matrix<T, 4, 4> rotate_degrees(const vector<T, 3> & axis, T degrees)
+	base_matrix<T, 4, 4> rotate_degrees4x4(const vector<T, 3> & axis, T degrees)
 	{
 		T radians = T(math::pi) / T(180) * degrees;
-		return rotate(axis, radians);
+		return rotate4x4(axis, radians);
 	}
 }

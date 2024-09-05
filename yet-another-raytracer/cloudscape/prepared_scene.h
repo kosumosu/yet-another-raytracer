@@ -6,9 +6,11 @@
 
 #include <Types.h>
 
+#include "lights/SunLightSource.h"
 #include "materials/NullMaterial.h"
 #include "math/angles.h"
 #include "participating_media/HomogeneousMedium.h"
+#include "participating_media/PerlinCloudsMedium.h"
 #include "participating_media/VoidMedium.h"
 
 namespace cloudscape
@@ -33,12 +35,18 @@ namespace cloudscape
 
         std::shared_ptr<materials::Material> planet_material;
         std::shared_ptr<materials::Material> null_material;
+        std::shared_ptr<materials::Material> extra_material;
 
         objects::SphereObject planet;
         objects::SphereObject lower_cloud_bound;
         objects::SphereObject upper_cloud_bound;
 
-        lights::DirectionalLightSource sun;
+        objects::SphereObject extra_sphere;
+        objects::FlatTriangleObject extra_triangle;
+
+        lights::SunLightSource sun;
+        lights::DirectionalLightSource directional_sun;
+        lights::PointLightSource point_light;
 
         Camera camera;
     };
@@ -52,11 +60,52 @@ namespace cloudscape
         const auto camera_pos = vector3{scene.camera.x, scene.camera.y, scene.camera.z};
 
         auto atmospheric_medium = std::make_shared<participating_media::VoidMedium>();
-        auto cloud_medium = std::make_shared<participating_media::HomogeneousMedium>(
+        auto homogenous_cloud_medium = std::make_shared<participating_media::HomogeneousMedium>(
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t::fill(scene.clouds.fog),
             participating_media::spectral_coeffs::zero()
         );
+
+        auto lower_clouds_radius = scene.planet.planetradius + scene.clouds.height;
+        auto upper_clouds_radius = scene.planet.planetradius + scene.clouds.height + scene.clouds.thickness;
+
+        auto density_evaluator = [planet_center, lower_clouds_radius, upper_clouds_radius](const vector3& point)
+        {
+            const auto radius = math::length(point - planet_center);
+            return color_real(std::clamp(std::lerp(space_real(0.0), space_real(0.01), radius - lower_clouds_radius),
+                                         space_real(0.0), space_real(1.0))
+                * std::clamp(std::lerp(space_real(0.0), space_real(0.01), upper_clouds_radius - radius),
+                             space_real(0.0), space_real(1.0))
+            );
+            //return color_real(1);
+        };
+
+        auto perlin_cloud_medium = std::make_shared<participating_media::PerlinCloudsMedium<decltype(density_evaluator
+        )>>(
+            participating_media::optical_thickness_t::zero(),
+            participating_media::optical_thickness_t::fill(scene.clouds.fog),
+            participating_media::spectral_coeffs::zero(),
+            scene.noise.size,
+            scene.clouds.coverage,
+            scene.noise.detail,
+            scene.noise.multiplier,
+            std::move(density_evaluator),
+            scene.noise.seed
+        );
+
+        // auto perlin_cloud_medium = std::make_shared<participating_media::PerlinCloudsMedium>(
+        //     participating_media::optical_thickness_t::zero(),
+        //     participating_media::optical_thickness_t::fill(scene.clouds.fog),
+        //     participating_media::spectral_coeffs::zero(),
+        //     scene.noise.size,
+        //     0.5,
+        //     1,
+        //     scene.noise.multiplier,
+        //     scene.noise.seed
+        // );
+
+        //auto cloud_medium = std::move(homogenous_cloud_medium);
+        auto cloud_medium = std::move(perlin_cloud_medium);
 
         auto planet_material = std::make_shared<materials::BlinnMaterial>(
             color_rgb::zero(),
@@ -74,23 +123,63 @@ namespace cloudscape
 
         planet_object.material(planet_material.get());
 
+        auto extra_material = std::make_shared<materials::BlinnMaterial>(
+            color_rgb::zero(),
+            nullptr,
+            color_rgb::fill(1.0),
+            color_rgb::zero(),
+            0.0,
+            color_rgb::zero()
+        );
+
+        // auto extra_sphere = objects::SphereObject{
+        //     {1500.0, 100.0, 1500.0},
+        //     500.0
+        // };
+        auto extra_sphere = objects::SphereObject{
+            {200.0, 50.0, 55.0},
+            50.0
+        };
+
+        extra_sphere.material(extra_material.get());
+
+        auto extra_triangle = objects::FlatTriangleObject(
+            {1000.0, 0.0, 1500.1},
+            {800.0, -200.0, 1500.1},
+            {800.0, 200.0, 1500.1}
+        );
+
+        extra_triangle.material(extra_material.get());
+
         auto null_material = std::make_shared<materials::NullMaterial>();
 
         auto lower_clouds_bound = objects::SphereObject{
-            planet_center, scene.planet.planetradius + scene.clouds.height, true
+            planet_center, lower_clouds_radius, true
         };
         lower_clouds_bound.material(null_material.get());
         lower_clouds_bound.inner_medium(cloud_medium.get());
         auto upper_clouds_bound = objects::SphereObject{
-            planet_center, scene.planet.planetradius + scene.clouds.height + scene.clouds.thickness
+            planet_center, upper_clouds_radius
         };
         upper_clouds_bound.material(null_material.get());
         upper_clouds_bound.inner_medium(cloud_medium.get());
 
-        lights::DirectionalLightSource sun{
+        lights::DirectionalLightSource directional_sun {
             math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation)),
             color::srgb_to_linear(color::from_bgr_int(scene.sun.color)) * scene.sun.multiplier
+            };
+
+        lights::SunLightSource sun{
+            color::srgb_to_linear(color::from_bgr_int(scene.sun.color)) * scene.sun.multiplier,
+            lights::SunLightSource::real_sun_average_angular_size_radians,
+            math::deg_to_rad(scene.sun.azimuth),
+            math::deg_to_rad(scene.sun.elevation)
         };
+
+        lights::PointLightSource point_light;
+        point_light.position({100.0, 0.0, 20.0});
+        point_light.color(color_rgb::fill(100000.0));
+
 
         return {
             scene,
@@ -106,10 +195,15 @@ namespace cloudscape
             std::move(cloud_medium),
             std::move(planet_material),
             std::move(null_material),
+            std::move(extra_material),
             std::move(planet_object),
             std::move(lower_clouds_bound),
             std::move(upper_clouds_bound),
+            std::move(extra_sphere),
+            std::move(extra_triangle),
             std::move(sun),
+            std::move(directional_sun),
+            std::move(point_light),
             Camera{
                 camera_pos,
                 math::normalize(camera_pos - planet_center),

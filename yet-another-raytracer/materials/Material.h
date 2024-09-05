@@ -16,14 +16,17 @@ namespace materials
 {
     struct bsdf_sample
     {
-        bsdf_sample(bool isTransition, vector3 outgoingDirection, std::function<color_rgb()> evaluate)
+        bsdf_sample(bool isTransition, bool isFullyTransparent, vector3 outgoingDirection,
+                    std::function<color_rgb()> evaluate)
             : isTransition(isTransition)
+              , isFullyTransparent(isFullyTransparent)
               , outgoingDirection(std::move(outgoingDirection))
               , evaluate(std::move(evaluate))
         {
         }
 
         bool isTransition;
+        bool isFullyTransparent; // meand it doens't influence ray. We mainly care does it block direct light.
         vector3 outgoingDirection;
         std::function<color_rgb()> evaluate;
     };

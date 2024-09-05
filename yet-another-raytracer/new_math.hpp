@@ -18,4 +18,5 @@
 #include "math/base_matrix_operations.hpp"
 #include "math/base_matrix_functions.hpp"
 #include "math/base_matrix4x4_transfrom.hpp"
+#include "math/base_matrix3x3_transfrom.hpp"
 #include "math/random.hpp"

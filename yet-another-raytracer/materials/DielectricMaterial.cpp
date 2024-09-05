@@ -182,6 +182,7 @@ namespace materials
 						return math::random_sample<const bsdf_sample, space_real>(
 							bsdf_sample(
 								false,
+								false,
 								reflection.reflectedDirection,
 								[=]()
 								{
@@ -200,6 +201,7 @@ namespace materials
 						return math::random_sample<const bsdf_sample, space_real>(
 							bsdf_sample(
 								true,
+								false,
 								refraction.refractedDirection,
 								[=, this]()
 								{

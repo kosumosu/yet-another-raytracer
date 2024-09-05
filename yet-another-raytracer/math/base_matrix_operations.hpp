@@ -8,7 +8,7 @@ namespace math
 {
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	bool inline operator == (const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
+	constexpr bool inline operator == (const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
 		bool equals = true;
 		iterate<0, ROWS - 1>([&](std::size_t i)
@@ -19,13 +19,13 @@ namespace math
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	bool inline operator != (const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
+	constexpr bool inline operator != (const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
 		return !(one == another);
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	base_matrix<T, COLS, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const T & scalar)
+	constexpr base_matrix<T, COLS, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const T & scalar)
 	{
 		base_matrix<T, COLS, ROWS> res = base_matrix<T, COLS, ROWS>::identity();
 		iterate<0, ROWS - 1>([&](std::size_t i)
@@ -36,20 +36,20 @@ namespace math
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	base_matrix<T, COLS, ROWS> inline operator * (const T & scalar, const base_matrix<T, COLS, ROWS> & another)
+	constexpr base_matrix<T, COLS, ROWS> inline operator * (const T & scalar, const base_matrix<T, COLS, ROWS> & another)
 	{
 		return another * scalar;
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	base_matrix<T, COLS, ROWS> inline operator / (const base_matrix<T, COLS, ROWS> & one, const T & scalar)
+	constexpr base_matrix<T, COLS, ROWS> inline operator / (const base_matrix<T, COLS, ROWS> & one, const T & scalar)
 	{
 		return one * ( T(1) / scalar );
 	}
 
 
 	template <typename T, std::size_t COLS_ROWS_BOTH, std::size_t ROWS_ONE, std::size_t COLS_ANOTHER>
-	base_matrix<T, COLS_ANOTHER, ROWS_ONE> inline operator * (const base_matrix<T, COLS_ROWS_BOTH, ROWS_ONE> & one, const base_matrix<T, COLS_ANOTHER, COLS_ROWS_BOTH> & another)
+	constexpr base_matrix<T, COLS_ANOTHER, ROWS_ONE> inline operator * (const base_matrix<T, COLS_ROWS_BOTH, ROWS_ONE> & one, const base_matrix<T, COLS_ANOTHER, COLS_ROWS_BOTH> & another)
 	{
 		base_matrix<T, COLS_ANOTHER, ROWS_ONE> res = base_matrix<T, COLS_ANOTHER, ROWS_ONE>::identity();
 		for (std::size_t j = 0; j < ROWS_ONE; j++)
@@ -63,7 +63,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	base_matrix<T, COLS, ROWS> inline operator +(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
+	constexpr base_matrix<T, COLS, ROWS> inline operator +(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
 		base_matrix<T, COLS, ROWS> res = base_matrix<T, COLS, ROWS>::identity();
 		iterate<0, ROWS - 1>([&](std::size_t i)
@@ -74,7 +74,7 @@ namespace math
 	}
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	base_matrix<T, COLS, ROWS> inline operator -(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
+	constexpr base_matrix<T, COLS, ROWS> inline operator -(const base_matrix<T, COLS, ROWS> & one, const base_matrix<T, COLS, ROWS> & another)
 	{
 		base_matrix<T, COLS, ROWS> res = base_matrix<T, COLS, ROWS>::identity();
 		iterate<0, ROWS - 1>([&](std::size_t i)
@@ -86,7 +86,7 @@ namespace math
 
 
 	template <typename T, std::size_t COLS, std::size_t ROWS>
-	vector<T, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const vector<T, COLS> & another)
+	constexpr vector<T, ROWS> inline operator * (const base_matrix<T, COLS, ROWS> & one, const vector<T, COLS> & another)
 	{
 		vector<T, ROWS> res = vector<T, ROWS>::zero();
 		iterate<0, ROWS - 1>([&](std::size_t i)

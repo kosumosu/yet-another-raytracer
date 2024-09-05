@@ -21,19 +21,19 @@ void TransformCommandProcessor::ProcessCommand( LoadingContext & context, const 
 {
 	if (command == "translate")
 	{
-		auto transform = math::translate(ParserHelper::ReadVec3(stream));
+		auto transform = math::translate4x4(ParserHelper::ReadVec3(stream));
 		context.transform(context.transform() * transform);
 	}
 	else if (command == "scale")
 	{
-		auto transform = math::scale(ParserHelper::ReadVec3(stream));
+		auto transform = math::scale4x4(ParserHelper::ReadVec3(stream));
 		context.transform(context.transform() * transform);
 	}
 	else if (command == "rotate")
 	{
 		auto axis = ParserHelper::ReadVec3(stream);
 		space_real angle = ParserHelper::ReadSpaceReal(stream);
-		auto transform = math::rotate_degrees(axis, angle);
+		auto transform = math::rotate_degrees4x4(axis, angle);
 		context.transform(context.transform() * transform);
 	}
 	else if (command == "pushTransform")

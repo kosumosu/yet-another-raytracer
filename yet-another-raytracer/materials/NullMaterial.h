@@ -35,6 +35,7 @@ namespace materials
                         return math::random_sample<const bsdf_sample, space_real>(
                             bsdf_sample(
                                 true,
+                                true,
                                 incidentDirection,
                                 [=]()
                                 {

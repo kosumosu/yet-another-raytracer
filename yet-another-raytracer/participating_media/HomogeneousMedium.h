@@ -8,10 +8,10 @@ namespace participating_media
 {
     class HomogeneousMedium final : public ParticipatingMedium
     {
-        optical_thickness_t absorption_;
-        optical_thickness_t scattering_;
-        optical_thickness_t majorant_;
-        spectral_coeffs emission_;
+        const optical_thickness_t absorption_;
+        const optical_thickness_t scattering_;
+        const optical_thickness_t majorant_;
+        const spectral_coeffs emission_;
 
     public:
         HomogeneousMedium(optical_thickness_t absorption, optical_thickness_t scattering, spectral_coeffs emission)
@@ -33,7 +33,7 @@ namespace participating_media
                 absorption_,
                 scattering_,
                 emission_,
-                [](math::Sampler<space_real>& sampler, const extinction_to_scalar_t& extinction_to_scalar)
+                [](math::Sampler<space_real>& sampler)
                 {
                     auto direction = math::sphericalRand<space_real>(sampler);
 

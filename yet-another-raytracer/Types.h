@@ -25,6 +25,7 @@ using uint_vector2 = math::vector<unsigned int, 2>;
 using vector2 = math::vector<space_real, 2>;
 using vector3 = math::vector<space_real, 3>;
 using vector4 = math::vector<space_real, 4>;
+using matrix3 = math::base_matrix<space_real, 3, 3>;
 using matrix4 = math::base_matrix<space_real, 4, 4>;
 using ray3 = math::ray<space_real, 3>;
 using bounding_box3 = math::bounding_box<space_real, 3>;

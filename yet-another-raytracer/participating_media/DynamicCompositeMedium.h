@@ -48,42 +48,54 @@ namespace participating_media
 
         [[nodiscard]] medium_properties SampleProperties(const vector3& point) const override
         {
-            optical_thickness_t absorption = optical_thickness_t::zero();
-            optical_thickness_t scattering = optical_thickness_t::zero();
-            spectral_coeffs emission = spectral_coeffs::zero();
+            optical_thickness_t absorption_sum = optical_thickness_t::zero();
+            optical_thickness_t scattering_sum = optical_thickness_t::zero();
+            spectral_coeffs weighted_emission_sum = spectral_coeffs::zero();
 
             props_temp_storage_.clear();
 
             for (const auto& medium : media_)
             {
                 auto props = medium->SampleProperties(point);
-                absorption += props.absorption;
-                scattering += props.scattering;
-                emission += props.emission;
+                absorption_sum += props.absorption;
+                scattering_sum += props.scattering;
+                weighted_emission_sum += props.emission * props.absorption;
                 props_temp_storage_.push_back(std::move(props));
             }
 
+            const spectral_coeffs emission {
+                absorption_sum[0] == optical_thickness_scalar_t(0) ? optical_thickness_scalar_t(0) : weighted_emission_sum[0] / absorption_sum[0],
+                absorption_sum[1] == optical_thickness_scalar_t(0) ? optical_thickness_scalar_t(0) : weighted_emission_sum[1] / absorption_sum[1],
+                absorption_sum[2] == optical_thickness_scalar_t(0) ? optical_thickness_scalar_t(0) : weighted_emission_sum[2] / absorption_sum[2],
+            };
+
+
             return {
-                absorption,
-                scattering,
+                absorption_sum,
+                scattering_sum,
                 emission,
-                [scattering, this](math::Sampler<space_real>& sampler,
-                                   const extinction_to_scalar_t& extinction_to_scalar)
+                [scattering_sum, this](math::Sampler<space_real>& sampler)
                 {
-                    const auto random_threshold = sampler.Get1D() * extinction_to_scalar(scattering);
+                    const auto inv_scattering_sum = optical_thickness_scalar_t(1.0) / scattering_sum;
+
+                    const auto scattering_sum_scalar = color::get_importance(scattering_sum);
+                    const auto random_threshold = optical_thickness_scalar_t(sampler.Get1D()) * scattering_sum_scalar;
                     // assuming extinction_to_scalar is linear
-                    auto sum = space_real(0.0);
+                    auto weight_sum = optical_thickness_scalar_t(0.0);
 
                     for (std::size_t i = 0; i + 1 < props_temp_storage_.size(); ++i)
                     {
-                        auto& props = props_temp_storage_[i];
-                        sum += extinction_to_scalar(props.absorption);
-                        if (sum < random_threshold)
-                            return props.scatter_generator(sampler, extinction_to_scalar);
+                        const auto& props = props_temp_storage_[i];
+                        const auto weight = color::get_importance(props.scattering);
+                        weight_sum += weight;
+                        if (random_threshold < weight_sum)
+                            return scale_transmittance(props.scatter_generator(sampler), props.scattering * inv_scattering_sum * weight_sum / weight); //  (weight / weight_sum) == pdf
+
                     }
-                    return props_temp_storage_.back().scatter_generator(sampler, extinction_to_scalar);
+                    const auto& props = props_temp_storage_.back();
+                    return scale_transmittance(props.scatter_generator(sampler), props.scattering * weight_sum / (optical_thickness_scalar_t(1.0) - weight_sum));
                 },
-                [scattering, this](const vector3& incident_direction,
+                [scattering_sum, this](const vector3& incident_direction,
                                           const vector3& outgoing_direction)
                 {
                     spectral_coeffs phase_function_sum = spectral_coeffs::zero();
@@ -92,8 +104,16 @@ namespace participating_media
                         phase_function_sum += props.phase_function(incident_direction, outgoing_direction) * props.
                             scattering;
                     }
-                    return phase_function_sum / scattering;
+                    return phase_function_sum / scattering_sum;
                 }
+            };
+        }
+
+        static scattering_event scale_transmittance(const scattering_event& event, const spectral_coeffs& scale)
+        {
+            return {
+                event.direction,
+                event.transmittance * scale
             };
         }
     };

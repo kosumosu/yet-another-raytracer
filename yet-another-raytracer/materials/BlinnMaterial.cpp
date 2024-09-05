@@ -74,6 +74,7 @@ namespace materials
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
 						true,
+						false,
 						direction,
 						[=, this]()
 						{
@@ -87,8 +88,9 @@ namespace materials
 				return math::random_sample<const bsdf_sample, space_real>(
 					bsdf_sample(
 						false,
+						false,
 						direction,
-						[=, this]()
+						[=, this]
 						{
 							return diffuseColor * (color_rgb::fill(1.0) - specular_) * (color_rgb::fill(1.0) - translucency_);
 						}),
@@ -125,6 +127,7 @@ namespace materials
 			const auto reflected_direction = incidentDirection - normal * (space_real(2.0) * cosTheta);
 			return math::random_sample<const bsdf_sample, space_real>(
 				bsdf_sample(
+					false,
 					false,
 					reflected_direction,
 					[=, this]()

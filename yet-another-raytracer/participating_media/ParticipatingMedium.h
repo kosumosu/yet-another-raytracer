@@ -1,5 +1,7 @@
 #pragma once
 
+#include "media_common.h"
+
 #include "math/vector.hpp"
 #include "math/random_sample.hpp"
 
@@ -7,8 +9,6 @@
 
 namespace participating_media
 {
-    using optical_thickness_t = color_rgb; //math::vector<space_real, 3>;
-    using spectral_coeffs = color_rgb; // math::vector<space_real, 3>;
 
     struct scattering_event
     {
@@ -18,10 +18,9 @@ namespace participating_media
 
     //using scattering_sample = math::random_sample<scattering_event, space_real>;
 
-    using extinction_to_scalar_t = std::function<color_real(optical_thickness_t)>;
+    //using extinction_to_scalar_t = std::function<color_real(optical_thickness_t)>;
 
-    using scatter_generator_t = std::function<scattering_event(math::Sampler<space_real>& sampler,
-                                                               const extinction_to_scalar_t& extinction_to_scalar)>;
+    using scatter_generator_t = std::function<scattering_event(math::Sampler<space_real>& sampler)>;
 
     using phase_function_t = std::function<spectral_coeffs(const vector3& incident_direction,
                                                            const vector3& outgoing_direction)>;
@@ -56,4 +55,9 @@ namespace participating_media
         // // Generates random direction for scattering
         // [[nodiscard]] virtual scattering_sample SampleScattering(const ray3& ray) const = 0;
     };
+
+    constexpr color_real thickness_to_scalar(const optical_thickness_t& thickness)
+    {
+        return math::max_element(thickness);
+    }
 }

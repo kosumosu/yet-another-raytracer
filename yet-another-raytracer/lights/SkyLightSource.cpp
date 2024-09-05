@@ -52,34 +52,34 @@ namespace lights
 	}
 
 	void SkyLightSource::DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
-		const distibution_func& job) const
+	                                        const distibution_func& job) const
 	{
 		job(lighting_functional_distribution(
-		0U,
-		true,
-		[&]
-		{
-	#if ENABLE_IMPORTANCE_SAMPLING
-			const auto direction = math::sphericalRand<space_real>(sampler);
-			constexpr auto pdf = space_real(0.25) * std::numbers::inv_pi_v<space_real>;
-	#else
+			0U,
+			true,
+			[&]
+			{
+#if ENABLE_IMPORTANCE_SAMPLING
+				const auto direction = math::sphericalRand<space_real>(sampler);
+				constexpr auto pdf = space_real(0.25) * std::numbers::inv_pi_v<space_real>;
+#else
 			auto direction = math::hemiSphericalRand(normal);
 			const space_real pdf = space_real(0.5 * math::oneOverPi);
-	#endif
+#endif
 
-			return math::random_sample<std::optional<light_sample>, space_real>(
-				light_sample(
-					direction,
-					std::numeric_limits<space_real>::max(),
-					[=, this]()
-					{
-						return m_color;
-					}
-				),
-				pdf,
-				false);
-		}
-	));
+				return math::random_sample<std::optional<light_sample>, space_real>(
+					light_sample(
+						direction,
+						std::numeric_limits<space_real>::max(),
+						[=, this]()
+						{
+							return m_color;
+						}
+					),
+					pdf,
+					false);
+			}
+		));
 	}
 
 	color_real SkyLightSource::GetApproximateTotalPower() const

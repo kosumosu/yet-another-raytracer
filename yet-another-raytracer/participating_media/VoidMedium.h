@@ -20,7 +20,7 @@ namespace participating_media
                 optical_thickness_t::zero(),
                 optical_thickness_t::zero(),
                 spectral_coeffs::zero(),
-                [](auto& ray, auto& sampler)
+                [](auto& sampler)
                 {
                     return scattering_event{
                         vector3::zero(),

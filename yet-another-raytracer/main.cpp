@@ -153,6 +153,7 @@ void RenderRegular(const std::filesystem::path& scene_file,
 
 #if true
             const renderers::BucketRenderer<typeof(integrator_t)> renderer(
+                std::thread::hardware_concurrency(),
                 {32, 32},
                 std::make_unique<TopDownSequencer>(),
                 [&]()
@@ -283,7 +284,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             initialize({scene.rendering.width, scene.rendering.height});
 
             std::vector<objects::GeometryObject*> objects = {
-                &prepared_scene.planet, &prepared_scene.lower_cloud_bound, &prepared_scene.upper_cloud_bound
+                &prepared_scene.planet, &prepared_scene.lower_cloud_bound, &prepared_scene.upper_cloud_bound, &prepared_scene.extra_sphere, &prepared_scene.extra_triangle
             };
 
             accelerators::null::NullAccelerator accelerator{objects};
@@ -291,6 +292,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             using integrator_t = cloudscape::CloudscapeIntegrator<accelerators::null::NullMarcher>;
 
             const renderers::BucketRenderer<typeof(integrator_t)> renderer(
+                scene.rendering.maxthreads ? scene.rendering.maxthreads : std::thread::hardware_concurrency(),
                 {scene.rendering.bucketwidth, scene.rendering.bucketheight},
                 std::make_unique<TopDownSequencer>(),
                 [&]()
@@ -327,9 +329,9 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             renderer.Render(
                 film,
                 {uint_vector2::zero(), film.size()},
-                //{ uint_vector2 { 320, 240 }, {1, 1}},
+                //{ uint_vector2 { 329, 282 }, {1, 1}},
                 prepared_scene.camera,
-                256,
+                scene.rendering.samples,
                 [&prepared_scene, &accelerator, &atmospheric_medium, &cloud_medium]
                 {
                     auto raytracer = Raytracer{accelerator.CreateMarcher()};

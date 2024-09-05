@@ -38,6 +38,7 @@ namespace renderers
             const uint_vector2& top_left, const uint_vector2& bottom_right)>;
 
     private:
+        const std::size_t thread_count_;
         const uint_vector2 bucketSize_;
         const std::unique_ptr<IBucketSequencer> bucketSequencer_;
 
@@ -52,13 +53,15 @@ namespace renderers
     public:
         // progressCallback must support concurrent multithreaded calls
         BucketRenderer(
+            std::size_t thread_count,
             uint_vector2 bucketSize,
             std::unique_ptr<IBucketSequencer> bucketSequencer,
             initialization_finished_callback initializationFinishedCallback,
             rendering_finished_callback renderingFinishedCallback,
             area_started_callback areaStartedCallback,
             progress_callback progressCallback)
-            : bucketSize_(std::move(bucketSize))
+            : thread_count_(thread_count)
+              ,bucketSize_(std::move(bucketSize))
               , bucketSequencer_(std::move(bucketSequencer))
               , initializationFinishedCallback_(std::move(initializationFinishedCallback))
               , areaStartedCallback_(std::move(areaStartedCallback))
@@ -87,13 +90,12 @@ namespace renderers
 
             std::atomic_size_t completedCount = 0;
 
-            const auto threadCount = std::thread::hardware_concurrency();
             std::vector<std::thread> threads;
-            threads.reserve(threadCount);
+            threads.reserve(thread_count_);
 
-            ThreadBarrier barrier{threadCount};
+            ThreadBarrier barrier{thread_count_};
 
-            for (unsigned int i = 0; i < threadCount; ++i)
+            for (unsigned int i = 0; i < thread_count_; ++i)
             {
                 std::thread thread{
                     [&, sequence = sequence.get()]
@@ -211,8 +213,9 @@ namespace renderers
                 const auto rayPayload =
                     rayIntegrator.EvaluateRay(ray, space_real(0.0), pixelPersonalSampler) *
                     sampleWeight;
-                assert(!std::isnan(rayPayload[0]) && !std::isnan(rayPayload[1]) && !std::isnan(rayPayload[2]) &&
-                    !std::isnan(rayPayload[3]));
+
+                assert(!math::anyNan(rayPayload));
+
                 averageColor += rayPayload;
             }
 
