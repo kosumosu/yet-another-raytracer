@@ -175,10 +175,8 @@ namespace cloudscape
 
                                         const auto lightSamplePdf = color_real(optionalLightSample.getPdf());
 
-                                        constexpr auto magic_multiplier = color_real(2.0);
                                         auto radianceByLight =
                                             lightValue
-                                            //* magic_multiplier
                                             * scattering_coeffs
                                             / lightSamplePdf;
 
