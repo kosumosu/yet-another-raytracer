@@ -52,7 +52,7 @@ namespace applications
             place.collocate();
 
 
-            nana::paint::pixel_buffer pb;
+            //nana::paint::pixel_buffer pb;
             nana::paint::graphics graphics;
             nana::drawing drawing{picture};
             drawing.draw([&graphics, this](nana::paint::graphics& graph)
@@ -85,23 +85,25 @@ namespace applications
                             form.caption(std::format(L"YART {:.2f}%", progress_percent));
                             //std::wcout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%\n";
                         },
-                        [&drawing, &graphics, &pb, this](const auto& top_left, const auto& bottom_right)
+                        [&drawing, &graphics, /*&pb,*/ this](const auto& top_left, const auto& bottom_right)
                         {
                             std::unique_lock guard{mutex_};
                             draw_bucket_in_progress(graphics, top_left, bottom_right);
 
                             drawing.update();
 
-                            return [&graphics, &pb, &drawing, top_left, bottom_right, this](const Film& film)
+                            return [&graphics, /*&pb,*/ &drawing, top_left, bottom_right, this](const Film& film)
                             {
-                                std::vector<nana::pixel_color_t> buffer(film.width() * film.height());
+                                const auto size = bottom_right - top_left;
 
-                                for (auto y = 0U; y < film.height(); ++y)
+                                std::vector<nana::pixel_color_t> buffer(size[0] * size[1]);
+
+                                for (auto y = 0U; y < size[1]; ++y)
                                 {
-                                    for (auto x = 0U; x < film.width(); ++x)
+                                    for (auto x = 0U; x < size[0]; ++x)
                                     {
                                         const auto color = film.getPixelTonemapped(x, y);
-                                        auto& element = buffer[y * film.width() + x].element;
+                                        auto& element = buffer[y * size[0] + x].element;
                                         element.red = color[0];
                                         element.green = color[1];
                                         element.blue = color[2];
@@ -109,12 +111,18 @@ namespace applications
                                     }
                                 }
 
-                                nana::paint::pixel_buffer pb { film.width(), film.height()};
+                                nana::paint::pixel_buffer pb{size[0], size[1]};
 
-                                pb.put(reinterpret_cast<const unsigned char*>(buffer.data()), film.width(), film.height(), 32, film.width() * sizeof(nana::pixel_color_t), true);
+                                pb.put(reinterpret_cast<const unsigned char*>(
+                                           buffer.data()),
+                                       size[0],
+                                       size[1],
+                                       32,
+                                       size[0] * sizeof(nana::pixel_color_t),
+                                       true);
 
                                 std::unique_lock guard{mutex_};
-                                pb.paste(graphics.handle(), { int(top_left[0]), int(top_left[1]) });
+                                pb.paste(graphics.handle(), {int(top_left[0]), int(top_left[1])});
 
                                 graphics.set_changed();
                                 drawing.update();
