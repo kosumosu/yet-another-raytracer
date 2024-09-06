@@ -104,4 +104,16 @@ namespace math
 		return std::copysign(T(1.0), val);
 		//return val >= 0 ? T(1) : T(-1);
 	}
+
+	template <class T>
+	T square(const T& a)
+	{
+		return a * a;
+	}
+
+	template <class T>
+	T safeSqrt(const T& a)
+	{
+		return std::sqrt(std::max(T(0), a));
+	}
 }

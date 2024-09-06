@@ -74,7 +74,7 @@ namespace participating_media
                 absorption_sum,
                 scattering_sum,
                 emission,
-                [scattering_sum, this](math::Sampler<space_real>& sampler)
+                [scattering_sum, this](const vector3& incident_direction, math::Sampler<space_real>& sampler)
                 {
                     const auto inv_scattering_sum = optical_thickness_scalar_t(1.0) / scattering_sum;
 
@@ -89,11 +89,11 @@ namespace participating_media
                         const auto weight = color::get_importance(props.scattering);
                         weight_sum += weight;
                         if (random_threshold < weight_sum)
-                            return scale_transmittance(props.scatter_generator(sampler), props.scattering * inv_scattering_sum * weight_sum / weight); //  (weight / weight_sum) == pdf
+                            return scale_transmittance(props.scatter_generator(incident_direction, sampler), props.scattering * inv_scattering_sum * weight_sum / weight); //  (weight / weight_sum) == pdf
 
                     }
                     const auto& props = props_temp_storage_.back();
-                    return scale_transmittance(props.scatter_generator(sampler), props.scattering * weight_sum / (optical_thickness_scalar_t(1.0) - weight_sum));
+                    return scale_transmittance(props.scatter_generator(incident_direction, sampler), props.scattering * weight_sum / (optical_thickness_scalar_t(1.0) - weight_sum));
                 },
                 [scattering_sum, this](const vector3& incident_direction,
                                           const vector3& outgoing_direction)

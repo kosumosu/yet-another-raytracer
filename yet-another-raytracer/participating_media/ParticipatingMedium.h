@@ -10,17 +10,11 @@
 namespace participating_media
 {
 
-    struct scattering_event
-    {
-        vector3 direction;
-        spectral_coeffs transmittance;
-    };
-
     //using scattering_sample = math::random_sample<scattering_event, space_real>;
 
     //using extinction_to_scalar_t = std::function<color_real(optical_thickness_t)>;
 
-    using scatter_generator_t = std::function<scattering_event(math::Sampler<space_real>& sampler)>;
+    using scatter_generator_t = std::function<scattering_event(const vector3& incident_direction, math::Sampler<space_real>& sampler)>;
 
     using phase_function_t = std::function<spectral_coeffs(const vector3& incident_direction,
                                                            const vector3& outgoing_direction)>;

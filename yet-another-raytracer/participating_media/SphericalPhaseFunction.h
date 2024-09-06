@@ -7,7 +7,7 @@ namespace participating_media
     class SphericalPhaseFunction final : public PhaseFunction
     {
     public:
-        [[nodiscard]] scattering_event Sample(math::Sampler<space_real>& sampler) const override
+        [[nodiscard]] scattering_event Sample(const vector3& incident_direction, math::Sampler<space_real>& sampler) const override
         {
             auto direction = math::sphericalRand<space_real>(sampler);
 
@@ -17,7 +17,8 @@ namespace participating_media
             };
         }
 
-        [[nodiscard]] spectral_coeffs Evaluate(const space_real& thetaCos) const override
+        [[nodiscard]] spectral_coeffs Evaluate(const vector3& incident_direction,
+                                               const vector3& outgoing_direction) const override
         {
             return spectral_coeffs::fill(space_real(0.25) * std::numbers::inv_pi_v<space_real>);
         }

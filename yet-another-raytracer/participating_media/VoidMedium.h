@@ -20,7 +20,7 @@ namespace participating_media
                 optical_thickness_t::zero(),
                 optical_thickness_t::zero(),
                 spectral_coeffs::zero(),
-                [](auto& sampler)
+                [](const vector3& incident_direction, auto& sampler)
                 {
                     return scattering_event{
                         vector3::zero(),
@@ -31,8 +31,8 @@ namespace participating_media
                    const vector3& outgoing_direction)
                 {
                     return (incident_direction == outgoing_direction)
-                       ? spectral_coeffs::one()
-                       : spectral_coeffs::zero();
+                               ? spectral_coeffs::one()
+                               : spectral_coeffs::zero();
                 }
             };
         }

@@ -27,16 +27,16 @@ namespace cloudscape
         color_rgb transmittance;
     };
 
-    struct media_interaction_absorbtion
+    struct media_interaction_absorbtion // left for termination by russian roulette
     {
-        color_rgb emission;
     };
 
     struct media_interaction_scatter
     {
         ray3 new_ray;
         color_rgb emission;
-        color_rgb transmittance;
+        color_rgb transmittance_to_event;
+        color_rgb scatter_transmittance;
         participating_media::phase_function_t phase_function; // in case we want to evaluate other lighting
     };
 
@@ -136,14 +136,12 @@ namespace cloudscape
 
                 if (const auto absorption = std::get_if<media_interaction_absorbtion>(&media_result))
                 {
-                    integral += absorption->emission * throughput;
-                    assert(!math::anyNan(integral));
                     break;
                 }
                 else if (const auto scatter = std::get_if<media_interaction_scatter>(&media_result))
                 {
-                    throughput *= scatter->transmittance;
-                    integral += scatter->emission * throughput;
+                    throughput *= scatter->transmittance_to_event;
+                    integral += scatter->emission;
                     assert(!math::anyNan(integral));
 
                     light_source_.DoWithDistribution(
@@ -191,7 +189,10 @@ namespace cloudscape
                             }
                         });
 
-                    const auto survive_probability = std::clamp(color::get_importance(scatter->transmittance),
+                    throughput *= scatter->scatter_transmittance;
+
+                    const auto total_scatter_transmittance = scatter->transmittance_to_event * scatter->scatter_transmittance;
+                    const auto survive_probability = std::clamp(color::get_importance(total_scatter_transmittance),
                                                                 MIN_SURVIVE_PROBABILITY, MAX_SURVIVE_PROBABILITY);
 
                     // Termination by russian roulette
@@ -354,7 +355,7 @@ namespace cloudscape
                 //const auto distance_pdf = math::exponentialPDF(distance, majorant_sampling_extinction);
 
                 //const auto last_piece_transmittance_dbl = math::exp((participating_media::optical_thickness_t::fill(majorant_sampling_extinction) - majorant_extinction) * max_distance);
-               // const auto last_piece_transmittance = math::cast<color_real>(last_piece_transmittance_dbl);
+                // const auto last_piece_transmittance = math::cast<color_real>(last_piece_transmittance_dbl);
 
                 // if (math::anyNan(last_piece_transmittance))
                 // {
@@ -381,15 +382,18 @@ namespace cloudscape
                 const auto random_value = sampler.Get1D() * majorant_sampling_extinction;
                 if (random_value < interaction_sigma_scalar)
                 {
-                    const auto scattering_sample = media_properties.scatter_generator(sampler);
+                    const auto scattering_sample = media_properties.scatter_generator(
+                        current_ray.direction(),
+                        sampler);
 
                     const auto scatter_weights = media_properties.scattering / interaction_sigma;
                     const auto absorption_weights = media_properties.absorption / interaction_sigma;
 
                     return media_interaction_scatter{
                         {new_ray.origin(), scattering_sample.direction},
-                        majorant_transmittance * media_properties.emission * absorption_weights,
-                        majorant_transmittance * scattering_sample.transmittance * scatter_weights,
+                        media_properties.emission * absorption_weights,
+                        majorant_transmittance,
+                        scattering_sample.transmittance * scatter_weights,
                         std::move(media_properties.phase_function)
                     };
                 }
@@ -398,21 +402,22 @@ namespace cloudscape
                     // null scattering
 
                     // spectral correction
-                    const color_rgb last_piece_transmittance = (color_rgb::fill(majorant_sampling_extinction) - interaction_sigma) / (majorant_sampling_extinction - interaction_sigma_scalar);
+                    const color_rgb last_piece_transmittance = (color_rgb::fill(majorant_sampling_extinction) -
+                        interaction_sigma) / (majorant_sampling_extinction - interaction_sigma_scalar);
 
                     // Russian roulette
                     const auto survive_probability = std::clamp(color::get_importance(last_piece_transmittance),
                                                                 MIN_SURVIVE_PROBABILITY, MAX_SURVIVE_PROBABILITY);
-                    // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
+
+
                     if (sampler.Get1D() >= survive_probability)
                     {
-                        return media_interaction_absorbtion{
-                            color_rgb::zero()
-                        };
+                        return media_interaction_absorbtion{};
                     }
                     else
                     {
-                        majorant_transmittance = majorant_transmittance * last_piece_transmittance / survive_probability;
+                        majorant_transmittance = majorant_transmittance * last_piece_transmittance /
+                            survive_probability;
                         assert(!math::anyNan(majorant_transmittance));
                         assert(math::max_element(majorant_transmittance) < 100000.0f);
                     }

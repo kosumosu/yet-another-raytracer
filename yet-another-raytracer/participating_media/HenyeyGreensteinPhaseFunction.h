@@ -52,8 +52,8 @@ namespace participating_media
 
             //assert(dotxy == space_real(0) && dotxz == space_real(0) && dotyz == space_real(0));
 
-            const auto dir = math::fromThetaPhi(sinTheta, cosTheta, phi);
-            const auto outgoing_direction = math::fromLocal(wFrame, dir);
+            const auto dir = math::from_theta_phi(sinTheta, cosTheta, phi);
+            const auto outgoing_direction = math::from_local(wFrame, dir);
 
             // if (math::length(outgoing_direction) > 1.01)
             // {

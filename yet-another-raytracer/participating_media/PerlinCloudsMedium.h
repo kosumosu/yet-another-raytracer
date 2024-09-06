@@ -12,7 +12,7 @@ namespace participating_media
     template <class TFunc>
     concept CDensityMultiplier = std::invocable<TFunc, const vector3&>;
 
-    template <CDensityMultiplier TDensityMultiplier>
+    template <CPhaseFunction TPhaseFunction, CDensityMultiplier TDensityMultiplier>
     //template <class TDensityMultiplier>
     class PerlinCloudsMedium final : public ParticipatingMedium
     {
@@ -26,6 +26,7 @@ namespace participating_media
         const size_t octaves_;
         const space_real multiplier_;
 
+        const TPhaseFunction& phase_function_;
         TDensityMultiplier density_multiplier_;
 
         const siv::PerlinNoise noise_;
@@ -40,7 +41,8 @@ namespace participating_media
             size_t octaves,
             space_real multiplier,
             TDensityMultiplier density_multiplier,
-            std::size_t seed)
+            std::size_t seed,
+            const TPhaseFunction& phase_function)
             : absorption_(std::move(absorption))
               , scattering_(std::move(scattering))
               , majorant_(absorption_ + scattering_)
@@ -51,6 +53,7 @@ namespace participating_media
               , multiplier_(multiplier)
               , density_multiplier_(std::move(density_multiplier))
               , noise_(seed)
+              , phase_function_(phase_function)
         {
         }
 
@@ -81,19 +84,14 @@ namespace participating_media
                 absorption_ * density,
                 scattering_ * density,
                 emission_,
-                [](math::Sampler<space_real>& sampler)
+                [this](const vector3& incident_direction, math::Sampler<space_real>& sampler)
                 {
-                    auto direction = math::sphericalRand<space_real>(sampler);
-
-                    return scattering_event{
-                        std::move(direction),
-                        spectral_coeffs::one()
-                    };
+                    return phase_function_.Sample(incident_direction, sampler);
                 },
-                [](const vector3& incident_direction,
-                   const vector3& outgoing_direction)
+                [this](const vector3& incident_direction,
+                       const vector3& outgoing_direction)
                 {
-                    return spectral_coeffs::fill(space_real(0.25) * std::numbers::inv_pi_v<space_real>);
+                    return phase_function_.Evaluate(incident_direction, outgoing_direction);
                 }
             };
         }

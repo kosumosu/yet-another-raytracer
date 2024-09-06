@@ -58,7 +58,9 @@ namespace lights
                     const auto point_on_scaled_circle3d = vector3(1.0, point_on_scaled_circle[0],
                                                                   point_on_scaled_circle[1]);
 
-                    const auto direction = direction_transform_ * point_on_scaled_circle3d;
+                    const auto untransformed_direction =  math::normalize(point_on_scaled_circle3d);
+
+                    const auto direction = direction_transform_ * untransformed_direction;
 
                     return math::random_sample<std::optional<light_sample>, space_real>(
                         light_sample(
@@ -69,7 +71,7 @@ namespace lights
                                 return color_per_unit_area_;
                             }
                         ),
-                        inv_disc_area_,
+                        inv_disc_area_ / untransformed_direction[0],
                         false);
                 }
             ));

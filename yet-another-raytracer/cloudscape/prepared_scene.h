@@ -13,6 +13,10 @@
 #include "participating_media/PerlinCloudsMedium.h"
 #include "participating_media/VoidMedium.h"
 
+
+#include "participating_media/HenyeyGreensteinPhaseFunction.h"
+#include "participating_media/SphericalPhaseFunction.h"
+
 namespace cloudscape
 {
     struct prepared_scene
@@ -30,7 +34,11 @@ namespace cloudscape
         vector3 extinction_rayleigh;
         vector3 extinction_mie;
 
+        std::shared_ptr<participating_media::PhaseFunction> spherical_phase_function;
+        std::shared_ptr<participating_media::PhaseFunction> clouds_phase_function;
+
         std::shared_ptr<participating_media::ParticipatingMedium> atmospheric_medium;
+        std::shared_ptr<participating_media::ParticipatingMedium> homogenous_medium;
         std::shared_ptr<participating_media::ParticipatingMedium> cloud_medium;
 
         std::shared_ptr<materials::Material> planet_material;
@@ -59,11 +67,17 @@ namespace cloudscape
         const auto planet_center = vector3{0.0, 0.0, -scene.planet.planetradius};
         const auto camera_pos = vector3{scene.camera.x, scene.camera.y, scene.camera.z};
 
+        auto spherical_phase_function = std::make_shared<participating_media::SphericalPhaseFunction>();
+        auto clouds_phase_function = std::make_shared<participating_media::HenyeyGreensteinPhaseFunction>(
+            scene.clouds.fwd_bck);
+
         auto atmospheric_medium = std::make_shared<participating_media::VoidMedium>();
-        auto homogenous_cloud_medium = std::make_shared<participating_media::HomogeneousMedium>(
+        auto homogeneous_medium = std::make_shared<participating_media::HomogeneousMedium<decltype(
+            spherical_phase_function)::element_type>>(
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t::fill(scene.clouds.fog),
-            participating_media::spectral_coeffs::zero()
+            participating_media::spectral_coeffs::zero(),
+            *spherical_phase_function
         );
 
         auto lower_clouds_radius = scene.planet.planetradius + scene.clouds.height;
@@ -80,8 +94,10 @@ namespace cloudscape
             //return color_real(1);
         };
 
-        auto perlin_cloud_medium = std::make_shared<participating_media::PerlinCloudsMedium<decltype(density_evaluator
-        )>>(
+        auto perlin_cloud_medium = std::make_shared<participating_media::PerlinCloudsMedium<
+            decltype(clouds_phase_function)::element_type,
+            decltype(density_evaluator)
+        >>(
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t::fill(scene.clouds.fog),
             participating_media::spectral_coeffs::zero(),
@@ -90,19 +106,10 @@ namespace cloudscape
             scene.noise.detail,
             scene.noise.multiplier,
             std::move(density_evaluator),
-            scene.noise.seed
+            scene.noise.seed,
+            *clouds_phase_function
         );
 
-        // auto perlin_cloud_medium = std::make_shared<participating_media::PerlinCloudsMedium>(
-        //     participating_media::optical_thickness_t::zero(),
-        //     participating_media::optical_thickness_t::fill(scene.clouds.fog),
-        //     participating_media::spectral_coeffs::zero(),
-        //     scene.noise.size,
-        //     0.5,
-        //     1,
-        //     scene.noise.multiplier,
-        //     scene.noise.seed
-        // );
 
         //auto cloud_medium = std::move(homogenous_cloud_medium);
         auto cloud_medium = std::move(perlin_cloud_medium);
@@ -116,12 +123,7 @@ namespace cloudscape
             color_rgb::zero()
         );
 
-        auto planet_object = objects::SphereObject{
-            planet_center,
-            scene.planet.planetradius
-        };
-
-        planet_object.material(planet_material.get());
+        auto null_material = std::make_shared<materials::NullMaterial>();
 
         auto extra_material = std::make_shared<materials::BlinnMaterial>(
             color_rgb::zero(),
@@ -132,6 +134,14 @@ namespace cloudscape
             color_rgb::zero()
         );
 
+        auto planet_object = objects::SphereObject{
+            planet_center,
+            scene.planet.planetradius
+        };
+
+        planet_object.material(planet_material.get());
+
+
         // auto extra_sphere = objects::SphereObject{
         //     {1500.0, 100.0, 1500.0},
         //     500.0
@@ -141,7 +151,8 @@ namespace cloudscape
             50.0
         };
 
-        extra_sphere.material(extra_material.get());
+        extra_sphere.material(null_material.get());
+        extra_sphere.inner_medium(homogeneous_medium.get());
 
         auto extra_triangle = objects::FlatTriangleObject(
             {1000.0, 0.0, 1500.1},
@@ -151,7 +162,6 @@ namespace cloudscape
 
         extra_triangle.material(extra_material.get());
 
-        auto null_material = std::make_shared<materials::NullMaterial>();
 
         auto lower_clouds_bound = objects::SphereObject{
             planet_center, lower_clouds_radius, true
@@ -164,10 +174,10 @@ namespace cloudscape
         upper_clouds_bound.material(null_material.get());
         upper_clouds_bound.inner_medium(cloud_medium.get());
 
-        lights::DirectionalLightSource directional_sun {
+        lights::DirectionalLightSource directional_sun{
             math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation)),
             color::srgb_to_linear(color::from_bgr_int(scene.sun.color)) * scene.sun.multiplier
-            };
+        };
 
         lights::SunLightSource sun{
             color::srgb_to_linear(color::from_bgr_int(scene.sun.color)) * scene.sun.multiplier,
@@ -191,7 +201,10 @@ namespace cloudscape
             {7.2865e-6, 1.2863e-5, 2.7408e-5}, // for wavelengths 615,535,445
             vector3::fill(turbidity_to_mie_extinction(scaled_rayleigh_height, scaled_mie_height,
                                                       scene.planet.turbidity)),
+            std::move(spherical_phase_function),
+            std::move(clouds_phase_function),
             std::move(atmospheric_medium),
+            std::move(homogeneous_medium),
             std::move(cloud_medium),
             std::move(planet_material),
             std::move(null_material),

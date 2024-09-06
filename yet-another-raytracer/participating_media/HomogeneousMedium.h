@@ -2,27 +2,33 @@
 
 #include "Sampler.h"
 
+#include "PhaseFunction.h"
 #include "ParticipatingMedium.h"
 
 namespace participating_media
 {
+    template <CPhaseFunction TPhaseFunction>
     class HomogeneousMedium final : public ParticipatingMedium
     {
         const optical_thickness_t absorption_;
         const optical_thickness_t scattering_;
         const optical_thickness_t majorant_;
         const spectral_coeffs emission_;
+        const TPhaseFunction& phase_function_;
 
     public:
-        HomogeneousMedium(optical_thickness_t absorption, optical_thickness_t scattering, spectral_coeffs emission)
+        HomogeneousMedium(optical_thickness_t absorption, optical_thickness_t scattering, spectral_coeffs emission,
+                          const TPhaseFunction& phase_function)
             : absorption_(std::move(absorption))
               , scattering_(std::move(scattering))
               , majorant_(absorption_ + scattering_)
               , emission_(std::move(emission))
+              , phase_function_(phase_function)
         {
         }
 
-        [[nodiscard]] optical_thickness_t SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override
+        [[nodiscard]] optical_thickness_t
+        SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override
         {
             return majorant_;
         }
@@ -33,22 +39,16 @@ namespace participating_media
                 absorption_,
                 scattering_,
                 emission_,
-                [](math::Sampler<space_real>& sampler)
+                [this](const vector3& incident_direction, math::Sampler<space_real>& sampler)
                 {
-                    auto direction = math::sphericalRand<space_real>(sampler);
-
-                    return scattering_event{
-                        std::move(direction),
-                        spectral_coeffs::one()
-                    };
+                    return phase_function_.Sample(incident_direction, sampler);
                 },
-                [](const vector3& incident_direction,
-                   const vector3& outgoing_direction)
+                [this](const vector3& incident_direction,
+                       const vector3& outgoing_direction)
                 {
-                    return spectral_coeffs::fill(space_real(0.25) * std::numbers::inv_pi_v<space_real>);
+                    return phase_function_.Evaluate(incident_direction, outgoing_direction);
                 }
             };
         }
-
     };
 }
