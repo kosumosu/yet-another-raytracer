@@ -447,7 +447,8 @@ namespace cloudscape
 
         [[nodiscard]] color_rgb EvaluateInfinity(const ray3& ray, bool accountForEmission)
         {
-            return color_rgb(0.5, 0.55, 0.8) + sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
+            return sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
+            //return color_rgb(0.5, 0.55, 0.8) + sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
         }
 
         color_rgb EvaluateTransmittanceAlongSegment(

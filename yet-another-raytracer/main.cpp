@@ -284,7 +284,11 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             initialize({scene.rendering.width, scene.rendering.height});
 
             std::vector<objects::GeometryObject*> objects = {
-                &prepared_scene.planet, &prepared_scene.lower_cloud_bound, &prepared_scene.upper_cloud_bound, &prepared_scene.extra_sphere, &prepared_scene.extra_triangle
+                &prepared_scene.planet,
+                // &prepared_scene.lower_cloud_bound,
+                // &prepared_scene.upper_cloud_bound,
+                &prepared_scene.extra_sphere,
+                &prepared_scene.extra_triangle
             };
 
             accelerators::null::NullAccelerator accelerator{objects};

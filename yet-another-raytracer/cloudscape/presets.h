@@ -103,8 +103,8 @@ namespace cloudscape
         scene.vis.brightness = 1.0f;
         scene.vis.gamma = 1.0f;
 
-        scene.sun.azimuth = 45.0f; //45.0f;
-        scene.sun.elevation = 30.0f; //30.0f;
+        scene.sun.azimuth = 0.0f; //45.0f;
+        scene.sun.elevation = 5.0f; //30.0f;
         scene.sun.ambient = 0x000000;
         scene.sun.multiplier = 1.0; //0.25f;
         scene.sun.color = 16777215;
@@ -116,7 +116,7 @@ namespace cloudscape
 
         scene.clouds.color = 16777215;
         scene.clouds.trans_falloff = 1.0f;
-        scene.clouds.fwd_bck = 0.6f;
+        scene.clouds.fwd_bck = 0.99f;
         scene.clouds.fog = 0.01f; //0.01;
         scene.clouds.height = 300.0f;
         scene.clouds.thickness = 500.0f;

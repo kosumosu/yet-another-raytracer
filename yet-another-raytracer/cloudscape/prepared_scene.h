@@ -68,16 +68,16 @@ namespace cloudscape
         const auto camera_pos = vector3{scene.camera.x, scene.camera.y, scene.camera.z};
 
         auto spherical_phase_function = std::make_shared<participating_media::SphericalPhaseFunction>();
-        auto clouds_phase_function = std::make_shared<participating_media::HenyeyGreensteinPhaseFunction>(
+        auto henyey_greenstein_phase_function = std::make_shared<participating_media::HenyeyGreensteinPhaseFunction>(
             scene.clouds.fwd_bck);
 
         auto atmospheric_medium = std::make_shared<participating_media::VoidMedium>();
         auto homogeneous_medium = std::make_shared<participating_media::HomogeneousMedium<decltype(
-            spherical_phase_function)::element_type>>(
+            henyey_greenstein_phase_function)::element_type>>(
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t::fill(scene.clouds.fog),
             participating_media::spectral_coeffs::zero(),
-            *spherical_phase_function
+            *henyey_greenstein_phase_function
         );
 
         auto lower_clouds_radius = scene.planet.planetradius + scene.clouds.height;
@@ -95,7 +95,7 @@ namespace cloudscape
         };
 
         auto perlin_cloud_medium = std::make_shared<participating_media::PerlinCloudsMedium<
-            decltype(clouds_phase_function)::element_type,
+            decltype(henyey_greenstein_phase_function)::element_type,
             decltype(density_evaluator)
         >>(
             participating_media::optical_thickness_t::zero(),
@@ -107,7 +107,7 @@ namespace cloudscape
             scene.noise.multiplier,
             std::move(density_evaluator),
             scene.noise.seed,
-            *clouds_phase_function
+            *henyey_greenstein_phase_function
         );
 
 
@@ -202,7 +202,7 @@ namespace cloudscape
             vector3::fill(turbidity_to_mie_extinction(scaled_rayleigh_height, scaled_mie_height,
                                                       scene.planet.turbidity)),
             std::move(spherical_phase_function),
-            std::move(clouds_phase_function),
+            std::move(henyey_greenstein_phase_function),
             std::move(atmospheric_medium),
             std::move(homogeneous_medium),
             std::move(cloud_medium),
