@@ -18,6 +18,9 @@ namespace participating_media
 
         [[nodiscard]] virtual spectral_coeffs Evaluate(const vector3& incident_direction,
                                                        const vector3& outgoing_direction) const = 0;
+
+        [[nodiscard]] virtual color_real EvaluatePdf(const vector3& incident_direction,
+                                                       const vector3& outgoing_direction) const = 0;
     };
 
     template <class T>

@@ -9,16 +9,16 @@
 
 namespace participating_media
 {
-
-    //using scattering_sample = math::random_sample<scattering_event, space_real>;
-
-    //using extinction_to_scalar_t = std::function<color_real(optical_thickness_t)>;
-
-    using scatter_generator_t = std::function<scattering_event(const vector3& incident_direction, math::Sampler<space_real>& sampler)>;
+    using scatter_generator_t = std::function<scattering_event(const vector3& incident_direction,
+                                                               math::Sampler<space_real>& sampler)>;
 
     using phase_function_t = std::function<spectral_coeffs(const vector3& incident_direction,
                                                            const vector3& outgoing_direction)>;
-    // extinction_to_scalar must be linear! I.e. sum(f(x)) == f(sum(x))
+
+
+    using pdf_evaluator_t = std::function<color_real(
+        const vector3& incident_direction,
+        const vector3& outgoing_direction)>;
 
     struct medium_properties
     {
@@ -27,6 +27,7 @@ namespace participating_media
         spectral_coeffs emission;
         scatter_generator_t scatter_generator;
         phase_function_t phase_function;
+        pdf_evaluator_t evaluate_pdf;
     };
 
     class ParticipatingMedium

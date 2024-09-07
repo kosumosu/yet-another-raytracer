@@ -92,6 +92,11 @@ namespace participating_media
                        const vector3& outgoing_direction)
                 {
                     return phase_function_.Evaluate(incident_direction, outgoing_direction);
+                },
+                [this](const vector3& incident_direction,
+                       const vector3& outgoing_direction)
+                {
+                    return phase_function_.EvaluatePdf(incident_direction, outgoing_direction);
                 }
             };
         }

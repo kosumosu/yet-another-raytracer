@@ -28,13 +28,13 @@ namespace lights
     }
 
     void GeometryLightSource::DoWithDistribution(const LightingContext& context, math::Sampler<space_real>& sampler,
-                                                 const distibution_func& job) const
+                                                 const distibution_func& job) const noexcept
     {
         DoWithDistributionImpl(context.getPoint(), context.object(), sampler, job);
     }
 
     void GeometryLightSource::DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
-                                                 const distibution_func& job) const
+                                                 const distibution_func& job) const noexcept
     {
         DoWithDistributionImpl(point, nullptr, sampler, job);
     }
@@ -42,7 +42,7 @@ namespace lights
     void GeometryLightSource::DoWithDistributionImpl(const vector3& point,
                                                      const objects::GeometryObject* illuminated_object,
                                                      math::Sampler<space_real>& sampler,
-                                                     const distibution_func& job) const
+                                                     const distibution_func& job) const noexcept
     {
         const auto randomFunc = [&]()
         {
@@ -128,7 +128,7 @@ namespace lights
         ));
     }
 
-    color_real GeometryLightSource::GetApproximateTotalPower() const
+    color_real GeometryLightSource::GetApproximateTotalPower() const noexcept
     {
         return _totalPower;
     }

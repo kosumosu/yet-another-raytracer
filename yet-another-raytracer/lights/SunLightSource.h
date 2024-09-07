@@ -11,13 +11,11 @@ namespace lights
         using lighting_functional_distribution = FunctionalDistribution<
             std::optional<light_sample>, vector3, space_real>;
 
-        const space_real disc_radius_; // a disc 1 unit away, with same angular size
-        const space_real inv_disc_area_;
-        const color_rgb color_per_unit_area_;
-        const matrix3 direction_transform_;
-
-        const vector3 direction_;
         const space_real half_angular_size_cos_;
+        const space_real pdf_;
+        const color_rgb color_per_sample_;
+        const matrix3 direction_transform_;
+        const vector3 direction_;
 
     public:
         constexpr static space_real earth_to_sun_distance = 149600000.0;
@@ -30,68 +28,69 @@ namespace lights
             const space_real& angular_size_radians,
             const space_real& azimuth_radians,
             const space_real& elevation_radians)
-            : disc_radius_(std::atan(angular_size_radians * space_real(0.5)))
-              , inv_disc_area_(space_real(1) / (std::numbers::pi_v<space_real> * disc_radius_ * disc_radius_))
-              , color_per_unit_area_(color * inv_disc_area_)
+            : half_angular_size_cos_(std::cos(angular_size_radians * space_real(0.5)))
+              , pdf_(math::conicalRandPdf<space_real>(half_angular_size_cos_))
+              , color_per_sample_(color * pdf_)
               , direction_transform_(GenerateTransformMatrix(azimuth_radians, elevation_radians))
               , direction_(math::from_angles(azimuth_radians, elevation_radians))
-              , half_angular_size_cos_(std::cos(angular_size_radians * space_real(0.5)))
         {
         }
 
         void DoWithDistribution(const LightingContext& context, math::Sampler<space_real>& sampler,
-                                const distibution_func& job) const override
+                                const distibution_func& job) const noexcept override
         {
             DoWithDistribution(context.getPoint(), sampler, job);
         }
 
         void DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
-                                const distibution_func& job) const override
+                                const distibution_func& job) const noexcept override
         {
             job(lighting_functional_distribution(
                 0U,
                 true,
                 [&, this]
                 {
-                    const auto point_on_unit_circle = math::circularRand<space_real>(sampler);
-                    const auto point_on_scaled_circle = point_on_unit_circle * disc_radius_;
-                    const auto point_on_scaled_circle3d = vector3(1.0, point_on_scaled_circle[0],
-                                                                  point_on_scaled_circle[1]);
-
-                    const auto untransformed_direction =  math::normalize(point_on_scaled_circle3d);
-
-                    const auto direction = direction_transform_ * untransformed_direction;
+                    const auto dir = math::conicalRand(sampler, half_angular_size_cos_);
+                    auto direction = direction_transform_ * dir;
 
                     return math::random_sample<std::optional<light_sample>, space_real>(
                         light_sample(
-                            direction,
+                            std::move(direction),
                             std::numeric_limits<space_real>::max(),
                             [this]
                             {
-                                return color_per_unit_area_;
+                                return color_per_sample_;
                             }
                         ),
-                        inv_disc_area_ / untransformed_direction[0],
+                        pdf_,
                         false);
                 }
             ));
         }
 
-        [[nodiscard]] color_real GetApproximateTotalPower() const override
+        [[nodiscard]] space_real EvaluatePdfExperimental(const ray3& ray) const noexcept override
         {
-            return color::get_importance(color_per_unit_area_ / inv_disc_area_);
+            const auto cos_theta = math::dot(ray.direction(), direction_);
+            const bool hits = cos_theta > half_angular_size_cos_;
+
+            return hits * pdf_;
+        }
+
+        [[nodiscard]] color_real GetApproximateTotalPower() const noexcept override
+        {
+            return color::get_importance(color_per_sample_ / pdf_);
         }
 
 
-        [[nodiscard]] color_rgb EvaluateEmissionForDirection(const vector3& direction) const
+        [[nodiscard]] color_rgb EvaluateEmissionForDirection(const vector3& direction) const noexcept
         {
             const bool hits = math::dot(direction, direction_) > half_angular_size_cos_;
-            return color_per_unit_area_ * hits;
+            return color_per_sample_ * hits;
         }
 
     private:
         constexpr static matrix3 GenerateTransformMatrix(const space_real& azimuth_radians,
-                                                         const space_real& elevation_radians)
+                                                         const space_real& elevation_radians) noexcept
         {
             return math::rotate3x3(vector3(0.0, 0.0, 1.0), azimuth_radians)
                 * math::rotate3x3(vector3(0.0, 1.0, 0.0), -elevation_radians);

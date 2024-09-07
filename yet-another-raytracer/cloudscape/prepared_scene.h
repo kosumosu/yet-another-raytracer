@@ -181,7 +181,9 @@ namespace cloudscape
 
         lights::SunLightSource sun{
             color::srgb_to_linear(color::from_bgr_int(scene.sun.color)) * scene.sun.multiplier,
-            lights::SunLightSource::real_sun_average_angular_size_radians,
+            std::atan(
+                lights::SunLightSource::sun_radius * scene.sun.size_mult /
+                lights::SunLightSource::earth_to_sun_distance) * 2.0,
             math::deg_to_rad(scene.sun.azimuth),
             math::deg_to_rad(scene.sun.elevation)
         };

@@ -273,6 +273,23 @@ namespace math
 		return isNan;
 	}
 
+	template <typename T, std::size_t N>
+	constexpr bool anyInf(const vector<T, N>& one)
+	{
+		bool isNan = false;
+		iterate<0, N - 1>([&](std::size_t i)
+			{
+				isNan = isNan || std::isinf(one[i]);
+			});
+		return isNan;
+	}
+
+	template <typename T, std::size_t N>
+	constexpr bool anyInvalid(const vector<T, N>& one)
+	{
+		return anyNan(one) || anyInf(one);
+	}
+
 	template <typename T, std::size_t N, typename TCallable>
 	constexpr auto mapElements(const vector<T, N>& one, TCallable&& callable)
 	{

@@ -12,13 +12,13 @@ namespace lights
 		, m_attenuation(1.0f, 0.0f, 0.0f) {}
 
 
-	void PointLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const
+	void PointLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const noexcept
 	{
 		DoWithDistribution(context.getPoint(), sampler, job);
 	}
 
 	void PointLightSource::DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
-		const distibution_func& job) const
+		const distibution_func& job) const noexcept
 	{
 		const auto point_to_light = m_position - point;
 
@@ -45,7 +45,7 @@ namespace lights
 		);
 	}
 
-	color_real PointLightSource::GetApproximateTotalPower() const
+	color_real PointLightSource::GetApproximateTotalPower() const noexcept
 	{
 		return color::get_importance(m_color) * color_real(4.0 * math::pi);
 	}

@@ -43,12 +43,15 @@ namespace lights
 		virtual ~LightSource() = default;
 
 		virtual void DoWithDistribution(const LightingContext& context, math::Sampler<space_real>& sampler,
-										const distibution_func& job) const = 0;
+										const distibution_func& job) const noexcept = 0;
 
 		virtual void DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
-									const distibution_func& job) const = 0;
+									const distibution_func& job) const noexcept = 0;
 
-		[[nodiscard]] virtual color_real GetApproximateTotalPower() const = 0;
+		// Not guaranteed to be correct yet.
+		[[nodiscard]] virtual space_real EvaluatePdfExperimental(const ray3& ray) const noexcept = 0;
+
+		[[nodiscard]] virtual color_real GetApproximateTotalPower() const noexcept = 0;
 	};
 
 	using LightSourceCollection = std::vector<std::shared_ptr<LightSource>>;

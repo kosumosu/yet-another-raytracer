@@ -36,7 +36,8 @@ namespace participating_media
             media_.clear();
         }
 
-        [[nodiscard]] optical_thickness_t SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override
+        [[nodiscard]] optical_thickness_t
+        SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override
         {
             return std::accumulate(
                 media_.cbegin(),
@@ -63,10 +64,18 @@ namespace participating_media
                 props_temp_storage_.push_back(std::move(props));
             }
 
-            const spectral_coeffs emission {
-                absorption_sum[0] == optical_thickness_scalar_t(0) ? optical_thickness_scalar_t(0) : weighted_emission_sum[0] / absorption_sum[0],
-                absorption_sum[1] == optical_thickness_scalar_t(0) ? optical_thickness_scalar_t(0) : weighted_emission_sum[1] / absorption_sum[1],
-                absorption_sum[2] == optical_thickness_scalar_t(0) ? optical_thickness_scalar_t(0) : weighted_emission_sum[2] / absorption_sum[2],
+            const auto scattering_sum_scalar = color::get_importance(scattering_sum);
+
+            const spectral_coeffs emission{
+                absorption_sum[0] == optical_thickness_scalar_t(0)
+                    ? optical_thickness_scalar_t(0)
+                    : weighted_emission_sum[0] / absorption_sum[0],
+                absorption_sum[1] == optical_thickness_scalar_t(0)
+                    ? optical_thickness_scalar_t(0)
+                    : weighted_emission_sum[1] / absorption_sum[1],
+                absorption_sum[2] == optical_thickness_scalar_t(0)
+                    ? optical_thickness_scalar_t(0)
+                    : weighted_emission_sum[2] / absorption_sum[2],
             };
 
 
@@ -74,11 +83,11 @@ namespace participating_media
                 absorption_sum,
                 scattering_sum,
                 emission,
-                [scattering_sum, this](const vector3& incident_direction, math::Sampler<space_real>& sampler)
+                [scattering_sum, scattering_sum_scalar, this](const vector3& incident_direction,
+                                                              math::Sampler<space_real>& sampler)
                 {
                     const auto inv_scattering_sum = optical_thickness_scalar_t(1.0) / scattering_sum;
 
-                    const auto scattering_sum_scalar = color::get_importance(scattering_sum);
                     const auto random_threshold = optical_thickness_scalar_t(sampler.Get1D()) * scattering_sum_scalar;
                     // assuming extinction_to_scalar is linear
                     auto weight_sum = optical_thickness_scalar_t(0.0);
@@ -89,14 +98,22 @@ namespace participating_media
                         const auto weight = color::get_importance(props.scattering);
                         weight_sum += weight;
                         if (random_threshold < weight_sum)
-                            return scale_transmittance(props.scatter_generator(incident_direction, sampler), props.scattering * inv_scattering_sum * weight_sum / weight); //  (weight / weight_sum) == pdf
-
+                            return fix_transmittance(
+                                props.scatter_generator(incident_direction, sampler),
+                                props.scattering * inv_scattering_sum,
+                                weight / weight_sum);
+                        //  (weight / weight_sum) == pdf
                     }
                     const auto& props = props_temp_storage_.back();
-                    return scale_transmittance(props.scatter_generator(incident_direction, sampler), props.scattering * weight_sum / (optical_thickness_scalar_t(1.0) - weight_sum));
+                    return fix_transmittance(
+                        props.scatter_generator(
+                            incident_direction, sampler),
+                        props.scattering * inv_scattering_sum,
+                        (optical_thickness_scalar_t(1.0) -
+                            weight_sum) / weight_sum);
                 },
                 [scattering_sum, this](const vector3& incident_direction,
-                                          const vector3& outgoing_direction)
+                                       const vector3& outgoing_direction)
                 {
                     spectral_coeffs phase_function_sum = spectral_coeffs::zero();
                     for (const auto& props : props_temp_storage_)
@@ -105,15 +122,31 @@ namespace participating_media
                             scattering;
                     }
                     return phase_function_sum / scattering_sum;
+                },
+                [scattering_sum_scalar, this](const vector3& incident_direction,
+                                              const vector3& outgoing_direction)
+                {
+                    auto phase_function_sum = color_real(0);
+                    for (const auto& props : props_temp_storage_)
+                    {
+                        phase_function_sum += props.evaluate_pdf(incident_direction, outgoing_direction) *
+                            color::get_importance(props.
+                                scattering);
+                    }
+                    return phase_function_sum / scattering_sum_scalar;
                 }
             };
         }
 
-        static scattering_event scale_transmittance(const scattering_event& event, const spectral_coeffs& scale)
+        static scattering_event fix_transmittance(
+            const scattering_event& event,
+            const spectral_coeffs& scale,
+            const color_real& pdf_scale)
         {
             return {
                 event.direction,
-                event.transmittance * scale
+                event.transmittance * scale,
+                event.pdf * pdf_scale
             };
         }
     };

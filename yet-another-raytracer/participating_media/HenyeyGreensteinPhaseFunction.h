@@ -46,38 +46,32 @@ namespace participating_media
             const auto phi = space_real(2) * std::numbers::pi_v<space_real> * u[1];
             const auto wFrame = math::makeCoordSystemFromVectorZ(incident_direction);
 
-            // const auto dotxy = math::dot(wFrame[0], wFrame[1]);
-            // const auto dotxz = math::dot(wFrame[0], wFrame[2]);
-            // const auto dotyz = math::dot(wFrame[1], wFrame[2]);
-
-            //assert(dotxy == space_real(0) && dotxz == space_real(0) && dotyz == space_real(0));
-
-            const auto dir = math::from_theta_phi(sinTheta, cosTheta, phi);
-            const auto outgoing_direction = math::from_local(wFrame, dir);
-
-            // if (math::length(outgoing_direction) > 1.01)
-            // {
-            //     const auto dir_len = math::length(dir);
-            //     const auto outgoing_direction_len = math::length(outgoing_direction);
-            //     const auto incident_direction_len = math::length(incident_direction);
-            //     int x = 23;
-            // }
-
-            // const auto coss = math::dot(incident_direction, outgoing_direction);
-            //
-            // if (std::abs(coss - cosTheta) > 0.00001)
-            // {
-            //     int sd = 0;
-            // }
+            const auto dir = math::from_theta_phi_towards_z(sinTheta, cosTheta, phi);
+            const auto outgoing_direction = -math::from_local(wFrame, dir);
 
             return {
                 outgoing_direction,
-                spectral_coeffs::one()
+                Evaluate(incident_direction, outgoing_direction),
+                EvaluatePdf(incident_direction, outgoing_direction)
             };
         }
 
         [[nodiscard]] spectral_coeffs Evaluate(const vector3& incident_direction,
                                                const vector3& outgoing_direction) const override
+        {
+            return spectral_coeffs::fill(EvaluateScalar(incident_direction, outgoing_direction));
+        }
+
+        [[nodiscard]] color_real EvaluatePdf(
+            const vector3& incident_direction,
+            const vector3& outgoing_direction) const override
+        {
+            return EvaluateScalar(incident_direction, outgoing_direction);
+        }
+
+    private:
+        [[nodiscard]] color_real EvaluateScalar(const vector3& incident_direction,
+                                                const vector3& outgoing_direction) const
         {
             const auto cosTheta = color_real(-math::dot(incident_direction, outgoing_direction));
             assert(std::abs(cosTheta) <= 1);
@@ -85,7 +79,7 @@ namespace participating_media
             const auto result = std::numbers::inv_pi_v<color_real> * color_real(0.25)
                 * (color_real(1) - color_real(g_squared_))
                 / (denom * math::safeSqrt(denom));
-            return spectral_coeffs::fill(result);
+            return result;
         }
     };
 }

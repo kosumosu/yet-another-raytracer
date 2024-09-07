@@ -13,7 +13,7 @@ namespace lights
 
 
 
-	void SkyLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const
+	void SkyLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const noexcept
 	{
 		// 	auto evaluatePdf = [&](const vector3& sample)
 		// 	{
@@ -52,7 +52,7 @@ namespace lights
 	}
 
 	void SkyLightSource::DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
-	                                        const distibution_func& job) const
+	                                        const distibution_func& job) const noexcept
 	{
 		job(lighting_functional_distribution(
 			0U,
@@ -82,7 +82,7 @@ namespace lights
 		));
 	}
 
-	color_real SkyLightSource::GetApproximateTotalPower() const
+	color_real SkyLightSource::GetApproximateTotalPower() const noexcept
 	{
 		throw std::exception{};
 	}

@@ -36,7 +36,7 @@ namespace math
         );
 
         auto res = base_matrix<T, 3, 3>::identity() * cosTheta + a_aT * (1 - cosTheta) + a_star * sinTheta;
-        res[3][3] = T(1);
+
         return res;
     }
 

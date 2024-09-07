@@ -11,5 +11,6 @@ namespace participating_media
     {
         vector3 direction;
         spectral_coeffs transmittance;
+        color_real pdf;
     };
 }

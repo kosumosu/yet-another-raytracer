@@ -31,13 +31,13 @@ namespace lights
 	{
 	}
 
-	void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const
+	void DirectionalLightSource::DoWithDistribution(const LightingContext & context, math::Sampler<space_real> & sampler, const distibution_func & job) const noexcept
 	{
 		DoWithDistribution(context.getPoint(), sampler, job);
 	}
 
 	void DirectionalLightSource::DoWithDistribution(const vector3& point, math::Sampler<space_real>& sampler,
-		const distibution_func& job) const
+		const distibution_func& job) const noexcept
 	{
 		job(lighting_functional_distribution(
 				1U,
@@ -59,7 +59,7 @@ namespace lights
 		);
 	}
 
-	color_real DirectionalLightSource::GetApproximateTotalPower() const
+	color_real DirectionalLightSource::GetApproximateTotalPower() const noexcept
 	{
 		return _power;
 	}

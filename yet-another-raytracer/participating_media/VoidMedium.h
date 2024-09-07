@@ -24,7 +24,8 @@ namespace participating_media
                 {
                     return scattering_event{
                         vector3::zero(),
-                        spectral_coeffs::zero()
+                        spectral_coeffs::zero(),
+                        color_real(1)
                     };
                 },
                 [](const vector3& incident_direction,
@@ -33,6 +34,11 @@ namespace participating_media
                     return (incident_direction == outgoing_direction)
                                ? spectral_coeffs::one()
                                : spectral_coeffs::zero();
+                },
+                [](const vector3& incident_direction,
+                   const vector3& outgoing_direction)
+                {
+                    return space_real(incident_direction == outgoing_direction);
                 }
             };
         }

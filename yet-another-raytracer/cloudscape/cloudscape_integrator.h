@@ -37,17 +37,20 @@ namespace cloudscape
         color_rgb emission;
         color_rgb transmittance_to_event;
         color_rgb scatter_transmittance;
+        color_real scatter_pdf;
         participating_media::phase_function_t phase_function; // in case we want to evaluate other lighting
+        participating_media::pdf_evaluator_t evaluate_pdf; // in case we want to evaluate other lighting
     };
 
     using media_trace_result = std::variant<media_interaction_none, media_interaction_absorbtion,
                                             media_interaction_scatter>;
 
-
-    struct atmospheric_sample
+    struct light_sample
     {
-        color_rgb inscatter;
-        color_rgb transparency;
+        color_rgb value = color_rgb::zero();
+        vector3 direction = vector3::zero();
+        color_real pdf = color_real(0);
+        color_real scatter_dir_pdf = color_real(0);
     };
 
     template <Marcher_c TMarcher>
@@ -99,6 +102,7 @@ namespace cloudscape
             //return EvaluateRayImpl(ray, bias, sampler, 2);
         }
 
+
         color_rgb EvaluateRayNew(const ray3& ray, space_real bias,
                                  math::Sampler<space_real>& sampler) noexcept
         {
@@ -121,6 +125,7 @@ namespace cloudscape
 
             auto currentRay = ray;
             bool accountForEmission = true;
+            color_real next_emission_weight = 1.0;
             bool earlyExit = false;
 
             auto hit = raytracer_.TraceRay(ray, bias);
@@ -142,54 +147,50 @@ namespace cloudscape
                 {
                     throughput *= scatter->transmittance_to_event;
                     integral += scatter->emission;
-                    assert(!math::anyNan(integral));
+                    assert(!math::anyInvalid(integral));
 
-                    light_source_.DoWithDistribution(
-                        scatter->new_ray.origin(),
-                        sampler,
-                        [&](const lights::light_distribution& lightDistribution)
+                    auto light_sample = SampleLight(*scatter, currentRay, sampler);
+
+                    if constexpr (false) // if using MIS
+                    {
+                        if (light_sample.pdf != color_real(0))
                         {
-                            if (lightDistribution.delta_components() != 0 || lightDistribution.
-                                has_non_delta_component())
-                            {
-                                const auto optionalLightSample = lightDistribution.generate_sample();
+                            const auto light_dir_pdf_of_scatter = scatter->evaluate_pdf(
+                                currentRay.direction(), light_sample.direction);
+                            const auto light_pdf_sqr_sum = math::square(light_sample.pdf) + math::square(
+                                light_dir_pdf_of_scatter);
+                            const auto direct_light_weight = math::square(light_sample.pdf) / light_pdf_sqr_sum;
+                            const auto direct_light = (light_sample.value / light_sample.pdf) * direct_light_weight;
 
-                                if (optionalLightSample.getValue())
-                                {
-                                    const auto& lightSample = *optionalLightSample.getValue();
+                            integral += direct_light;
+                            assert(!math::anyInvalid(integral));
 
-                                    const ray3 light_ray{scatter->new_ray.origin(), lightSample.direction};
+                            const auto scatter_dir_pdf_of_light = light_sample.scatter_dir_pdf;
+                            const auto scatter_pdf_sqr_sum = math::square(scatter->scatter_pdf) + math::square(
+                                light_sample.scatter_dir_pdf);
+                            next_emission_weight = math::square(scatter->scatter_pdf) / scatter_pdf_sqr_sum;
+                            accountForEmission = true;
+                        }
+                        else
+                        {
+                            next_emission_weight = 1.0;
+                        }
+                    }
+                    else
+                    {
+                        if (!math::isZero(light_sample.value))
+                        {
+                            integral += light_sample.value / light_sample.pdf;
+                            assert(!math::anyInvalid(integral));
+                        }
+                        accountForEmission = false;
+                    }
 
-                                    const auto light_ray_transmittance = EvaluateTransmittanceAlongSegment(
-                                        light_ray,
-                                        lightSample.distance - BIAS * lightSample.distance,
-                                        sampler
-                                    );
+                    throughput *= scatter->scatter_transmittance / scatter->scatter_pdf;
+                    assert(!math::anyInvalid(throughput));
 
-                                    if (!math::isZero(light_ray_transmittance))
-                                    {
-                                        auto lightValue = lightSample.evaluate();
-
-                                        const auto scattering_coeffs = scatter->phase_function(
-                                            currentRay.direction(), lightSample.direction);
-
-                                        const auto lightSamplePdf = color_real(optionalLightSample.getPdf());
-
-                                        auto radianceByLight =
-                                            lightValue
-                                            * scattering_coeffs
-                                            / lightSamplePdf;
-
-                                        integral += radianceByLight * light_ray_transmittance * throughput;
-                                        assert(!math::anyNan(integral));
-                                    }
-                                }
-                            }
-                        });
-
-                    throughput *= scatter->scatter_transmittance;
-
-                    const auto total_scatter_transmittance = scatter->transmittance_to_event * scatter->scatter_transmittance;
+                    const auto total_scatter_transmittance = scatter->transmittance_to_event * scatter->
+                        scatter_transmittance;
                     const auto survive_probability = std::clamp(color::get_importance(total_scatter_transmittance),
                                                                 MIN_SURVIVE_PROBABILITY, MAX_SURVIVE_PROBABILITY);
 
@@ -205,7 +206,6 @@ namespace cloudscape
                     }
 
                     currentRay = scatter->new_ray;
-                    accountForEmission = false;
 
                     const auto rt_bias = BiasForPosition(currentRay.origin());
                     hit = raytracer_.TraceRay(currentRay, rt_bias,
@@ -217,11 +217,12 @@ namespace cloudscape
 
                 const auto no_interaction = std::get<media_interaction_none>(media_result);
                 throughput *= no_interaction.transmittance;
+                assert(!math::anyInvalid(throughput));
 
                 if (!hit.has_occurred())
                 {
-                    integral += EvaluateInfinity(currentRay, accountForEmission) * throughput;
-                    assert(!math::anyNan(integral));
+                    integral += EvaluateInfinity(currentRay, accountForEmission * next_emission_weight) * throughput;
+                    assert(!math::anyInvalid(integral));
                     break;
                 }
 
@@ -258,11 +259,11 @@ namespace cloudscape
                                 sampler);
 
                         const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-                        assert(!math::anyNan(samplePayload));
+                        assert(!math::anyInvalid(samplePayload));
 
                         integral += samplePayload;
 
-                        assert(!math::anyNan(integral));
+                        assert(!math::anyInvalid(integral));
 
                         assert(math::max_element(integral) < 20000.0f);
 
@@ -293,7 +294,7 @@ namespace cloudscape
                         else
                         {
                             throughput *= vertexThroughput / survive_probability;
-                            assert(!math::anyNan(throughput));
+                            assert(!math::anyInvalid(throughput));
                             assert(math::max_element(throughput) < 100000.0f);
                         }
 
@@ -328,6 +329,97 @@ namespace cloudscape
             return integral;
         }
 
+
+        // TODO get rid of this
+        statistics::Stats getStats() const
+        {
+            return {};
+        }
+
+    private:
+        [[nodiscard]] static space_real BiasForPosition(const vector3& position)
+        {
+            return std::max(space_real(std::numeric_limits<float>::epsilon()),
+                            std::abs(math::max_element(position)) * EPS * space_real(8192.0));
+        }
+
+        [[nodiscard]] static participating_media::optical_thickness_scalar_t ExtinctionForSamping(
+            const participating_media::optical_thickness_t& extinction)
+        {
+            return participating_media::thickness_to_scalar(extinction); // Just take green for now
+        }
+
+        [[nodiscard]] color_rgb EvaluateInfinity(const ray3& ray, color_real emission_weight)
+        {
+            return sun_.EvaluateEmissionForDirection(ray.direction()) * emission_weight;
+            //return color_rgb(0.5, 0.55, 0.8) + sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
+        }
+
+
+        light_sample SampleLight(
+            const media_interaction_scatter& scatter,
+            ray3 currentRay,
+            math::Sampler<space_real>& sampler)
+        {
+            const auto& light_source = light_source_;
+            light_sample light_sample{};
+            light_source.DoWithDistribution(
+                scatter.new_ray.origin(),
+                sampler,
+                [
+                    this,
+                    &light_source,
+                    &scatter,
+                    &sampler,
+                    &currentRay,
+                    &light_sample
+                ](const lights::light_distribution& lightDistribution)
+                {
+                    if (lightDistribution.delta_components() != 0 || lightDistribution.
+                        has_non_delta_component())
+                    {
+                        const auto optionalLightSample = lightDistribution.generate_sample();
+
+                        if (optionalLightSample.getValue())
+                        {
+                            const auto& lightSample = *optionalLightSample.getValue();
+
+                            const ray3 light_ray{scatter.new_ray.origin(), lightSample.direction};
+
+                            const auto light_ray_transmittance = EvaluateTransmittanceAlongSegment(
+                                light_ray,
+                                lightSample.distance - BIAS * lightSample.distance,
+                                sampler
+                            );
+
+                            if (!math::isZero(light_ray_transmittance))
+                            {
+                                auto lightValue = lightSample.evaluate();
+
+                                const auto scattering_coeffs = scatter.phase_function(
+                                    currentRay.direction(), lightSample.direction);
+
+
+                                //const auto lightSamplePdf = color_real(optionalLightSample.getPdf());
+
+                                auto radianceByLight =
+                                        lightValue
+                                        * scattering_coeffs
+                                    // / lightSamplePdf
+                                    ;
+
+                                light_sample.value = radianceByLight * light_ray_transmittance;
+                                light_sample.pdf = color_real(optionalLightSample.getPdf());
+                                light_sample.direction = lightSample.direction;
+                                light_sample.scatter_dir_pdf = light_source.EvaluatePdfExperimental(scatter.new_ray);
+                            }
+                        }
+                    }
+                });
+            return light_sample;
+        }
+
+
         media_trace_result TraceMedia(participating_media::DynamicCompositeMedium& medium, const ray3& ray,
                                       space_real max_distance, math::Sampler<space_real>& sampler)
         {
@@ -350,17 +442,6 @@ namespace cloudscape
 
                 const auto distance =
                     math::sampleExponential(color_real(sampler.Get1D()), majorant_sampling_extinction);
-                //const auto distance_pdf = math::exponentialPDF(distance, majorant_sampling_extinction);
-
-                //const auto last_piece_transmittance_dbl = math::exp((participating_media::optical_thickness_t::fill(majorant_sampling_extinction) - majorant_extinction) * max_distance);
-                // const auto last_piece_transmittance = math::cast<color_real>(last_piece_transmittance_dbl);
-
-                // if (math::anyNan(last_piece_transmittance))
-                // {
-                //     int asd = 543;
-                // }
-
-                //majorant_transmittance *= last_piece_transmittance;
 
                 if (traversed_distance + distance > max_distance)
                 {
@@ -384,6 +465,8 @@ namespace cloudscape
                         current_ray.direction(),
                         sampler);
 
+                    assert(scattering_sample.pdf != color_real(0));
+
                     const auto scatter_weights = media_properties.scattering / interaction_sigma;
                     const auto absorption_weights = media_properties.absorption / interaction_sigma;
 
@@ -392,7 +475,9 @@ namespace cloudscape
                         media_properties.emission * absorption_weights,
                         majorant_transmittance,
                         scattering_sample.transmittance * scatter_weights,
-                        std::move(media_properties.phase_function)
+                        scattering_sample.pdf,
+                        std::move(media_properties.phase_function),
+                        std::move(media_properties.evaluate_pdf)
                     };
                 }
                 else
@@ -423,32 +508,6 @@ namespace cloudscape
                     current_ray = new_ray;
                 }
             }
-        }
-
-
-        // TODO get rid of this
-        statistics::Stats getStats() const
-        {
-            return {};
-        }
-
-    private:
-        [[nodiscard]] static space_real BiasForPosition(const vector3& position)
-        {
-            return std::max(space_real(std::numeric_limits<float>::epsilon()),
-                            std::abs(math::max_element(position)) * EPS * space_real(8192.0));
-        }
-
-        [[nodiscard]] static participating_media::optical_thickness_scalar_t ExtinctionForSamping(
-            const participating_media::optical_thickness_t& extinction)
-        {
-            return participating_media::thickness_to_scalar(extinction); // Just take green for now
-        }
-
-        [[nodiscard]] color_rgb EvaluateInfinity(const ray3& ray, bool accountForEmission)
-        {
-            return sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
-            //return color_rgb(0.5, 0.55, 0.8) + sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
         }
 
         color_rgb EvaluateTransmittanceAlongSegment(
@@ -607,38 +666,6 @@ namespace cloudscape
                 });
 
             return radianceAtCurrentPathVertex;
-        }
-
-
-        // should include sun
-        [[nodiscard]] atmospheric_sample EvaluateAtmosphere(const ray3& ray) const
-        {
-            constexpr auto sun_angular_size_cos = std::cos(math::deg_to_rad(1.0));
-            const auto sun_cos = math::dot(ray.direction(), scene_.sun_direction);
-            const auto sun_addition = sun_cos >= sun_angular_size_cos ? scene_.sun_color : color_rgb::zero();
-            return {
-                color_rgb(0.5, 0.55, 0.8) + sun_addition,
-                color_rgb::zero()
-            };
-
-            // auto beta_rayleigh = scene_.beta_total_rayleigh;
-            // auto beta_mie = scene_.beta_total_mie;
-            //
-            //
-        }
-
-        [[nodiscard]] atmospheric_sample EvaluateAtmosphere(const vector3& start, const vector3& end) const
-        {
-            auto transparency = math::exp(-color_rgb(0.00010, 0.00015, 0.0002) * color_real(math::length(end - start)));
-            return {
-                color_rgb(0.5, 0.55, 0.8) * (color_rgb::fill(1.0) - transparency),
-                std::move(transparency)
-            };
-
-            // auto beta_rayleigh = scene_.beta_total_rayleigh;
-            // auto beta_mie = scene_.beta_total_mie;
-            //
-            //
         }
     };
 }

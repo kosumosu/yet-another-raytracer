@@ -333,7 +333,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             renderer.Render(
                 film,
                 {uint_vector2::zero(), film.size()},
-                //{ uint_vector2 { 329, 282 }, {1, 1}},
+                //{ uint_vector2 { 639, 317 }, {1, 1}},
                 prepared_scene.camera,
                 scene.rendering.samples,
                 [&prepared_scene, &accelerator, &atmospheric_medium, &cloud_medium]

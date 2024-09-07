@@ -72,6 +72,7 @@ namespace cloudscape
         uint32_t ambient;
         float multiplier;
         uint32_t color;
+        float size_mult;
     };
 
     struct clouds

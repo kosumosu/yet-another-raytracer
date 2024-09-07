@@ -6,6 +6,8 @@
 #include <cassert>
 #include <random>
 
+#include "vector3_functions.hpp"
+
 namespace math
 {
 	template <typename TValue, std::size_t N, typename TSampler>
@@ -43,6 +45,23 @@ namespace math
 		return a * std::exp(-a * value);
 	}
 
+	template <typename TValue, typename TSampler>
+	vector<TValue, 3> conicalRand(TSampler& sampler, const TValue& half_angular_size_cos)
+	{
+		const auto u = sampler.Get2D();
+
+		const auto cosTheta = (1 - u[0]) + u[0] * half_angular_size_cos;
+		const auto sinTheta = math::safeSqrt(1 - math::square(cosTheta));
+		const auto phi = u[1] * 2 * std::numbers::pi_v<TValue>;
+		return math::from_theta_phi_towards_x(sinTheta, cosTheta, phi);
+	}
+
+	template <typename TValue>
+	TValue conicalRandPdf(const TValue& half_angular_size_cos)
+	{
+		auto val = 1 / (2 * std::numbers::pi_v<TValue> * (1 - half_angular_size_cos));
+		return val;
+	}
 
 	template <typename TValue, typename TSampler>
 	vector<TValue, 3> sphericalRand(TSampler& sampler)
