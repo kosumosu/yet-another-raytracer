@@ -70,6 +70,7 @@ namespace cloudscape
         const prepared_scene scene_;
         raytracer_t raytracer_;
         const participating_media::ParticipatingMedium& atmosphericMedium_;
+        const participating_media::ParticipatingMedium& atmosphericAerosolMedium_;
         const participating_media::ParticipatingMedium& cloudsMedium_;
 
         const lights::SunLightSource& sun_;
@@ -87,10 +88,11 @@ namespace cloudscape
         )
             : scene_(std::move(scene))
               , raytracer_{std::move(raytracer)}
-              , atmosphericMedium_(*scene_.atmospheric_medium)
+              , atmosphericMedium_(*scene_.atmospheric_molecular_medium)
+              , atmosphericAerosolMedium_(*scene_.atmospheric_aerosol_medium)
               , cloudsMedium_(*scene_.cloud_medium)
               , sun_(scene_.sun)
-              , light_source_(scene_.sun)
+              , light_source_(scene_.directional_sun)
         {
         }
 
@@ -100,6 +102,36 @@ namespace cloudscape
             return EvaluateRayNew(ray, bias, sampler);
 
             //return EvaluateRayImpl(ray, bias, sampler, 2);
+        }
+
+        void catch_shit(const color_rgb& color, size_t color_index)
+        {
+            const bool check =
+                (color[0] == 0 && color_index != 0)
+                && (color[1] == 0 && color_index != 1)
+                && (color[2] == 0 && color_index != 2);
+            if (check)
+            {
+                int x = 389;
+            }
+        }
+
+        constexpr static void catch_invalid(const color_rgb& color)
+        {
+            if (color[1] > 1)
+            {
+                int x  = 0;
+            }
+
+            const bool invalid =
+                math::anyInvalid(color)
+            || math::max_element(color) > 100000.0
+            || math::min_element(color) < 0.0;
+            if (invalid)
+            {
+                int sd = 0;
+            }
+            assert(!invalid);
         }
 
 
@@ -113,11 +145,23 @@ namespace cloudscape
             const auto is_inside_clouds = dist_to_planet_center2 > lower_cloud_bound2 && dist_to_planet_center2 <
                 upper_cloud_bound2;
 
+
+            const auto color_index = static_cast<size_t>(3 * sampler.Get1D());
+            const auto color_pdf = color_real(1) / 3;
+
+
+            // const auto random_var = std::min(color_real(0.99999), color_real(sampler.Get1D())); // to avoid getting 1 when casting to color_real. Sum of weights may also be less than 1, probably.
+            // const auto color_index = color::sample_color_component(random_var);
+            // const auto color_pdf = color::LUMINOCITY_WEIGHTS[color_index];
+
+
             color_rgb integral(color_rgb::zero()); // sort of sub integral or just single sample
-            color_rgb throughput(color_rgb::fill(1));
+            color_rgb throughput(color_rgb::zero());
+            throughput[color_index] = 1 / color_pdf;
 
             media_.ClearMedia();
-            media_.PushMedium(&atmosphericMedium_);
+            //media_.PushMedium(&atmosphericMedium_);
+            media_.PushMedium(&atmosphericAerosolMedium_);
             if (is_inside_clouds)
             {
                 media_.PushMedium(&cloudsMedium_);
@@ -137,7 +181,7 @@ namespace cloudscape
                                                            ? hit.distance()
                                                            : std::numeric_limits<space_real>::max();
 
-                auto media_result = TraceMedia(media_, currentRay, obstruction_free_distance, sampler);
+                auto media_result = TraceMedia(media_, currentRay, obstruction_free_distance, throughput, color_index, sampler);
 
                 if (const auto absorption = std::get_if<media_interaction_absorbtion>(&media_result))
                 {
@@ -146,24 +190,25 @@ namespace cloudscape
                 else if (const auto scatter = std::get_if<media_interaction_scatter>(&media_result))
                 {
                     throughput *= scatter->transmittance_to_event;
-                    integral += scatter->emission;
-                    assert(!math::anyInvalid(integral));
+                    catch_invalid(throughput);
+                    integral += throughput * scatter->emission;
+                    catch_invalid(integral);
 
-                    auto light_sample = SampleLight(*scatter, currentRay, sampler);
+                    auto light_sample = SampleLight(*scatter, currentRay, color_index, sampler);
 
                     if constexpr (false) // if using MIS
                     {
                         if (light_sample.pdf != color_real(0))
                         {
                             const auto light_dir_pdf_of_scatter = scatter->evaluate_pdf(
-                                currentRay.direction(), light_sample.direction);
+                                currentRay.direction(), light_sample.direction, color_index);
                             const auto light_pdf_sqr_sum = math::square(light_sample.pdf) + math::square(
                                 light_dir_pdf_of_scatter);
                             const auto direct_light_weight = math::square(light_sample.pdf) / light_pdf_sqr_sum;
                             const auto direct_light = (light_sample.value / light_sample.pdf) * direct_light_weight;
 
-                            integral += direct_light;
-                            assert(!math::anyInvalid(integral));
+                            integral += throughput * direct_light;
+                            catch_invalid(integral);
 
                             const auto scatter_dir_pdf_of_light = light_sample.scatter_dir_pdf;
                             const auto scatter_pdf_sqr_sum = math::square(scatter->scatter_pdf) + math::square(
@@ -180,18 +225,18 @@ namespace cloudscape
                     {
                         if (!math::isZero(light_sample.value))
                         {
-                            integral += light_sample.value / light_sample.pdf;
-                            assert(!math::anyInvalid(integral));
+                            integral += throughput * light_sample.value / light_sample.pdf;
+                            catch_invalid(integral);
                         }
                         accountForEmission = false;
                     }
 
                     throughput *= scatter->scatter_transmittance / scatter->scatter_pdf;
-                    assert(!math::anyInvalid(throughput));
+                    catch_invalid(throughput);
 
                     const auto total_scatter_transmittance = scatter->transmittance_to_event * scatter->
-                        scatter_transmittance;
-                    const auto survive_probability = std::clamp(color::get_importance(total_scatter_transmittance),
+                        scatter_transmittance / scatter->scatter_pdf;
+                    const auto survive_probability = std::clamp(color::get_survive_importance(total_scatter_transmittance),
                                                                 MIN_SURVIVE_PROBABILITY, MAX_SURVIVE_PROBABILITY);
 
                     // Termination by russian roulette
@@ -216,13 +261,14 @@ namespace cloudscape
                 }
 
                 const auto no_interaction = std::get<media_interaction_none>(media_result);
+                auto prev_thr = throughput;
                 throughput *= no_interaction.transmittance;
-                assert(!math::anyInvalid(throughput));
+                catch_invalid(throughput);
 
                 if (!hit.has_occurred())
                 {
                     integral += EvaluateInfinity(currentRay, accountForEmission * next_emission_weight) * throughput;
-                    assert(!math::anyInvalid(integral));
+                    catch_invalid(integral);
                     break;
                 }
 
@@ -247,6 +293,7 @@ namespace cloudscape
                             radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(
                                 currentRay,
                                 hit,
+                                color_index,
                                 sampler);
 
                         if (accountForEmission)
@@ -259,13 +306,11 @@ namespace cloudscape
                                 sampler);
 
                         const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-                        assert(!math::anyInvalid(samplePayload));
+                        catch_invalid(samplePayload);
 
                         integral += samplePayload;
 
-                        assert(!math::anyInvalid(integral));
-
-                        assert(math::max_element(integral) < 20000.0f);
+                        catch_invalid(integral);
 
                         if (!bsdfDistribution.has_non_delta_component() && bsdfDistribution.delta_components() == 0)
                         {
@@ -281,7 +326,7 @@ namespace cloudscape
                                                           : bsdfColor * geometricTerm * color_real(math::oneOverPi) /
                                                           bsdfPdf;
 
-                        const auto survive_probability = std::clamp(color::get_importance(vertexThroughput),
+                        const auto survive_probability = std::clamp(color::get_survive_importance(vertexThroughput),
                                                                     MIN_SURVIVE_PROBABILITY, MAX_SURVIVE_PROBABILITY);
 
                         // Termination by russian roulette
@@ -294,8 +339,7 @@ namespace cloudscape
                         else
                         {
                             throughput *= vertexThroughput / survive_probability;
-                            assert(!math::anyInvalid(throughput));
-                            assert(math::max_element(throughput) < 100000.0f);
+                            catch_invalid(throughput);
                         }
 
                         if (bsdfSample.getValue().isTransition && hit.object()->inner_medium())
@@ -351,6 +395,7 @@ namespace cloudscape
 
         [[nodiscard]] color_rgb EvaluateInfinity(const ray3& ray, color_real emission_weight)
         {
+            return color_rgb(0, 0, 0);
             return sun_.EvaluateEmissionForDirection(ray.direction()) * emission_weight;
             //return color_rgb(0.5, 0.55, 0.8) + sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
         }
@@ -358,7 +403,8 @@ namespace cloudscape
 
         light_sample SampleLight(
             const media_interaction_scatter& scatter,
-            ray3 currentRay,
+            const ray3& currentRay,
+            const std::size_t color_index,
             math::Sampler<space_real>& sampler)
         {
             const auto& light_source = light_source_;
@@ -372,7 +418,8 @@ namespace cloudscape
                     &scatter,
                     &sampler,
                     &currentRay,
-                    &light_sample
+                    &light_sample,
+                    color_index
                 ](const lights::light_distribution& lightDistribution)
                 {
                     if (lightDistribution.delta_components() != 0 || lightDistribution.
@@ -389,6 +436,7 @@ namespace cloudscape
                             const auto light_ray_transmittance = EvaluateTransmittanceAlongSegment(
                                 light_ray,
                                 lightSample.distance - BIAS * lightSample.distance,
+                                color_index,
                                 sampler
                             );
 
@@ -397,7 +445,7 @@ namespace cloudscape
                                 auto lightValue = lightSample.evaluate();
 
                                 const auto scattering_coeffs = scatter.phase_function(
-                                    currentRay.direction(), lightSample.direction);
+                                    currentRay.direction(), lightSample.direction, color_index);
 
 
                                 //const auto lightSamplePdf = color_real(optionalLightSample.getPdf());
@@ -407,6 +455,8 @@ namespace cloudscape
                                         * scattering_coeffs
                                     // / lightSamplePdf
                                     ;
+
+                                catch_invalid(radianceByLight);
 
                                 light_sample.value = radianceByLight * light_ray_transmittance;
                                 light_sample.pdf = color_real(optionalLightSample.getPdf());
@@ -419,19 +469,50 @@ namespace cloudscape
             return light_sample;
         }
 
-
-        media_trace_result TraceMedia(participating_media::DynamicCompositeMedium& medium, const ray3& ray,
-                                      space_real max_distance, math::Sampler<space_real>& sampler)
+        media_trace_result TraceMedia(
+            participating_media::DynamicCompositeMedium& medium,
+            const ray3& ray,
+            space_real max_distance,
+            const color_rgb& color_sampling_hint,
+            const std::size_t color_index,
+            math::Sampler<space_real>& sampler)
         {
+            return TraceMediaOneByOne(medium, ray, max_distance, color_sampling_hint, color_index, sampler);
+        }
+
+        media_trace_result TraceMediaOneByOne(
+            participating_media::DynamicCompositeMedium& medium,
+            const ray3& ray,
+            space_real max_distance,
+            const color_rgb& color_sampling_hint,
+            const std::size_t color_index,
+            math::Sampler<space_real>& sampler)
+        {
+            const auto color_pdf = 1;
+
+            // const auto color_index = static_cast<size_t>(3 * sampler.Get1D());
+            // const auto color_pdf = color::LUMINOCITY_WEIGHTS[color_index];
+
+            // const auto random_var = std::min(color_real(0.99999), color_real(sampler.Get1D())); // to avoid getting 1 when casting to color_real. Sum of weights may also be less than 1, probably.
+            // const auto [color_index, color_pdf] = color::sample_color_component(color_sampling_hint, random_var);
+
+            assert(color_index < 3);
+
             auto traversed_distance = space_real(0);
             auto majorant_transmittance = color_rgb::one();
+            //majorant_transmittance[color_index] = 1 / color_pdf;
+            if (math::anyInvalid(majorant_transmittance))
+            {
+                int asd = 0;
+            }
+            assert(!math::anyInvalid(majorant_transmittance));
 
             auto current_ray = ray;
-            while (true)
+            for (std::size_t i = 0; ; ++i)
             {
                 const auto majorant_extinction_vec = medium.SampleMajorantExtinction(current_ray, max_distance);
 
-                const auto majorant_sampling_extinction = ExtinctionForSamping(majorant_extinction_vec);
+                const auto majorant_sampling_extinction = majorant_extinction_vec[color_index];
 
                 if (majorant_sampling_extinction == color_real(0))
                 {
@@ -455,26 +536,25 @@ namespace cloudscape
                 const auto new_ray = current_ray.ray_along(distance);
                 auto media_properties = medium.SampleProperties(new_ray.origin());
 
-                const auto interaction_sigma = media_properties.absorption + media_properties.scattering;
-                const auto interaction_sigma_scalar = ExtinctionForSamping(interaction_sigma);
+                const auto interaction_sigma = media_properties.absorption[color_index] + media_properties.scattering[
+                    color_index];
 
                 const auto random_value = sampler.Get1D() * majorant_sampling_extinction;
-                if (random_value < interaction_sigma_scalar)
+                if (random_value < interaction_sigma)
                 {
                     const auto scattering_sample = media_properties.scatter_generator(
                         current_ray.direction(),
+                        color_index,
                         sampler);
 
                     assert(scattering_sample.pdf != color_real(0));
-
-                    const auto scatter_weights = media_properties.scattering / interaction_sigma;
-                    const auto absorption_weights = media_properties.absorption / interaction_sigma;
+                    assert(std::isfinite(scattering_sample.pdf));
 
                     return media_interaction_scatter{
                         {new_ray.origin(), scattering_sample.direction},
-                        media_properties.emission * absorption_weights,
+                        media_properties.emission,
                         majorant_transmittance,
-                        scattering_sample.transmittance * scatter_weights,
+                        scattering_sample.transmittance,
                         scattering_sample.pdf,
                         std::move(media_properties.phase_function),
                         std::move(media_properties.evaluate_pdf)
@@ -484,24 +564,19 @@ namespace cloudscape
                 {
                     // null scattering
 
-                    // spectral correction
-                    const color_rgb last_piece_transmittance = (color_rgb::fill(majorant_sampling_extinction) -
-                        interaction_sigma) / (majorant_sampling_extinction - interaction_sigma_scalar);
-
-                    // Russian roulette
-                    const auto survive_probability = std::clamp(color::get_importance(last_piece_transmittance),
-                                                                MIN_SURVIVE_PROBABILITY, MAX_SURVIVE_PROBABILITY);
-
-
-                    if (sampler.Get1D() >= survive_probability)
+                    if (sampler.Get1D() >= MAX_SURVIVE_PROBABILITY)
                     {
                         return media_interaction_absorbtion{};
                     }
                     else
                     {
-                        majorant_transmittance = majorant_transmittance * last_piece_transmittance /
-                            survive_probability;
+                        majorant_transmittance = majorant_transmittance /
+                            MAX_SURVIVE_PROBABILITY;
                         assert(!math::anyNan(majorant_transmittance));
+                        if (math::max_element(majorant_transmittance) >= 100000.0f)
+                        {
+                            int asd = 9034;
+                        }
                         assert(math::max_element(majorant_transmittance) < 100000.0f);
                     }
 
@@ -513,6 +588,7 @@ namespace cloudscape
         color_rgb EvaluateTransmittanceAlongSegment(
             const ray3& ray,
             const space_real& distance,
+            const std::size_t color_index,
             math::Sampler<space_real>& sampler)
         {
             shadowMedia_.CopyMedia(media_);
@@ -537,7 +613,7 @@ namespace cloudscape
                 const auto limited_obstruction_free_distance = std::min(distance_left, hit.distance());
                 distance_left -= limited_obstruction_free_distance;
 
-                auto media_result = TraceMedia(shadowMedia_, currentRay, limited_obstruction_free_distance, sampler);
+                auto media_result = TraceMedia(shadowMedia_, currentRay, limited_obstruction_free_distance, throughput, color_index, sampler);
 
                 if (const auto absorption = std::get_if<media_interaction_absorbtion>(&media_result))
                 {
@@ -565,7 +641,7 @@ namespace cloudscape
                     sampler
                 );
 
-                const auto survive_probability = std::clamp(color::get_importance(surface_transmittance),
+                const auto survive_probability = std::clamp(color::get_survive_importance(surface_transmittance),
                                                             MIN_SURVIVE_PROBABILITY, MAX_SURVIVE_PROBABILITY);
 
                 if (math::isZero(surface_transmittance) || sampler.Get1D() >= survive_probability)
@@ -602,6 +678,7 @@ namespace cloudscape
         color_rgb EvaluateRadianceByLightsAtVertex(
             const ray3& currentRay,
             const Hit& hit,
+            const std::size_t color_index,
             math::Sampler<space_real>& sampler)
         {
             color_rgb radianceAtCurrentPathVertex{color_rgb::zero()};
@@ -636,6 +713,7 @@ namespace cloudscape
                                 const auto light_ray_transmittance = EvaluateTransmittanceAlongSegment(
                                     {hit.point(), lightSample.direction},
                                     lightSample.distance - BIAS * lightSample.distance,
+                                    color_index,
                                     sampler
                                 );
 

@@ -65,16 +65,16 @@ namespace cloudscape
     // From https://www.shadertoy.com/view/X3fXRn
     // Returns Mie volume-scattering coefficient (scalar, assumed
     // wavelength-independent), in m^-1.
-    constexpr space_real turbidity_to_mie_extinction(space_real extinction_at_550nm, space_real rayleigh_scale_height, space_real mie_scale_height, space_real turbidity)
+    constexpr color_real turbidity_to_mie_extinction(color_real extinction_at_550nm, space_real rayleigh_scale_height, space_real mie_scale_height, color_real turbidity)
     {
         // NOTE: the vertical optical depth is just B*H.
-        return (turbidity - space_real(1.0)) * extinction_at_550nm * rayleigh_scale_height / mie_scale_height;
+        return (turbidity - color_real(1.0)) * extinction_at_550nm * color_real(rayleigh_scale_height / mie_scale_height);
     }
 
     // Using the reference value of Rayleigh volume-scattering
     // coefficient at 550 nm.
     // See https://www.shadertoy.com/view/43j3zm.
-    constexpr float turbidity_to_mie_extinction(space_real rayleigh_scale_height, space_real mie_scale_height, space_real turbidity)
+    constexpr color_real turbidity_to_mie_extinction(space_real rayleigh_scale_height, space_real mie_scale_height, color_real turbidity)
     {
         return turbidity_to_mie_extinction(1.149e-5, rayleigh_scale_height, mie_scale_height, turbidity);
     }

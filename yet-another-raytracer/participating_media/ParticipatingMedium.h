@@ -10,15 +10,18 @@
 namespace participating_media
 {
     using scatter_generator_t = std::function<scattering_event(const vector3& incident_direction,
+                                                               std::size_t color_index,
                                                                math::Sampler<space_real>& sampler)>;
 
     using phase_function_t = std::function<spectral_coeffs(const vector3& incident_direction,
-                                                           const vector3& outgoing_direction)>;
+                                                           const vector3& outgoing_direction,
+                                                           std::size_t color_index)>;
 
 
     using pdf_evaluator_t = std::function<color_real(
         const vector3& incident_direction,
-        const vector3& outgoing_direction)>;
+        const vector3& outgoing_direction,
+        std::size_t color_index)>;
 
     struct medium_properties
     {

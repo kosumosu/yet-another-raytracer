@@ -63,10 +63,10 @@ namespace cloudscape
 
     inline void LoadThickAntarctica(cloudscape_scene& scene)
     {
-        scene.planet.turbidity = 0.05f; // Sample had 1.375
+        scene.planet.turbidity = 1.375f; // Sample had 1.375
         scene.planet.samples = 10;
-        //scene.planet.groundcolor = 8421504;
-        scene.planet.groundcolor = 0x407F40;
+        scene.planet.groundcolor = 8421504;
+        //scene.planet.groundcolor = 0x407F40;
         scene.planet.dispersion = 1;
         scene.planet.atmosradius = 6381000.0f;
         scene.planet.airdensity = 1.0f;
@@ -82,7 +82,7 @@ namespace cloudscape
         scene.optimizations.shadowstep = 25.0f;
         scene.optimizations.shadowsamples = 100;
 
-        scene.rendering.samples = 2048;
+        scene.rendering.samples = 1024;
         //scene.rendering.samples = 1024;
         scene.rendering.step = 2.0f; //25.0f;
         scene.rendering.hangle = 360.0f;
@@ -91,24 +91,24 @@ namespace cloudscape
         scene.rendering.height = 720; //1080;
         scene.rendering.bucketwidth = 24;
         scene.rendering.bucketheight = 24;
-        scene.rendering.maxthreads = 16;
+        scene.rendering.maxthreads = 30;
 
         scene.camera.elevation = 0.0f;
         scene.camera.azimuth = 0.0f;
-        scene.camera.x = 0;
+        scene.camera.x = -10; //0;
         scene.camera.y = 0;
         //scene.camera.z = 1000.0; //30.0f;
-        scene.camera.z = 30.0; //30.0f;
+        scene.camera.z = 70.0; //30.0f;
 
         scene.vis.brightness = 1.0f;
         scene.vis.gamma = 1.0f;
 
-        scene.sun.azimuth = 0.0f; //45.0f;
-        scene.sun.elevation = 45.0f; //30.0f;
+        scene.sun.azimuth = 30.0f; //45.0f;
+        scene.sun.elevation = -1.0f; //30.0f;
         scene.sun.ambient = 0x000000;
         scene.sun.multiplier = 0.1; //0.25f;
         scene.sun.color = 16777215;
-        scene.sun.size_mult = 1.0;
+        scene.sun.size_mult = 1;
 
         scene.noise.multiplier = 0.75f;
         scene.noise.detail = 10;
@@ -117,9 +117,23 @@ namespace cloudscape
 
         scene.clouds.color = 16777215;
         scene.clouds.trans_falloff = 1.0f;
-        scene.clouds.fwd_bck = 0.9f;
-        scene.clouds.fog = 0.1f; //0.01;
+        scene.clouds.fwd_bck = 0.99f;
+        scene.clouds.fog = 1.0f; //0.01;
         scene.clouds.height = 300.0f;
+        scene.clouds.thickness = 500.0f;
+        scene.clouds.coverage = 0.5f; //0.2;
+
+
+        // high
+        scene.noise.multiplier = 0.6f;
+        scene.noise.detail = 10;
+        scene.noise.size = 20000;
+
+        scene.clouds.color = 16777215;
+        scene.clouds.trans_falloff = 1.0f;
+        scene.clouds.fwd_bck = 0.8f;
+        scene.clouds.fog = 0.001f; //0.01;
+        scene.clouds.height = 7000.0f;
         scene.clouds.thickness = 500.0f;
         scene.clouds.coverage = 0.5f; //0.2;
     }

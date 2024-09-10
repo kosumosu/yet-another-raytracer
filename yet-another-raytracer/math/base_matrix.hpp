@@ -51,7 +51,7 @@ namespace math
 		}
 
 
-		vector<T, COLS> & operator[](std::size_t index)
+		constexpr vector<T, COLS> & operator[](std::size_t index)
 		{
 			return m_rows[index];
 		}

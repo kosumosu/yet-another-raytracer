@@ -4,18 +4,27 @@
 #include "Types.h"
 
 #include <filesystem>
+#include <functional>
+#include <utility>
 
 class Film
 {
+public:
+    using tonemap_t = std::function<color_rgb(const color_rgb&)>;
+
+private:
     static constexpr color_rgb color_0 = {0.0f, 0.0f, 0.0f};
     static constexpr color_rgb color_1 = {1.0f, 1.0f, 1.0f};
 
     const uint_vector2 size_;
+    const tonemap_t tonemap_;
+
     std::vector<color_rgb> pixels_;
 
 public:
-    explicit Film(uint_vector2 size)
+    explicit Film(uint_vector2 size, tonemap_t tonemap = [](const auto& color) { return color; })
         : size_{std::move(size)}
+          , tonemap_(std::move(tonemap))
           , pixels_{std::size_t(size_[0]) * size_[1], color_rgb::zero()}
     {
     }
@@ -30,9 +39,15 @@ public:
         return pixels_[std::size_t(y) * width() + x];
     }
 
-    [[nodiscard]] color_u8rgb getPixelTonemapped(unsigned int x, unsigned int y) const
+    [[nodiscard]] color_rgb getPixelTonemapped(unsigned int x, unsigned int y) const
     {
-        return math::clamp(linear_to_storage(getPixel(x, y)), color_0, color_1) * std::numeric_limits<color_u8rgb::element_t>::max();
+        return math::clamp(linear_to_storage(tonemap_(getPixel(x, y))), color_0, color_1);
+    }
+
+    [[nodiscard]] color_u8rgb getPixelTonemappedU8(unsigned int x, unsigned int y) const
+    {
+        return getPixelTonemapped(x, y) * std::numeric_limits<
+            color_u8rgb::element_t>::max();
     }
 
     void setPixel(uint_vector2 coord, const color_rgb& value)
@@ -60,6 +75,11 @@ public:
     [[nodiscard]] uint_vector2 size() const
     {
         return size_;
+    }
+
+    [[nodiscard]] Film CreateSubFilm(uint_vector2 size) const
+    {
+        return Film { std::move(size), tonemap_ };
     }
 
 private:

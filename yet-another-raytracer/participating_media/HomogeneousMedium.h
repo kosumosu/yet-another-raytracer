@@ -39,17 +39,22 @@ namespace participating_media
                 absorption_,
                 scattering_,
                 emission_,
-                [this](const vector3& incident_direction, math::Sampler<space_real>& sampler)
+                [this](
+                const vector3& incident_direction,
+                std::size_t color_index,
+                math::Sampler<space_real>& sampler)
                 {
                     return phase_function_.Sample(incident_direction, sampler);
                 },
                 [this](const vector3& incident_direction,
-                       const vector3& outgoing_direction)
+                       const vector3& outgoing_direction,
+                       std::size_t color_index)
                 {
                     return phase_function_.Evaluate(incident_direction, outgoing_direction);
                 },
                 [this](const vector3& incident_direction,
-                       const vector3& outgoing_direction)
+                       const vector3& outgoing_direction,
+                       std::size_t color_index)
                 {
                     return phase_function_.EvaluatePdf(incident_direction, outgoing_direction);
                 }

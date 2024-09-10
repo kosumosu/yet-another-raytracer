@@ -98,11 +98,9 @@ namespace renderers
             for (unsigned int i = 0; i < thread_count_; ++i)
             {
                 std::thread thread{
-                    [&, sequence = sequence.get()]
+                    [&, sequence = sequence.get(), subFilm = film.CreateSubFilm(bucketSize_)] () mutable
                     {
                         auto integrator = rayIntegratorFactory();
-
-                        Film subFilm{bucketSize_};
 
                         barrier.arrive_and_wait();
 

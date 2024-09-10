@@ -129,4 +129,23 @@ namespace math
 		const auto point = firstBinormal * pointOnCircle[0] + secondBinormal * pointOnCircle[1] + normal * normalCosine;
 		return {point, normalCosine * TValue(oneOverPi)};
 	}
+
+
+	template <class TValue, std::size_t N>
+	constexpr std::size_t sample_vector_component(const vector<TValue, N>& normalized_weights, const TValue& random_value)
+	{
+		TValue weight_sum = 0;
+		for (std::size_t i = 0; i < N - 1; ++i)
+		{
+			weight_sum += normalized_weights[i];
+			if (random_value < weight_sum)
+				return i;
+		}
+		if (!(weight_sum + normalized_weights[N - 1] > 0.999 && weight_sum + normalized_weights[N - 1] < 1.001))
+		{
+			int s = 03;
+		}
+		assert(weight_sum + normalized_weights[N - 1] > 0.999 && weight_sum + normalized_weights[N - 1] < 1.001);
+		return N - 1;
+	}
 }

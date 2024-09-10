@@ -102,7 +102,7 @@ namespace applications
                                 {
                                     for (auto x = 0U; x < size[0]; ++x)
                                     {
-                                        const auto color = film.getPixelTonemapped(x, y);
+                                        const auto color = film.getPixelTonemappedU8(x, y);
                                         auto& element = buffer[y * size[0] + x].element;
                                         element.red = color[0];
                                         element.green = color[1];

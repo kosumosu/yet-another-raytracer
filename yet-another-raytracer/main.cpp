@@ -277,7 +277,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             processTimeStopwatch.Restart();
             realTimeStopwatch.Restart();
 
-            Film film({scene.rendering.width, scene.rendering.height});
+            Film film({scene.rendering.width, scene.rendering.height}, color::cas_to_rgb);
             float processInitTime;
             float realInitTime;
 
@@ -285,8 +285,8 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
 
             std::vector<objects::GeometryObject*> objects = {
                 &prepared_scene.planet,
-                // &prepared_scene.lower_cloud_bound,
-                // &prepared_scene.upper_cloud_bound,
+                &prepared_scene.lower_cloud_bound,
+                &prepared_scene.upper_cloud_bound,
                 &prepared_scene.extra_sphere,
                 &prepared_scene.extra_triangle
             };
@@ -333,7 +333,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             renderer.Render(
                 film,
                 {uint_vector2::zero(), film.size()},
-                //{ uint_vector2 { 639, 317 }, {1, 1}},
+                //{ uint_vector2 { 412, 159 }, {1, 1}},
                 prepared_scene.camera,
                 scene.rendering.samples,
                 [&prepared_scene, &accelerator, &atmospheric_medium, &cloud_medium]

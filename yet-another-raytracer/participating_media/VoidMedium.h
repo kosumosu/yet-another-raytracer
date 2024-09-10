@@ -20,7 +20,7 @@ namespace participating_media
                 optical_thickness_t::zero(),
                 optical_thickness_t::zero(),
                 spectral_coeffs::zero(),
-                [](const vector3& incident_direction, auto& sampler)
+                [](const vector3& incident_direction, std::size_t color_index, auto& sampler)
                 {
                     return scattering_event{
                         vector3::zero(),
@@ -29,14 +29,16 @@ namespace participating_media
                     };
                 },
                 [](const vector3& incident_direction,
-                   const vector3& outgoing_direction)
+                   const vector3& outgoing_direction,
+                   std::size_t color_index)
                 {
                     return (incident_direction == outgoing_direction)
                                ? spectral_coeffs::one()
                                : spectral_coeffs::zero();
                 },
                 [](const vector3& incident_direction,
-                   const vector3& outgoing_direction)
+                   const vector3& outgoing_direction,
+                   std::size_t color_index)
                 {
                     return space_real(incident_direction == outgoing_direction);
                 }

@@ -18,19 +18,17 @@ void Film::SaveAsPng(const std::filesystem::path& filename) const
     if (!stream.is_open())
         throw std::exception();
 
-    png::image<png::rgb_pixel> image(width(), height());
+    png::image<png::rgb_pixel_16> image(width(), height());
     //image.set_gamma(1 / 2.2);
 
     for (unsigned int y = 0; y < height(); y++)
     {
         for (unsigned int x = 0; x < width(); x++)
         {
-            const auto gammaCorrected = linear_to_storage(getPixel(x, y));
-            const auto clamped = math::clamp(gammaCorrected, color_0, color_1);
-
-            setToInteger(image[y][x].red, clamped[0]);
-            setToInteger(image[y][x].green, clamped[1]);
-            setToInteger(image[y][x].blue, clamped[2]);
+            const auto gammaCorrected = getPixelTonemapped(x, y);
+            setToInteger(image[y][x].red, gammaCorrected[0]);
+            setToInteger(image[y][x].green, gammaCorrected[1]);
+            setToInteger(image[y][x].blue, gammaCorrected[2]);
         }
     }
 
