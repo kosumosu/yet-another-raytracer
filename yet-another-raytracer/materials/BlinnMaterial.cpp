@@ -51,6 +51,9 @@ namespace materials
 		const bsdf_distribution_func& job) const
 	{
 		const auto diffuseColor = EvaluateDiffuseColor(object, hitPoint, normal, uvs[0], incidentDirection, sampler);
+
+		const auto hasDiffuse = diffuseColor != color_rgb::zero();
+
 		bsdf_functional_distribution::generate_sample_func generateDiffuseFuncImpl = [&]()
 		{
 			const bool isEntering = math::is_obtuse_angle(incidentDirection, normal);
@@ -99,11 +102,11 @@ namespace materials
 			}
 		};
 
-		bsdf_functional_distribution::generate_sample_func generateDiffuseFunc = diffuseColor == color_rgb::zero() || specular_ == color_rgb::fill(1.0)
+		bsdf_functional_distribution::generate_sample_func generateDiffuseFunc = !hasDiffuse || specular_ == color_rgb::fill(1.0)
 			? bsdf_functional_distribution::generate_sample_func(nullptr)
 			: generateDiffuseFuncImpl;
 
-		bsdf_functional_distribution::evaluate_pdf_func evaluateDiffusePdfFunc = diffuseColor == color_rgb::zero() || specular_ == color_rgb::fill(1.0)
+		bsdf_functional_distribution::evaluate_pdf_func evaluateDiffusePdfFunc = !hasDiffuse || specular_ == color_rgb::fill(1.0)
 			? bsdf_functional_distribution::evaluate_pdf_func(nullptr)
 			: [&](const vector3& direction)
 			{
@@ -142,7 +145,7 @@ namespace materials
 			? bsdf_functional_distribution::generate_sample_func(nullptr)
 			: generateReflectionFuncImpl;
 
-		bsdf_functional_distribution::generate_sample_func generateSampleFunc = specular_ == color_rgb::zero() && diffuseColor == color_rgb::zero()
+		bsdf_functional_distribution::generate_sample_func generateSampleFunc = !hasDiffuse && specular_ == color_rgb::zero()
 			? bsdf_functional_distribution::generate_sample_func(nullptr)
 			: [&]()
 			{
@@ -158,7 +161,7 @@ namespace materials
 		job(
 			bsdf_functional_distribution(
 				specular_ == color_rgb::zero() ? 0U : 1U,
-				true,
+				hasDiffuse,
 				//std::move(generateReflectionFunc),
 				//std::move(generateDiffuseFunc),
 				//std::move(evaluateDiffusePdfFunc),

@@ -160,7 +160,7 @@ namespace cloudscape
             throughput[color_index] = 1 / color_pdf;
 
             media_.ClearMedia();
-            //media_.PushMedium(&atmosphericMedium_);
+            media_.PushMedium(&atmosphericMedium_);
             media_.PushMedium(&atmosphericAerosolMedium_);
             if (is_inside_clouds)
             {
@@ -281,20 +281,7 @@ namespace cloudscape
                     sampler,
                     [&](const materials::bsdf_distribution& bsdfDistribution)
                     {
-                        const auto bsdfSample = bsdfDistribution.generate_sample();
-                        const auto bsdfDirection = bsdfSample.getValue().outgoingDirection;
-                        const auto bsdfColor = bsdfSample.getValue().evaluate();
-                        const auto bsdfPdf = color_real(bsdfSample.getPdf());
-
-                        const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
                         color_rgb radianceAtCurrentPathVertex(color_rgb::zero());
-
-                        if (bsdfDistribution.has_non_delta_component())
-                            radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(
-                                currentRay,
-                                hit,
-                                color_index,
-                                sampler);
 
                         if (accountForEmission)
                             radianceAtCurrentPathVertex += hit.object()->material()->EvaluateEmission(
@@ -305,19 +292,33 @@ namespace cloudscape
                                 currentRay.direction(),
                                 sampler);
 
-                        const auto samplePayload = radianceAtCurrentPathVertex * throughput;
-                        catch_invalid(samplePayload);
-
-                        integral += samplePayload;
-
-                        catch_invalid(integral);
-
                         if (!bsdfDistribution.has_non_delta_component() && bsdfDistribution.delta_components() == 0)
                         {
                             earlyExit = true;
                             return;
                         }
 
+                        if (bsdfDistribution.has_non_delta_component())
+                            radianceAtCurrentPathVertex += EvaluateRadianceByLightsAtVertex(
+                                currentRay,
+                                hit,
+                                color_index,
+                                sampler);
+
+
+                        const auto bsdfSample = bsdfDistribution.generate_sample();
+                        const auto bsdfDirection = bsdfSample.getValue().outgoingDirection;
+                        const auto bsdfColor = bsdfSample.getValue().evaluate();
+                        const auto bsdfPdf = color_real(bsdfSample.getPdf());
+
+                        const bool entering = math::is_obtuse_angle(currentRay.direction(), hit.normal());
+
+                        const auto samplePayload = radianceAtCurrentPathVertex * throughput;
+                        catch_invalid(samplePayload);
+
+                        integral += samplePayload;
+
+                        catch_invalid(integral);
 
                         const auto geometricTerm = color_real(std::abs(math::dot(bsdfDirection, hit.normal())));
 
@@ -396,7 +397,7 @@ namespace cloudscape
         [[nodiscard]] color_rgb EvaluateInfinity(const ray3& ray, color_real emission_weight)
         {
             return color_rgb(0, 0, 0);
-            return sun_.EvaluateEmissionForDirection(ray.direction()) * emission_weight;
+            //return sun_.EvaluateEmissionForDirection(ray.direction()) * emission_weight;
             //return color_rgb(0.5, 0.55, 0.8) + sun_.EvaluateEmissionForDirection(ray.direction()) * accountForEmission;
         }
 

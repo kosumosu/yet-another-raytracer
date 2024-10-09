@@ -266,7 +266,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             }
             else
             {
-                cloudscape::LoadThickAntarctica(scene);
+                cloudscape::LoadThinAntarctica(scene);
             }
 
             auto prepared_scene = cloudscape::prepare_scene(scene);

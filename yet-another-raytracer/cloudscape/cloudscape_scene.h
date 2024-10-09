@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Types.h"
 #include <cstdint>
 
 namespace cloudscape
@@ -86,6 +87,12 @@ namespace cloudscape
         float coverage;
     };
 
+    struct extensions
+    {
+        vector3 sphere_pos = vector3::zero();
+        space_real sphere_radius;
+    };
+
     struct cloudscape_scene
     {
         planet planet;
@@ -96,5 +103,6 @@ namespace cloudscape
         vis vis;
         sun sun;
         clouds clouds;
+        extensions extensions;
     };
 }

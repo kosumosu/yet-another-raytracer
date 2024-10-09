@@ -21,6 +21,7 @@
 #include "participating_media/RayleighPhaseFunction.h"
 #include "participating_media/SphericalPhaseFunction.h"
 #include "participating_media/SunAwareHenyeyGreensteinPhaseFunction.h"
+#include "participating_media/SunAwareRayleighPhaseFunction.h"
 
 namespace cloudscape
 {
@@ -30,6 +31,7 @@ namespace cloudscape
 
         std::shared_ptr<participating_media::PhaseFunction> spherical_phase_function;
         std::shared_ptr<participating_media::PhaseFunction> rayleigh_phase_function;
+        std::shared_ptr<participating_media::PhaseFunction> sun_aware_rayleigh_phase_function;
         std::shared_ptr<participating_media::PhaseFunction> aerosol_phase_function;
         std::shared_ptr<participating_media::PhaseFunction> sun_aware_phase_function;
         std::shared_ptr<participating_media::PhaseFunction> clouds_phase_function;
@@ -82,11 +84,16 @@ namespace cloudscape
 
         auto spherical_phase_function = std::make_shared<participating_media::SphericalPhaseFunction>();
         auto rayleigh_phase_function = std::make_shared<participating_media::RayleighPhaseFunction>();
+        auto sun_aware_rayleigh_phase_function = std::make_shared<participating_media::SunAwareRayleighPhaseFunction>(
+            0.98,
+            0.5,
+            math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation))
+            );
         auto aerosol_atmosphere_phase_function = std::make_shared<participating_media::HenyeyGreensteinPhaseFunction>(
             0.99);
         auto sun_aware_aerosol_atmosphere_phase_function = std::make_shared<participating_media::SunAwareHenyeyGreensteinPhaseFunction>(
             0.99,
-            0.97,
+            0.98,
             0.5,
             math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation))
             );
@@ -96,13 +103,13 @@ namespace cloudscape
         //auto atmospheric_medium = std::make_shared<participating_media::VoidMedium>();
 
         auto atmospheric_molecular_medium = std::make_shared<participating_media::AtmosphericMedium<decltype(
-            rayleigh_phase_function)::element_type>>(
+            sun_aware_rayleigh_phase_function)::element_type>>(
             scene.planet.planetradius,
             7994.0,
             planet_center,
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t{7.2865e-6, 1.2863e-5, 2.7408e-5},
-            *rayleigh_phase_function
+            *sun_aware_rayleigh_phase_function
         );
 
         auto atmospheric_aerosol_medium = std::make_shared<participating_media::AtmosphericMedium<decltype(
@@ -198,8 +205,8 @@ namespace cloudscape
         //     500.0
         // };
         auto extra_sphere = objects::SphereObject{
-            {200.0, 50.0, 55.0},
-            50.0
+            scene.extensions.sphere_pos,
+            scene.extensions.sphere_radius
         };
 
         extra_sphere.material(glass_material.get());
@@ -227,7 +234,7 @@ namespace cloudscape
 
         lights::DirectionalLightSource directional_sun{
             math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation)),
-            int_to_working_color_space(scene.sun.color) * scene.sun.multiplier
+            sun_cas * int_to_linear(scene.sun.color) * scene.sun.multiplier
         };
 
         lights::SunLightSource sun{
@@ -249,6 +256,7 @@ namespace cloudscape
             //vector3::fill(turbidity_to_mie_extinction(scaled_rayleigh_height, scaled_mie_height, scene.planet.turbidity)),
             std::move(spherical_phase_function),
             std::move(rayleigh_phase_function),
+            std::move(sun_aware_rayleigh_phase_function),
             std::move(aerosol_atmosphere_phase_function),
             std::move(sun_aware_aerosol_atmosphere_phase_function),
             std::move(henyey_greenstein_phase_function),
