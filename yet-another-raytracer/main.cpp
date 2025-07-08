@@ -152,7 +152,7 @@ void RenderRegular(const std::filesystem::path& scene_file,
             using integrator_t = MonteCarloPathIntegrator<accelerators::kd_tree::KDTreeMarcher>;
 
 #if true
-            const renderers::BucketRenderer<typeof(integrator_t)> renderer(
+            const renderers::BucketRenderer<integrator_t> renderer(
                 std::thread::hardware_concurrency(),
                 {32, 32},
                 std::make_unique<TopDownSequencer>(),
@@ -295,7 +295,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
 
             using integrator_t = cloudscape::CloudscapeIntegrator<accelerators::null::NullMarcher>;
 
-            const renderers::BucketRenderer<typeof(integrator_t)> renderer(
+            const renderers::BucketRenderer<integrator_t> renderer(
                 scene.rendering.maxthreads ? scene.rendering.maxthreads : std::thread::hardware_concurrency(),
                 {scene.rendering.bucketwidth, scene.rendering.bucketheight},
                 std::make_unique<TopDownSequencer>(),
