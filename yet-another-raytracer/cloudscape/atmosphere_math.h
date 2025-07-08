@@ -18,7 +18,7 @@ namespace cloudscape
         return value * value;
     }
 
-    constexpr float optmass(
+    inline float optmass(
         space_real x1,
         space_real x2,
         space_real y,
@@ -28,7 +28,7 @@ namespace cloudscape
     {
         // integrate rho*exp(-(x^2+y^2 - r)/s) dx from x=x1 to x2
 
-        constexpr auto sqrtpi = std::sqrt(std::numbers::pi_v<space_real>);
+        const auto sqrtpi = std::sqrt(std::numbers::pi_v<space_real>);
 
         const auto height_scale_sqrt = std::sqrt(height_scale);
         const auto inv_height_scale_sqrt = std::sqrt(height_scale);
@@ -38,7 +38,7 @@ namespace cloudscape
             * (std::erf(x2 * inv_height_scale_sqrt) - std::erf(x1 * inv_height_scale_sqrt));
     }
 
-    constexpr float optmass(
+    inline float optmass(
         const vector3& p1,
         const vector3& p2,
         space_real density,

@@ -20,7 +20,7 @@ namespace lights
     public:
         constexpr static space_real earth_to_sun_distance = 149600000.0;
         constexpr static space_real sun_radius = 696000.0;
-        constexpr static space_real real_sun_average_angular_size_radians = std::atan(
+        const space_real real_sun_average_angular_size_radians = std::atan(
             sun_radius / earth_to_sun_distance) * 2.0;
 
         SunLightSource(
