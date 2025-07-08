@@ -11,19 +11,19 @@ namespace math
 	constexpr T upperRandomBound; // = std::nextafter(T(1.0), T(0.0)); // this requires constexpr cmath.
 
 	template <>
-	constexpr float upperRandomBound<float> = 0.99999994039535522461; // one step away from 1.0f
+	constexpr inline float upperRandomBound<float> = 0.99999994039535522461; // one step away from 1.0f
 
 	template <>
-	constexpr double upperRandomBound<double> = 0.99999999999999988898; // one step away from 1.0
+	constexpr inline double upperRandomBound<double> = 0.99999999999999988898; // one step away from 1.0
 
 	template <typename T>
 	constexpr T lowerRandomBound;
 
 	template <>
-	constexpr float lowerRandomBound<float> = 5.605193857e-45f; // five steps away from 0.0f to avoid numeric problems.
+	constexpr inline float lowerRandomBound<float> = 5.605193857e-45f; // five steps away from 0.0f to avoid numeric problems.
 
 	template <>
-	constexpr double lowerRandomBound<double> = 1.97626258336498618e-323; // five steps away from 0.0 to avoid numeric problems.
+	constexpr inline double lowerRandomBound<double> = 1.97626258336498618e-323; // five steps away from 0.0 to avoid numeric problems.
 
 	
 	template <typename TValue>
