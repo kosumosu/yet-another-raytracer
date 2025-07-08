@@ -91,6 +91,10 @@ namespace cloudscape
     {
         vector3 sphere_pos = vector3::zero();
         space_real sphere_radius;
+
+        float haze_density = 0.0f;
+        float haze_scale_height;
+        float haze_fwd_bck;
     };
 
     struct cloudscape_scene

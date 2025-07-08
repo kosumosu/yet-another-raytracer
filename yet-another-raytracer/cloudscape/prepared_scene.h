@@ -35,11 +35,13 @@ namespace cloudscape
         std::shared_ptr<participating_media::PhaseFunction> aerosol_phase_function;
         std::shared_ptr<participating_media::PhaseFunction> sun_aware_phase_function;
         std::shared_ptr<participating_media::PhaseFunction> clouds_phase_function;
+        std::shared_ptr<participating_media::PhaseFunction> haze_phase_function;
 
         std::shared_ptr<participating_media::ParticipatingMedium> atmospheric_molecular_medium;
         std::shared_ptr<participating_media::ParticipatingMedium> atmospheric_aerosol_medium;
         std::shared_ptr<participating_media::ParticipatingMedium> homogenous_medium;
         std::shared_ptr<participating_media::ParticipatingMedium> cloud_medium;
+        std::shared_ptr<participating_media::ParticipatingMedium> haze_medium;
 
         std::shared_ptr<materials::Material> planet_material;
         std::shared_ptr<materials::Material> null_material;
@@ -85,41 +87,54 @@ namespace cloudscape
         auto spherical_phase_function = std::make_shared<participating_media::SphericalPhaseFunction>();
         auto rayleigh_phase_function = std::make_shared<participating_media::RayleighPhaseFunction>();
         auto sun_aware_rayleigh_phase_function = std::make_shared<participating_media::SunAwareRayleighPhaseFunction>(
-            0.98,
+            0.81,
             0.5,
             math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation))
             );
         auto aerosol_atmosphere_phase_function = std::make_shared<participating_media::HenyeyGreensteinPhaseFunction>(
-            0.99);
+            0.9);
         auto sun_aware_aerosol_atmosphere_phase_function = std::make_shared<participating_media::SunAwareHenyeyGreensteinPhaseFunction>(
-            0.99,
-            0.98,
+            0.9,
+            0.81,
             0.5,
             math::from_angles(math::deg_to_rad(scene.sun.azimuth), math::deg_to_rad(scene.sun.elevation))
             );
         auto henyey_greenstein_phase_function = std::make_shared<participating_media::HenyeyGreensteinPhaseFunction>(
             scene.clouds.fwd_bck);
 
+        auto haze_phase_function = std::make_shared<participating_media::HenyeyGreensteinPhaseFunction>(
+            scene.extensions.haze_fwd_bck);
+
         //auto atmospheric_medium = std::make_shared<participating_media::VoidMedium>();
 
         auto atmospheric_molecular_medium = std::make_shared<participating_media::AtmosphericMedium<decltype(
-            sun_aware_rayleigh_phase_function)::element_type>>(
+            rayleigh_phase_function)::element_type>>(
             scene.planet.planetradius,
             7994.0,
             planet_center,
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t{7.2865e-6, 1.2863e-5, 2.7408e-5},
-            *sun_aware_rayleigh_phase_function
+            *rayleigh_phase_function
         );
 
         auto atmospheric_aerosol_medium = std::make_shared<participating_media::AtmosphericMedium<decltype(
-            sun_aware_aerosol_atmosphere_phase_function)::element_type>>(
+            aerosol_atmosphere_phase_function)::element_type>>(
             scene.planet.planetradius,
             1200.0,
             planet_center,
             participating_media::optical_thickness_t::zero(),
             color_rgb::fill(turbidity_to_mie_extinction(7994.0, 1200.0, scene.planet.turbidity)),
-            *sun_aware_aerosol_atmosphere_phase_function
+            *aerosol_atmosphere_phase_function
+        );
+
+        auto haze_medium = std::make_shared<participating_media::AtmosphericMedium<decltype(
+            haze_phase_function)::element_type>>(
+            scene.planet.planetradius,
+            scene.extensions.haze_scale_height,
+            planet_center,
+            participating_media::optical_thickness_t::zero(),
+            color_rgb::fill(scene.extensions.haze_density),
+            *haze_phase_function
         );
 
 
@@ -260,10 +275,12 @@ namespace cloudscape
             std::move(aerosol_atmosphere_phase_function),
             std::move(sun_aware_aerosol_atmosphere_phase_function),
             std::move(henyey_greenstein_phase_function),
+            std::move(haze_phase_function),
             std::move(atmospheric_molecular_medium),
             std::move(atmospheric_aerosol_medium),
             std::move(homogeneous_medium),
             std::move(cloud_medium),
+            std::move(haze_medium),
             std::move(planet_material),
             std::move(null_material),
             std::move(extra_material),

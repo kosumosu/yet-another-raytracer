@@ -65,12 +65,13 @@ namespace cloudscape
         constexpr static auto MAX_DIST = std::numeric_limits<space_real>::max();
 
         constexpr static auto MIN_SURVIVE_PROBABILITY = color_real(0.1);
-        constexpr static auto MAX_SURVIVE_PROBABILITY = color_real(0.995);
+        constexpr static auto MAX_SURVIVE_PROBABILITY = color_real(0.9999);
 
         const prepared_scene scene_;
         raytracer_t raytracer_;
         const participating_media::ParticipatingMedium& atmosphericMedium_;
         const participating_media::ParticipatingMedium& atmosphericAerosolMedium_;
+        const participating_media::ParticipatingMedium& hazeMedium_;
         const participating_media::ParticipatingMedium& cloudsMedium_;
 
         const lights::SunLightSource& sun_;
@@ -90,6 +91,7 @@ namespace cloudscape
               , raytracer_{std::move(raytracer)}
               , atmosphericMedium_(*scene_.atmospheric_molecular_medium)
               , atmosphericAerosolMedium_(*scene_.atmospheric_aerosol_medium)
+              , hazeMedium_(*scene_.haze_medium)
               , cloudsMedium_(*scene_.cloud_medium)
               , sun_(scene_.sun)
               , light_source_(scene_.directional_sun)
@@ -118,20 +120,24 @@ namespace cloudscape
 
         constexpr static void catch_invalid(const color_rgb& color)
         {
-            if (color[1] > 1)
-            {
-                int x  = 0;
-            }
+            if constexpr (false) {
+                if (color[1] > 1)
+                {
+                    int x  = 0;
+                }
 
-            const bool invalid =
-                math::anyInvalid(color)
-            || math::max_element(color) > 100000.0
-            || math::min_element(color) < 0.0;
-            if (invalid)
-            {
-                int sd = 0;
+                const bool invalid =
+                    math::anyInvalid(color)
+                || math::max_element(color) > 100000.0
+                || math::min_element(color) < 0.0;
+                if (invalid)
+                {
+                    int sd = 0;
+                }
+                assert(!invalid);
+            } else {
+                // NOOP
             }
-            assert(!invalid);
         }
 
 
@@ -162,6 +168,8 @@ namespace cloudscape
             media_.ClearMedia();
             media_.PushMedium(&atmosphericMedium_);
             media_.PushMedium(&atmosphericAerosolMedium_);
+            media_.PushMedium(&hazeMedium_);
+
             if (is_inside_clouds)
             {
                 media_.PushMedium(&cloudsMedium_);

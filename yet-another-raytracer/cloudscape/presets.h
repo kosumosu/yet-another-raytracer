@@ -63,7 +63,7 @@ namespace cloudscape
 
     inline void LoadThinAntarctica(cloudscape_scene& scene)
     {
-        scene.planet.turbidity = 1.375f; // Sample had 1.375
+        scene.planet.turbidity = 2.375f; // Sample had 1.375
         scene.planet.samples = 10;
         scene.planet.groundcolor = 8421504;
         //scene.planet.groundcolor = 0x407F40;
@@ -82,16 +82,16 @@ namespace cloudscape
         scene.optimizations.shadowstep = 25.0f;
         scene.optimizations.shadowsamples = 100;
 
-        scene.rendering.samples = 4096*10;
-        //scene.rendering.samples = 1024;
+        //scene.rendering.samples = 4096*16*4;
+        scene.rendering.samples = 32;
         scene.rendering.step = 2.0f; //25.0f;
         scene.rendering.hangle = 360.0f;
-        scene.rendering.vangle = 30.0f;
+        scene.rendering.vangle = 45.0f;
         scene.rendering.width = 1280; //1920;
         scene.rendering.height = 720; //1080;
 
-        scene.rendering.width = 287*5; //1920;
-        scene.rendering.height = 200*5; //1080;
+        scene.rendering.width = 640; //1920;
+        scene.rendering.height = 360; //1080;
 
         scene.rendering.bucketwidth = 24;
         scene.rendering.bucketheight = 24;
@@ -111,7 +111,7 @@ namespace cloudscape
         scene.extensions.sphere_radius = 50.0;
 
         scene.sun.azimuth = 10.0f; //45.0f;
-        scene.sun.elevation = -2.8; //30.0f;
+        scene.sun.elevation = 30.0f; //-2.8; //30.0f;
         scene.sun.ambient = 0x000000;
         scene.sun.multiplier = 0.5; //0.25f;
         scene.sun.color = 16777215;
@@ -134,15 +134,22 @@ namespace cloudscape
         // high
         scene.noise.multiplier = 0.8f;
         scene.noise.detail = 10;
-        scene.noise.size = 20000;
+        scene.noise.size = 8000;
 
         scene.clouds.color = 16777215;
         scene.clouds.trans_falloff = 1.0f;
-        scene.clouds.fwd_bck = 0.8f;
-        scene.clouds.fog = 0.005f; //0.01;
-        scene.clouds.height = 7000.0f;
+        scene.clouds.fwd_bck = 0.9f;
+        scene.clouds.fog = 0.1f; //0.01;
+        //scene.clouds.fog = 0.1f; //0.01;
+        scene.clouds.height = 3000.0f;
         scene.clouds.thickness = 500.0f;
-        scene.clouds.coverage = 0.44f; //0.2;
+        scene.clouds.coverage = 0.48f; // 0.44f; //0.2;
+        //scene.clouds.coverage = 0.51f; // 0.44f; //0.2;
+
+        scene.extensions.haze_density = 0.00003f;
+        //scene.extensions.haze_density = 0.0003f;
+        scene.extensions.haze_scale_height = 300.0f;
+        scene.extensions.haze_fwd_bck = 0.3f;
     }
 
     inline void LoadThickAntarctica(cloudscape_scene& scene)
