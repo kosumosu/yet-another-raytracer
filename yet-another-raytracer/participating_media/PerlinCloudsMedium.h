@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ParticipatingMedium.h"
+#include "PhaseFunction.h"
 #include "Sampler.h"
 
 
@@ -13,7 +14,6 @@ namespace participating_media
     concept CDensityMultiplier = std::invocable<TFunc, const vector3&>;
 
     template <CPhaseFunction TPhaseFunction, CDensityMultiplier TDensityMultiplier>
-    //template <class TDensityMultiplier>
     class PerlinCloudsMedium final : public ParticipatingMedium
     {
         const optical_thickness_t absorption_;
@@ -30,6 +30,8 @@ namespace participating_media
         TDensityMultiplier density_multiplier_;
 
         const siv::PerlinNoise noise_;
+
+        const color_real sumScale_;
 
     public:
         PerlinCloudsMedium(
@@ -51,9 +53,10 @@ namespace participating_media
               , coverage_(coverage)
               , octaves_(octaves)
               , multiplier_(multiplier)
+              , phase_function_(phase_function)
               , density_multiplier_(std::move(density_multiplier))
               , noise_(seed)
-              , phase_function_(phase_function)
+              , sumScale_(color_real(1.0) / sumOfOctaves(multiplier, octaves_))
         {
         }
 
@@ -66,19 +69,7 @@ namespace participating_media
 
         [[nodiscard]] medium_properties SampleProperties(const vector3& point) const override
         {
-            const auto scaled_pos = point * inv_size_;
-            const auto final_pos = scaled_pos;
-
-            const auto noise_density = std::max(space_real(0.0),
-                                                space_real(
-                                                    space_real(coverage_ - 0.5) * space_real(2.0) + noise_.
-                                                    normalizedOctave3D(final_pos[0], final_pos[1], final_pos[2],
-                                                                       std::int32_t(octaves_),
-                                                                       multiplier_)));
-
-            const auto density = noise_density * density_multiplier_(point);
-
-            // const space_real density = 1.0;
+            const auto density = evaluateDensity(point);
 
             return {
                 absorption_ * density,
@@ -103,6 +94,34 @@ namespace participating_media
                     return phase_function_.EvaluatePdf(incident_direction, outgoing_direction);
                 }
             };
+        }
+
+    private:
+        [[nodiscard]]
+        color_real evaluateDensity(const vector3& point) const {
+            const auto noise = evaluateNoise(point);
+            return noise * density_multiplier_(point);
+        }
+
+        [[nodiscard]]
+        color_real evaluateNoise(const vector3& point) const {
+            const auto scaled_pos = point * inv_size_;
+
+            auto final_pos = scaled_pos;
+
+            color_real sum = 0.0;
+            color_real amplitude = 1.0;
+            for (std::size_t i = 0; i < octaves_; ++i) {
+                sum += amplitude * noise_.noise3D(final_pos[0], final_pos[1], final_pos[2]);
+                amplitude *= multiplier_;
+                final_pos = final_pos * 2;
+            }
+            return std::max(color_real(0.0), color_real(sum) * sumScale_);
+        }
+
+        static color_real sumOfOctaves(color_real multiplier, std::size_t octaveCount) {
+            const auto sum = (color_real(1.0) - color_real(std::pow(multiplier, octaveCount))) / (color_real(1.0) - multiplier );
+            return sum;
         }
     };
 }
