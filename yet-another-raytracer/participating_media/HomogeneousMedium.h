@@ -5,6 +5,8 @@
 #include "PhaseFunction.h"
 #include "ParticipatingMedium.h"
 
+#include <limits>
+
 namespace participating_media
 {
     template <CPhaseFunction TPhaseFunction>
@@ -27,10 +29,12 @@ namespace participating_media
         {
         }
 
-        [[nodiscard]] optical_thickness_t
-        SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override
-        {
-            return majorant_;
+        [[nodiscard]] majorant_sample_result
+        SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override {
+            return {
+                majorant_,
+                std::numeric_limits<space_real>::max()
+                };
         }
 
         [[nodiscard]] medium_properties SampleProperties(const vector3& point) const override

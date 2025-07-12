@@ -3,6 +3,8 @@
 #include "ParticipatingMedium.h"
 #include "PhaseFunction.h"
 
+#include <limits>
+
 namespace participating_media
 {
     template <CPhaseFunction TPhaseFunction>
@@ -35,16 +37,18 @@ namespace participating_media
         {
         }
 
-        [[nodiscard]] optical_thickness_t
-        SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override
-        {
+        [[nodiscard]] majorant_sample_result
+        SampleMajorantExtinction(const ray3& ray, space_real max_distance) const override {
             // Find max majorant along the ray. It's maximum at the point, closest to planet center.
             const auto origin_to_planet_center = planet_center_ - ray.origin();
             const auto distance_to_point_closest_to_planet = math::dot(origin_to_planet_center, ray.direction());
             const auto clamped_distance = std::clamp(distance_to_point_closest_to_planet, space_real(0), max_distance);
             const auto point_closest_to_planet = ray.point_along(clamped_distance);
             const auto density = DensityAtPoint(point_closest_to_planet);
-            return (scattering_ + absorption_) * color_real(density);
+            return {
+                (scattering_ + absorption_) * color_real(density),
+                    std::numeric_limits<space_real>::max(),
+                    };
         }
 
 

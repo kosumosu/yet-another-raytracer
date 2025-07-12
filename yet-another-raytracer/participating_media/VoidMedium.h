@@ -2,16 +2,20 @@
 
 #include "ParticipatingMedium.h"
 
+#include <limits>
+
 namespace participating_media
 {
     class VoidMedium final : public ParticipatingMedium
     {
     public:
-        [[nodiscard]] optical_thickness_t SampleMajorantExtinction(
+        [[nodiscard]] majorant_sample_result SampleMajorantExtinction(
             const ray3& ray,
-            space_real max_distance) const override
-        {
-            return optical_thickness_t::zero();
+            space_real max_distance) const override {
+            return {
+                optical_thickness_t::zero(),
+                std::numeric_limits<space_real>::max(),
+                };
         }
 
         [[nodiscard]] medium_properties SampleProperties(const vector3& point) const override

@@ -33,13 +33,18 @@ namespace participating_media
         pdf_evaluator_t evaluate_pdf;
     };
 
+    struct majorant_sample_result {
+        optical_thickness_t majorant;
+        space_real valid_distance;
+    };
+
     class ParticipatingMedium
     {
     public:
         virtual ~ParticipatingMedium() = default;
 
         // Returns majorant extinction along ray within max_distance. 0 <= max_distance <= +inf
-        [[nodiscard]] virtual optical_thickness_t SampleMajorantExtinction(
+        [[nodiscard]] virtual majorant_sample_result SampleMajorantExtinction(
             const ray3& ray,
             space_real max_distance) const = 0;
 

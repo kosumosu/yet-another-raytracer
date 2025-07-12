@@ -507,19 +507,16 @@ namespace cloudscape
 
             assert(color_index < 3);
 
-            auto traversed_distance = space_real(0);
+            auto distance_left = max_distance;
             auto majorant_transmittance = color_rgb::one();
             //majorant_transmittance[color_index] = 1 / color_pdf;
-            if (math::anyInvalid(majorant_transmittance))
-            {
-                int asd = 0;
-            }
-            assert(!math::anyInvalid(majorant_transmittance));
+
+            catch_invalid(majorant_transmittance);
 
             auto current_ray = ray;
             for (std::size_t i = 0; ; ++i)
             {
-                const auto majorant_extinction_vec = medium.SampleMajorantExtinction(current_ray, max_distance);
+                const auto [majorant_extinction_vec, majorant_valid_distance] = medium.SampleMajorantExtinction(current_ray, distance_left);
 
                 const auto majorant_sampling_extinction = majorant_extinction_vec[color_index];
 
@@ -530,19 +527,27 @@ namespace cloudscape
                     };
                 }
 
-                const auto distance =
+                const auto step_distance =
                     math::sampleExponential(color_real(sampler.Get1D()), majorant_sampling_extinction);
 
-                if (traversed_distance + distance > max_distance)
-                {
-                    return media_interaction_none{
-                        majorant_transmittance
-                    };
+                if (majorant_valid_distance < distance_left) {
+                    distance_left -= majorant_valid_distance;
+                    if (step_distance > majorant_valid_distance) {
+                        // No interaction happened within valid distance. Just skip this step.
+                        current_ray = current_ray.ray_along(majorant_valid_distance);
+                        continue;
+                    }
+                } else {
+                    distance_left -= step_distance;
+                    if (distance_left <= space_real(0.0))
+                    {
+                        return media_interaction_none{
+                            majorant_transmittance
+                        };
+                    }
                 }
 
-                traversed_distance += distance;
-
-                const auto new_ray = current_ray.ray_along(distance);
+                const auto new_ray = current_ray.ray_along(step_distance);
                 auto media_properties = medium.SampleProperties(new_ray.origin());
 
                 const auto interaction_sigma = media_properties.absorption[color_index] + media_properties.scattering[
@@ -581,12 +586,8 @@ namespace cloudscape
                     {
                         majorant_transmittance = majorant_transmittance /
                             MAX_SURVIVE_PROBABILITY;
-                        assert(!math::anyNan(majorant_transmittance));
-                        if (math::max_element(majorant_transmittance) >= 100000.0f)
-                        {
-                            int asd = 9034;
-                        }
-                        assert(math::max_element(majorant_transmittance) < 100000.0f);
+
+                        catch_invalid(majorant_transmittance);
                     }
 
                     current_ray = new_ray;
