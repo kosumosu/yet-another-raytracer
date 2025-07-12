@@ -79,7 +79,7 @@ namespace cloudscape
         const auto sun_srgb = color::cas_to_rgb(sun_cas);
         const auto sun_cas_again = color::rgb_to_cas(sun_srgb);
 
-        const auto wieghts_cas = color::rgb_to_cas(color::LUMINOCITY_WEIGHTS);
+        const auto weights_cas = color::rgb_to_cas(color::LUMINOCITY_WEIGHTS);
 
         const auto planet_center = vector3{0.0, 0.0, -scene.planet.planetradius};
         const auto camera_pos = vector3{scene.camera.x, scene.camera.y, scene.camera.z};
@@ -113,7 +113,7 @@ namespace cloudscape
             7994.0,
             planet_center,
             participating_media::optical_thickness_t::zero(),
-            participating_media::optical_thickness_t{7.2865e-6, 1.2863e-5, 2.7408e-5},
+            participating_media::optical_thickness_t{7.2865e-6, 1.2863e-5, 2.7408e-5} * scene.planet.airdensity,
             *rayleigh_phase_function
         );
 
@@ -295,7 +295,7 @@ namespace cloudscape
             std::move(point_light),
             Camera{
                 camera_pos,
-                math::normalize(camera_pos - planet_center),
+                math::from_theta_phi_towards_z(math::deg_to_rad(scene.camera.azimuth), math::deg_to_rad(scene.camera.elevation)),
                 math::from_angles(math::deg_to_rad(scene.camera.azimuth), math::deg_to_rad(scene.camera.elevation)),
                 std::min(140.0f, scene.rendering.vangle)
             }
