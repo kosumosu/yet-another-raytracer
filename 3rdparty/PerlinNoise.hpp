@@ -152,6 +152,17 @@ namespace siv
 		[[nodiscard]]
 		value_type noise3D(value_type x, value_type y, value_type z) const noexcept;
 
+		[[nodiscard]]
+		value_type noise3D_Reordered(value_type x, value_type y, value_type z) const noexcept;
+
+		template <class TVal>
+		[[nodiscard]]
+		TVal noise3D_Mixed(value_type x, value_type y, value_type z) const noexcept;
+
+		[[nodiscard]]
+		value_type noise3D_Branchless(value_type x, value_type y, value_type z) const noexcept;
+
+
 		///////////////////////////////////////
 		//
 		//	Noise (The result is remapped to the range [0, 1])
@@ -298,6 +309,22 @@ namespace siv
 			const Float u = h < 8 ? x : y;
 			const Float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
 			return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+		}
+
+		template <class Float>
+		[[nodiscard]]
+		inline constexpr Float Dot(const Float (&grad)[3], const Float x, const Float y, const Float z) noexcept
+		{
+			return grad[0] * x + grad[1] * y + grad[2] * z;
+		}
+
+		template <class Float>
+		[[nodiscard]]
+		inline constexpr Float Grad(const std::uint8_t hash, const Float (&grads)[16][3], const Float x, const Float y, const Float z) noexcept
+		{
+			const std::uint8_t h = hash & 15;
+			const auto& grad = grads[h];
+			return Dot(grad, x, y, z);
 		}
 
 		template <class Float>
@@ -521,6 +548,173 @@ namespace siv
 		const value_type p5 = perlin_detail::Grad(m_permutation[(BA + 1) & 255], fx - 1, fy, fz - 1);
 		const value_type p6 = perlin_detail::Grad(m_permutation[(AB + 1) & 255], fx, fy - 1, fz - 1);
 		const value_type p7 = perlin_detail::Grad(m_permutation[(BB + 1) & 255], fx - 1, fy - 1, fz - 1);
+
+		const value_type q0 = perlin_detail::Lerp(p0, p1, u);
+		const value_type q1 = perlin_detail::Lerp(p2, p3, u);
+		const value_type q2 = perlin_detail::Lerp(p4, p5, u);
+		const value_type q3 = perlin_detail::Lerp(p6, p7, u);
+
+		const value_type r0 = perlin_detail::Lerp(q0, q1, v);
+		const value_type r1 = perlin_detail::Lerp(q2, q3, v);
+
+		return perlin_detail::Lerp(r0, r1, w);
+	}
+
+	template <class Float>
+	inline typename BasicPerlinNoise<Float>::value_type BasicPerlinNoise<Float>::noise3D_Reordered(const value_type x, const value_type y, const value_type z) const noexcept
+	{
+		const value_type _x = std::floor(x);
+		const value_type _y = std::floor(y);
+		const value_type _z = std::floor(z);
+
+		const std::int32_t ix = static_cast<std::int32_t>(_x) & 255;
+		const std::int32_t iy = static_cast<std::int32_t>(_y) & 255;
+		const std::int32_t iz = static_cast<std::int32_t>(_z) & 255;
+
+		const value_type fx = (x - _x);
+		const value_type fy = (y - _y);
+		const value_type fz = (z - _z);
+
+		const std::uint8_t A = (m_permutation[ix & 255] + iy) & 255;
+		const std::uint8_t B = (m_permutation[(ix + 1) & 255] + iy) & 255;
+
+		const std::uint8_t AA = (m_permutation[A] + iz) & 255;
+		const std::uint8_t AB = (m_permutation[(A + 1) & 255] + iz) & 255;
+
+		const std::uint8_t BA = (m_permutation[B] + iz) & 255;
+		const std::uint8_t BB = (m_permutation[(B + 1) & 255] + iz) & 255;
+
+		const value_type p0 = perlin_detail::Grad(m_permutation[AA], fx, fy, fz);
+		const value_type p1 = perlin_detail::Grad(m_permutation[BA], fx - 1, fy, fz);
+		const value_type p2 = perlin_detail::Grad(m_permutation[AB], fx, fy - 1, fz);
+		const value_type p3 = perlin_detail::Grad(m_permutation[BB], fx - 1, fy - 1, fz);
+		const value_type p4 = perlin_detail::Grad(m_permutation[(AA + 1) & 255], fx, fy, fz - 1);
+		const value_type p5 = perlin_detail::Grad(m_permutation[(BA + 1) & 255], fx - 1, fy, fz - 1);
+		const value_type p6 = perlin_detail::Grad(m_permutation[(AB + 1) & 255], fx, fy - 1, fz - 1);
+		const value_type p7 = perlin_detail::Grad(m_permutation[(BB + 1) & 255], fx - 1, fy - 1, fz - 1);
+
+
+		const value_type u = perlin_detail::Fade(fx);
+		const value_type v = perlin_detail::Fade(fy);
+		const value_type w = perlin_detail::Fade(fz);
+
+		const value_type q0 = perlin_detail::Lerp(p0, p1, u);
+		const value_type q1 = perlin_detail::Lerp(p2, p3, u);
+		const value_type q2 = perlin_detail::Lerp(p4, p5, u);
+		const value_type q3 = perlin_detail::Lerp(p6, p7, u);
+
+		const value_type r0 = perlin_detail::Lerp(q0, q1, v);
+		const value_type r1 = perlin_detail::Lerp(q2, q3, v);
+
+		return perlin_detail::Lerp(r0, r1, w);
+	}
+
+	template<class Float>
+	template<class TVal>
+	TVal BasicPerlinNoise<Float>::noise3D_Mixed(value_type x, value_type y,
+		value_type z) const noexcept {
+
+		const value_type _x = std::floor(x);
+		const value_type _y = std::floor(y);
+		const value_type _z = std::floor(z);
+
+		const std::int32_t ix = static_cast<std::int32_t>(_x) & 255;
+		const std::int32_t iy = static_cast<std::int32_t>(_y) & 255;
+		const std::int32_t iz = static_cast<std::int32_t>(_z) & 255;
+
+		const auto fx = static_cast<TVal>(x - _x);
+		const auto fy = static_cast<TVal>(y - _y);
+		const auto fz = static_cast<TVal>(z - _z);
+
+		const auto u = perlin_detail::Fade(fx);
+		const auto v = perlin_detail::Fade(fy);
+		const auto w = perlin_detail::Fade(fz);
+
+		const std::uint8_t A = (m_permutation[ix & 255] + iy) & 255;
+		const std::uint8_t B = (m_permutation[(ix + 1) & 255] + iy) & 255;
+
+		const std::uint8_t AA = (m_permutation[A] + iz) & 255;
+		const std::uint8_t AB = (m_permutation[(A + 1) & 255] + iz) & 255;
+
+		const std::uint8_t BA = (m_permutation[B] + iz) & 255;
+		const std::uint8_t BB = (m_permutation[(B + 1) & 255] + iz) & 255;
+
+		const auto p0 = perlin_detail::Grad(m_permutation[AA], fx, fy, fz);
+		const auto p1 = perlin_detail::Grad(m_permutation[BA], fx - TVal(1), fy, fz);
+		const auto p2 = perlin_detail::Grad(m_permutation[AB], fx, fy - TVal(1), fz);
+		const auto p3 = perlin_detail::Grad(m_permutation[BB], fx - TVal(1), fy - TVal(1), fz);
+		const auto p4 = perlin_detail::Grad(m_permutation[(AA + 1) & 255], fx, fy, fz - TVal(1));
+		const auto p5 = perlin_detail::Grad(m_permutation[(BA + 1) & 255], fx - TVal(1), fy, fz - TVal(1));
+		const auto p6 = perlin_detail::Grad(m_permutation[(AB + 1) & 255], fx, fy - TVal(1), fz - TVal(1));
+		const auto p7 = perlin_detail::Grad(m_permutation[(BB + 1) & 255], fx - TVal(1), fy - TVal(1), fz - TVal(1));
+
+		const auto q0 = perlin_detail::Lerp(p0, p1, u);
+		const auto q1 = perlin_detail::Lerp(p2, p3, u);
+		const auto q2 = perlin_detail::Lerp(p4, p5, u);
+		const auto q3 = perlin_detail::Lerp(p6, p7, u);
+
+		const auto r0 = perlin_detail::Lerp(q0, q1, v);
+		const auto r1 = perlin_detail::Lerp(q2, q3, v);
+
+		return perlin_detail::Lerp(r0, r1, w);
+	}
+
+	template <class Float>
+	inline typename BasicPerlinNoise<Float>::value_type BasicPerlinNoise<Float>::noise3D_Branchless(const value_type x, const value_type y, const value_type z) const noexcept
+	{
+		const static Float gradients[][3] = {
+			{1,1,0},
+			{-1,1,0},
+			{1,-1,0},
+			{-1,-1,0},
+			{1,0,1},
+			{-1,0,1},
+			{1,0,-1},
+			{-1,0,-1},
+			{0,1,1},
+			{0,-1,1},
+			{0,1,-1},
+			{0,-1,-1},
+			{1,1,0},
+			{0,-1,1},
+			{-1,1,0},
+			{0,-1,-1},
+		};
+
+
+		const value_type _x = std::floor(x);
+		const value_type _y = std::floor(y);
+		const value_type _z = std::floor(z);
+
+		const std::int32_t ix = static_cast<std::int32_t>(_x) & 255;
+		const std::int32_t iy = static_cast<std::int32_t>(_y) & 255;
+		const std::int32_t iz = static_cast<std::int32_t>(_z) & 255;
+
+		const value_type fx = (x - _x);
+		const value_type fy = (y - _y);
+		const value_type fz = (z - _z);
+
+		const value_type u = perlin_detail::Fade(fx);
+		const value_type v = perlin_detail::Fade(fy);
+		const value_type w = perlin_detail::Fade(fz);
+
+		const std::uint8_t A = (m_permutation[ix & 255] + iy) & 255;
+		const std::uint8_t B = (m_permutation[(ix + 1) & 255] + iy) & 255;
+
+		const std::uint8_t AA = (m_permutation[A] + iz) & 255;
+		const std::uint8_t AB = (m_permutation[(A + 1) & 255] + iz) & 255;
+
+		const std::uint8_t BA = (m_permutation[B] + iz) & 255;
+		const std::uint8_t BB = (m_permutation[(B + 1) & 255] + iz) & 255;
+
+		const value_type p0 = perlin_detail::Grad(m_permutation[AA], gradients, fx, fy, fz);
+		const value_type p1 = perlin_detail::Grad(m_permutation[BA], gradients, fx - 1, fy, fz);
+		const value_type p2 = perlin_detail::Grad(m_permutation[AB], gradients, fx, fy - 1, fz);
+		const value_type p3 = perlin_detail::Grad(m_permutation[BB], gradients, fx - 1, fy - 1, fz);
+		const value_type p4 = perlin_detail::Grad(m_permutation[(AA + 1) & 255], gradients, fx, fy, fz - 1);
+		const value_type p5 = perlin_detail::Grad(m_permutation[(BA + 1) & 255], gradients, fx - 1, fy, fz - 1);
+		const value_type p6 = perlin_detail::Grad(m_permutation[(AB + 1) & 255], gradients, fx, fy - 1, fz - 1);
+		const value_type p7 = perlin_detail::Grad(m_permutation[(BB + 1) & 255], gradients, fx - 1, fy - 1, fz - 1);
 
 		const value_type q0 = perlin_detail::Lerp(p0, p1, u);
 		const value_type q1 = perlin_detail::Lerp(p2, p3, u);
