@@ -27,14 +27,14 @@ namespace cloudscape
         color_rgb transmittance;
     };
 
-    struct media_interaction_absorbtion // left for termination by russian roulette
+    struct media_interaction_absorption // left for termination by russian roulette
     {
+        color_rgb emission;
     };
 
     struct media_interaction_scatter
     {
         ray3 new_ray;
-        color_rgb emission;
         color_rgb transmittance_to_event;
         color_rgb scatter_transmittance;
         color_real scatter_pdf;
@@ -42,7 +42,7 @@ namespace cloudscape
         participating_media::pdf_evaluator_t evaluate_pdf; // in case we want to evaluate other lighting
     };
 
-    using media_trace_result = std::variant<media_interaction_none, media_interaction_absorbtion,
+    using media_trace_result = std::variant<media_interaction_none, media_interaction_absorption,
                                             media_interaction_scatter>;
 
     struct light_sample
@@ -191,15 +191,15 @@ namespace cloudscape
 
                 auto media_result = TraceMedia(media_, currentRay, obstruction_free_distance, throughput, color_index, sampler);
 
-                if (const auto absorption = std::get_if<media_interaction_absorbtion>(&media_result))
+                if (const auto absorption = std::get_if<media_interaction_absorption>(&media_result))
                 {
+                    integral += throughput * absorption->emission;
                     break;
                 }
                 else if (const auto scatter = std::get_if<media_interaction_scatter>(&media_result))
                 {
                     throughput *= scatter->transmittance_to_event;
                     catch_invalid(throughput);
-                    integral += throughput * scatter->emission;
                     catch_invalid(integral);
 
                     auto light_sample = SampleLight(*scatter, currentRay, color_index, sampler);
@@ -490,7 +490,7 @@ namespace cloudscape
         }
 
         media_trace_result TraceMediaOneByOne(
-            participating_media::DynamicCompositeMedium& medium,
+            const participating_media::DynamicCompositeMedium& medium,
             const ray3& ray,
             space_real max_distance,
             const color_rgb& color_sampling_hint,
@@ -516,19 +516,18 @@ namespace cloudscape
             auto current_ray = ray;
             for (std::size_t i = 0; ; ++i)
             {
-                const auto [majorant_extinction_vec, majorant_valid_distance] = medium.SampleMajorantExtinction(current_ray, distance_left);
+                const auto [majorant_sampling_extinction, majorant_valid_distance] = medium.SampleMajorantExtinction(current_ray, distance_left, color_index);
 
-                const auto majorant_sampling_extinction = majorant_extinction_vec[color_index];
-
-                if (majorant_sampling_extinction == color_real(0))
-                {
+                if (majorant_sampling_extinction == color_real(0) && majorant_valid_distance >= distance_left) {
                     return media_interaction_none{
                         majorant_transmittance
                     };
                 }
 
-                const auto step_distance =
-                    math::sampleExponential(color_real(sampler.Get1D()), majorant_sampling_extinction);
+                const auto step_distance = majorant_sampling_extinction > 0
+                    ? math::sampleExponential(color_real(sampler.Get1D()), majorant_sampling_extinction)
+                    : majorant_valid_distance
+                ;
 
                 if (majorant_valid_distance < distance_left) {
                     distance_left -= majorant_valid_distance;
@@ -554,8 +553,11 @@ namespace cloudscape
                     color_index];
 
                 const auto random_value = sampler.Get1D() * majorant_sampling_extinction;
-                if (random_value < interaction_sigma)
-                {
+                if (random_value < media_properties.absorption[color_index]) {
+                    return media_interaction_absorption{
+                        .emission = media_properties.emission * majorant_transmittance,
+                        };
+                } else if (random_value < interaction_sigma) {
                     const auto scattering_sample = media_properties.scatter_generator(
                         current_ray.direction(),
                         color_index,
@@ -566,7 +568,6 @@ namespace cloudscape
 
                     return media_interaction_scatter{
                         {new_ray.origin(), scattering_sample.direction},
-                        media_properties.emission,
                         majorant_transmittance,
                         scattering_sample.transmittance,
                         scattering_sample.pdf,
@@ -580,7 +581,9 @@ namespace cloudscape
 
                     if (sampler.Get1D() >= MAX_SURVIVE_PROBABILITY)
                     {
-                        return media_interaction_absorbtion{};
+                        return media_interaction_absorption{
+                            .emission = color_rgb::zero(),
+                            };
                     }
                     else
                     {
@@ -625,7 +628,7 @@ namespace cloudscape
 
                 auto media_result = TraceMedia(shadowMedia_, currentRay, limited_obstruction_free_distance, throughput, color_index, sampler);
 
-                if (const auto absorption = std::get_if<media_interaction_absorbtion>(&media_result))
+                if (const auto absorption = std::get_if<media_interaction_absorption>(&media_result))
                 {
                     throughput = color_rgb::zero();
                     break;

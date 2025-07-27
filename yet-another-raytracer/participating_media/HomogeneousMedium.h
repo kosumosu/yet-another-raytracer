@@ -37,6 +37,14 @@ namespace participating_media
                 };
         }
 
+        [[nodiscard]] single_majorant_sample_result SampleMajorantExtinction(const ray3 &ray, space_real max_distance,
+            const std::size_t color_index) const override {
+            return {
+                majorant_[color_index],
+                std::numeric_limits<space_real>::max()
+                };
+        }
+
         [[nodiscard]] medium_properties SampleProperties(const vector3& point) const override
         {
             return {

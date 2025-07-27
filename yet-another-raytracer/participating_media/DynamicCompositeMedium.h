@@ -53,6 +53,25 @@ namespace participating_media
             };
         }
 
+        [[nodiscard]] single_majorant_sample_result SampleMajorantExtinction(
+            const ray3 &ray,
+            space_real max_distance,
+            const std::size_t color_index
+            ) const override {
+            color_real majorant_sum = 0.0;
+            space_real min_valid_distance = std::numeric_limits<space_real>::max();
+            for (const auto& medium: media_) {
+                const auto [majorant, valid_distance] = medium->SampleMajorantExtinction(ray, max_distance, color_index);
+                majorant_sum += majorant;
+                min_valid_distance = std::min(min_valid_distance, valid_distance);
+            }
+
+            return {
+                majorant_sum,
+                min_valid_distance
+            };
+        }
+
         [[nodiscard]] medium_properties SampleProperties(const vector3& point) const override
         {
             optical_thickness_t absorption_sum = optical_thickness_t::zero();

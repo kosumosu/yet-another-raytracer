@@ -38,6 +38,11 @@ namespace participating_media
         space_real valid_distance;
     };
 
+    struct single_majorant_sample_result {
+        color_real majorant;
+        space_real valid_distance;
+    };
+
     class ParticipatingMedium
     {
     public:
@@ -47,6 +52,12 @@ namespace participating_media
         [[nodiscard]] virtual majorant_sample_result SampleMajorantExtinction(
             const ray3& ray,
             space_real max_distance) const = 0;
+
+        [[nodiscard]] virtual single_majorant_sample_result SampleMajorantExtinction(
+            const ray3& ray,
+            space_real max_distance,
+            const std::size_t color_index
+            ) const = 0;
 
         [[nodiscard]] virtual medium_properties SampleProperties(const vector3& point) const = 0;
 

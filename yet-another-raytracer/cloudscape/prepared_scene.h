@@ -114,6 +114,7 @@ namespace cloudscape
             planet_center,
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t{7.2865e-6, 1.2863e-5, 2.7408e-5} * scene.planet.airdensity,
+            participating_media::optical_thickness_t(1.0, 0.2, 0.01) * 1.0f,
             *rayleigh_phase_function
         );
 
@@ -124,6 +125,7 @@ namespace cloudscape
             planet_center,
             participating_media::optical_thickness_t::zero(),
             color_rgb::fill(turbidity_to_mie_extinction(7994.0, 1200.0, scene.planet.turbidity)),
+            participating_media::optical_thickness_t::zero(),
             *aerosol_atmosphere_phase_function
         );
 
@@ -134,6 +136,7 @@ namespace cloudscape
             planet_center,
             participating_media::optical_thickness_t::zero(),
             color_rgb::fill(scene.extensions.haze_density),
+            participating_media::optical_thickness_t::zero(),
             *haze_phase_function
         );
 
@@ -167,7 +170,7 @@ namespace cloudscape
         >>(
             participating_media::optical_thickness_t::zero(),
             participating_media::optical_thickness_t::fill(scene.clouds.fog),
-            participating_media::spectral_coeffs::zero(),
+            participating_media::spectral_coeffs(1.0, 0.5, 0.2) * 10.0f,
             scene.noise.size,
             scene.clouds.coverage,
             scene.noise.detail,
