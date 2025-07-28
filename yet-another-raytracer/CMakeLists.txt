@@ -38,6 +38,7 @@ add_executable(yet_another_raytracer
         TransformCommandProcessor.cpp
         main.cpp
         applications/NanaApplication.cpp
+        debug_printing.cpp
 )
 
 target_include_directories(yet_another_raytracer PRIVATE ".")
@@ -100,7 +101,7 @@ target_link_libraries(yet_another_raytracer PRIVATE
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_link_options(yet_another_raytracer PRIVATE "-municode")
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_options(yet_another_raytracer PRIVATE "-ffast-math" "-funroll-loops" "-O3" "-Wno-deprecated-enum-enum-conversion")
+        target_compile_options(yet_another_raytracer PRIVATE "-funroll-loops" "-O3" "-Wno-deprecated-enum-enum-conversion")
     endif ()
 endif ()
 
