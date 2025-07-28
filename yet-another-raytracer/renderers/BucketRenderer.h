@@ -11,12 +11,12 @@
 #include "Raytracer.h"
 #include "integrators/MonteCarloPathIntegrator.h"
 #include "Film.h"
+#include "accelerators/kd_tree/KDTreeAccelerator.h"
 
 #include <atomic>
 #include <functional>
 #include <mutex>
 #include <thread>
-#include <accelerators/kd_tree/KDTreeAccelerator.h>
 
 namespace renderers
 {
