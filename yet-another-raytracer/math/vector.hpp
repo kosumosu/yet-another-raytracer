@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <utility>
 #include <array>
+#include <ostream>
 
 namespace math
 {
@@ -149,6 +150,19 @@ namespace math
 		constexpr vector<TSpace, DIMENSIONS - 1> reduce_impl(std::index_sequence<ReducedIndices...>) const
 		{
 			return vector<TSpace, DIMENSIONS - 1>(m_elements[ReducedIndices] ...);
+		}
+
+		friend std::ostream & operator<<(std::ostream &os, const vector &obj) {
+			os << "[";
+			for (std::size_t i = 0; i < DIMENSIONS - 1; ++i) {
+				os << obj.m_elements[i];
+				os << ", ";
+			}
+			if constexpr (DIMENSIONS > 0) {
+				os << obj.m_elements[DIMENSIONS - 1];
+			}
+			os << "]";
+			return os;
 		}
 	};
 }
