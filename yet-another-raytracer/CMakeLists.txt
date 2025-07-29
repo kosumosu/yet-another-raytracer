@@ -51,6 +51,9 @@ find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
 target_link_libraries(yet_another_raytracer PRIVATE PNG::PNG)
 
+find_package(OpenEXR CONFIG REQUIRED)
+target_link_libraries(yet_another_raytracer PRIVATE OpenEXR::OpenEXR)
+
 if (TRUE)
     include(FetchContent)
 
