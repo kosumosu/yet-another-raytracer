@@ -71,6 +71,7 @@ public:
     }
 
     void SaveAsPng(const std::filesystem::path& filename) const;
+    void SaveAsExr(const std::filesystem::path& filename) const;
 
     [[nodiscard]] uint_vector2 size() const
     {

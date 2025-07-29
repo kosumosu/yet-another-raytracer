@@ -1,6 +1,10 @@
 #include "Film.h"
 
 #include <png.hpp>
+
+#include <ImfRgbaFile.h>
+#include <ImfArray.h>
+
 #include <fstream>
 #include <limits>
 
@@ -33,4 +37,22 @@ void Film::SaveAsPng(const std::filesystem::path& filename) const
     }
 
     image.write_stream(stream);
+}
+
+void Film::SaveAsExr(const std::filesystem::path &filename) const {
+
+    Imf::Array2D<Imf::Rgba> pixels(height(), width());
+
+    for (unsigned int y = 0; y < height(); y++)
+    {
+        for (unsigned int x = 0; x < width(); x++)
+        {
+            const auto film_pixel = getPixel(x, y);
+            pixels[y][x] = Imf::Rgba{ film_pixel[0], film_pixel[1], film_pixel[2] };
+        }
+    }
+
+    Imf::RgbaOutputFile output_file { filename.string().c_str(), static_cast<int>(width()), static_cast<int>(height()), Imf::WRITE_RGB };
+    output_file.setFrameBuffer(&pixels[0][0], 1, width());
+    output_file.writePixels(height());
 }

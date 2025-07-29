@@ -349,7 +349,8 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
 
             // renderer.PrintStats(std::wcout);
 
-            film.SaveAsPng(output_image_file);
+            // film.SaveAsPng(output_image_file);
+            film.SaveAsExr(output_image_file);
         }
     );
 }
@@ -364,7 +365,7 @@ int wmain(int argc, const wchar_t* argv[])
     {
         const auto scene_path = std::filesystem::path(argv[2]);
         auto image_path = std::filesystem::path(scene_path);
-        image_path.replace_extension(".png");
+        image_path.replace_extension(".exr");
 
         RenderCloudscape(std::filesystem::path(argv[2]), image_path);
 
