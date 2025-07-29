@@ -45,57 +45,32 @@ target_include_directories(yet_another_raytracer PRIVATE ".")
 include_directories(${PNGPP_INCLUDE_DIR})
 include_directories(../3rdparty)
 
-include(FetchContent)
+# Works on windows via vcpkg with
+# libpng x64-mingw-static (MinGW) OR x64-windows (VC)
+find_package(ZLIB REQUIRED)
+find_package(PNG REQUIRED)
+target_link_libraries(yet_another_raytracer PRIVATE PNG::PNG)
 
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    find_package(ZLIB REQUIRED)
-
-    find_package(PNG REQUIRED)
-    add_definitions(${PNG_DEFINITIONS})
-    include_directories(${PNG_INCLUDE_DIR})
-    #    target_link_libraries(yet_another_raytracer ${PNG_LIBRARIES})
-
-else ()
-
+if (TRUE)
+    include(FetchContent)
 
     FetchContent_Declare(
-            libpng
-            GIT_REPOSITORY https://git.code.sf.net/p/libpng/code
-            GIT_TAG libpng16
+            nana
+            GIT_REPOSITORY https://github.com/cnjinhao/nana.git
+            GIT_TAG v1.7.4
     )
-    set(PNG_TESTS OFF)
 
-
-    FetchContent_GetProperties(libpng)
-    if (NOT libpng_POPULATED)
-        FetchContent_Populate(libpng)
-        FetchContent_MakeAvailable(libpng)
-        add_subdirectory("${libpng_SOURCE_DIR}" ${libpng_BINARY_DIR} EXCLUDE_FROM_ALL)
-        include_directories(${libpng_SOURCE_DIR})
+    FetchContent_GetProperties(nana)
+    if (NOT nana_POPULATED)
+        FetchContent_Populate(nana)
+        FetchContent_MakeAvailable(nana)
+        add_subdirectory("${nana_SOURCE_DIR}" "${nana_BINARY_DIR}")
     endif ()
 
+    target_link_libraries(yet_another_raytracer PRIVATE
+            nana
+    )
 endif ()
-
-FetchContent_Declare(
-        nana
-        GIT_REPOSITORY https://github.com/cnjinhao/nana.git
-        GIT_TAG v1.7.4
-)
-
-FetchContent_GetProperties(nana)
-if (NOT nana_POPULATED)
-    FetchContent_Populate(nana)
-    FetchContent_MakeAvailable(nana)
-    add_subdirectory("${nana_SOURCE_DIR}" "${nana_BINARY_DIR}")
-endif ()
-
-
-target_link_libraries(yet_another_raytracer PRIVATE
-        png_static
-        nana
-        ${PNG_LIBRARIES}
-)
 
 
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
