@@ -227,8 +227,9 @@ namespace cloudscape
             scene.extensions.sphere_radius
         };
 
-        extra_sphere.material(glass_material.get());
-        extra_sphere.inner_medium(homogeneous_medium.get());
+        // extra_sphere.material(glass_material.get());
+        extra_sphere.material(extra_material.get());
+        // extra_sphere.inner_medium(homogeneous_medium.get());
 
         auto extra_triangle = objects::FlatTriangleObject(
             {1000.0, 0.0, 1500.1},
