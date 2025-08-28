@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <thread>
-#include <cmake-build-debug/_deps/nana-src/include/nana/gui/widgets/picture.hpp>
-#include <cmake-build-debug/_deps/nana-src/include/nana/paint/pixel_buffer.hpp>
+#include <nana/gui/widgets/picture.hpp>
+#include <nana/paint/pixel_buffer.hpp>
 
 #include "IApplication.h"
 
