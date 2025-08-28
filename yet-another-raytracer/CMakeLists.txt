@@ -75,9 +75,11 @@ if (TRUE)
     )
 endif ()
 
+if (MINGW)
+    target_link_options(yet_another_raytracer PRIVATE "-municode")
+endif ()
 
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_link_options(yet_another_raytracer PRIVATE "-municode")
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_compile_options(yet_another_raytracer PRIVATE "-funroll-loops" "-O3" "-Wno-deprecated-enum-enum-conversion")
     endif ()
