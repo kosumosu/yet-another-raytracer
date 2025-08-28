@@ -530,12 +530,13 @@ namespace cloudscape
                 ;
 
                 if (majorant_valid_distance < distance_left) {
-                    distance_left -= majorant_valid_distance;
-                    if (step_distance > majorant_valid_distance) {
+                    if (step_distance >= majorant_valid_distance) {
+                        distance_left -= majorant_valid_distance;
                         // No interaction happened within valid distance. Just skip this step.
                         current_ray = current_ray.ray_along(majorant_valid_distance);
                         continue;
                     }
+                    distance_left -= step_distance;
                 } else {
                     distance_left -= step_distance;
                     if (distance_left <= space_real(0.0))
