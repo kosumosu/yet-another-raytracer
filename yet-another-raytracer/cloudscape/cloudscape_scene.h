@@ -5,7 +5,7 @@
 
 namespace cloudscape
 {
-    struct planet
+    struct planet_t
     {
         float turbidity;
         float samples;
@@ -17,7 +17,7 @@ namespace cloudscape
         float planetradius;
     };
 
-    struct noise
+    struct noise_t
     {
         float multiplier;
         uint32_t detail;
@@ -26,7 +26,7 @@ namespace cloudscape
         uint32_t seed;
     };
 
-    struct optimizations
+    struct optimizations_t
     {
         float cutoffthresshold;
         float stepfalloff;
@@ -38,7 +38,7 @@ namespace cloudscape
         uint32_t shadowsamples;
     };
 
-    struct rendering
+    struct rendering_t
     {
         uint32_t samples;
         float step;
@@ -51,7 +51,7 @@ namespace cloudscape
         uint32_t maxthreads;
     };
 
-    struct camera
+    struct camera_t
     {
         float elevation;
         float azimuth;
@@ -60,13 +60,13 @@ namespace cloudscape
         float y;
     };
 
-    struct vis
+    struct vis_t
     {
         float brightness;
         float gamma;
     };
 
-    struct sun
+    struct sun_t
     {
         float azimuth;
         float elevation;
@@ -76,7 +76,7 @@ namespace cloudscape
         float size_mult;
     };
 
-    struct clouds
+    struct clouds_t
     {
         uint32_t color;
         float trans_falloff;
@@ -87,7 +87,7 @@ namespace cloudscape
         float coverage;
     };
 
-    struct extensions
+    struct extensions_t
     {
         vector3 sphere_pos = vector3::zero();
         space_real sphere_radius;
@@ -99,14 +99,14 @@ namespace cloudscape
 
     struct cloudscape_scene
     {
-        planet planet;
-        noise noise;
-        optimizations optimizations;
-        rendering rendering;
-        camera camera;
-        vis vis;
-        sun sun;
-        clouds clouds;
-        extensions extensions;
+        planet_t planet;
+        noise_t noise;
+        optimizations_t optimizations;
+        rendering_t rendering;
+        camera_t camera;
+        vis_t vis;
+        sun_t sun;
+        clouds_t clouds;
+        extensions_t extensions;
     };
 }
