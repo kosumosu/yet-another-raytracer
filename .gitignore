@@ -166,3 +166,5 @@ yet-another-raytracer.VC.db
 *.jpg
 /_scenes/deus-ex/02_NYC_Street.dx.scene
 /.vs
+yet-another-raytracer/cmake-build-*
+/build-vc
