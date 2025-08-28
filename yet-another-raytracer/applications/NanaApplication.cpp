@@ -1,7 +1,5 @@
-#include <windows.h>
-
-
 #if defined(_WIN32)
+#include <windows.h>
 
 int wmain(int argc, const wchar_t** argv);
 
