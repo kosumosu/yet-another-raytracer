@@ -168,7 +168,7 @@ namespace cloudscape
             media_.ClearMedia();
             media_.PushMedium(&atmosphericMedium_);
             media_.PushMedium(&atmosphericAerosolMedium_);
-            media_.PushMedium(&hazeMedium_);
+            // media_.PushMedium(&hazeMedium_);
 
             if (is_inside_clouds)
             {
