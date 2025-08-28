@@ -133,6 +133,7 @@ namespace cloudscape
                 if (invalid)
                 {
                     int sd = 0;
+                    throw std::logic_error("invalid color");
                 }
                 assert(!invalid);
             } else {
@@ -194,6 +195,7 @@ namespace cloudscape
                 if (const auto absorption = std::get_if<media_interaction_absorption>(&media_result))
                 {
                     integral += throughput * absorption->emission;
+                    catch_invalid(integral);
                     break;
                 }
                 else if (const auto scatter = std::get_if<media_interaction_scatter>(&media_result))
@@ -379,6 +381,7 @@ namespace cloudscape
                     });
             }
 
+            catch_invalid(integral);
             return integral;
         }
 
