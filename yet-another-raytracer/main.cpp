@@ -239,7 +239,7 @@ void RenderRegular(const std::filesystem::path& scene_file,
 }
 
 void RenderCloudscape(const std::filesystem::path& scene_file,
-                      const std::filesystem::path& output_image_file
+                       const std::filesystem::path& output_image_file_without_extension
 )
 {
 #if false
@@ -250,7 +250,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
 
 
     application.run(
-        [&scene_file, &output_image_file](
+        [&scene_file, &output_image_file_without_extension](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -266,7 +266,9 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             }
             else
             {
-                cloudscape::LoadThinAntarctica(scene);
+                // cloudscape::LoadThinAntarctica(scene);
+                // cloudscape::LoadPlanetFromSide(scene);
+                cloudscape::LoadPlanetFromSideWithThinAntarctica(scene);
             }
 
             auto prepared_scene = cloudscape::prepare_scene(scene);
@@ -333,7 +335,7 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             renderer.Render(
                 film,
                 {uint_vector2::zero(), film.size()},
-                //{ uint_vector2 { 412, 159 }, {1, 1}},
+                 // { uint_vector2 { 200, 200 }, {1, 1}},
                 prepared_scene.camera,
                 scene.rendering.samples,
                 [&prepared_scene, &accelerator, &atmospheric_medium, &cloud_medium]
@@ -349,8 +351,12 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
 
             // renderer.PrintStats(std::wcout);
 
-            // film.SaveAsPng(output_image_file);
+            auto output_image_file = output_image_file_without_extension;
+
+            output_image_file.replace_extension(".exr");
             film.SaveAsExr(output_image_file);
+            output_image_file.replace_extension(".png");
+            film.SaveAsPng(output_image_file);
         }
     );
 }
@@ -365,11 +371,12 @@ int wmain(int argc, const wchar_t* argv[])
     {
         const auto scene_path = std::filesystem::path(argv[2]);
         auto image_path = std::filesystem::path(scene_path);
-        image_path.replace_extension(".exr");
+        image_path.replace_extension("");
 
         RenderCloudscape(std::filesystem::path(argv[2]), image_path);
 
-        openImageFileForDisplay(image_path.c_str());
+        image_path.replace_extension(".png");
+        openImageFileForDisplay(image_path);
     }
     else
     {
