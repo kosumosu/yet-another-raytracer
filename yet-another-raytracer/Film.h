@@ -41,7 +41,7 @@ public:
 
     [[nodiscard]] color_rgb getPixelTonemapped(unsigned int x, unsigned int y) const
     {
-        return math::clamp(linear_to_storage(tonemap_(getPixel(x, y))), color_0, color_1);
+        return math::clamp(linear_to_storage(lumaBasedReinhardToneMapping(tonemap_(getPixel(x, y)))), color_0, color_1);
     }
 
     [[nodiscard]] color_u8rgb getPixelTonemappedU8(unsigned int x, unsigned int y) const
@@ -106,5 +106,13 @@ private:
         {
             throw;
         }
+    }
+
+    static color_rgb lumaBasedReinhardToneMapping(color_rgb color)
+    {
+        const float luma = dot(color, color_rgb(0.2126, 0.7152, 0.0722));
+        const float toneMappedLuma = luma / (1.f + luma);
+        color *= toneMappedLuma / luma;
+        return color;
     }
 };
