@@ -362,12 +362,12 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
 }
 
 template <class TChar>
-int wmain_impl(int argc, const TChar* argv[])
+int wmain_impl(int argc, const TChar* argv[], std::basic_string_view<TChar> cloudscape_key)
 {
     if (argc < 2)
         return 0;
 
-    if (L"-c"sv == argv[1])
+    if (cloudscape_key == argv[1])
     {
         const auto scene_path = std::filesystem::path(argv[2]);
         auto image_path = std::filesystem::path(scene_path);
@@ -394,12 +394,12 @@ int wmain_impl(int argc, const TChar* argv[])
 #if defined(_WIN32)
 int wmain(int argc, const wchar_t* argv[])
 {
-    return wmain_impl(argc, argv);
+    return wmain_impl(argc, argv, L"-c"sv);
 }
 #elif defined (__linux__)
 int main(int argc, const char* argv[])
 {
-    return wmain_impl(argc, argv);
+    return wmain_impl(argc, argv, "-c"sv);
 }
 
 #endif
