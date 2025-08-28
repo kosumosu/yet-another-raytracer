@@ -361,8 +361,8 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
     );
 }
 
-#if defined(_WIN32)
-int wmain(int argc, const wchar_t* argv[])
+template <class TChar>
+int wmain_impl(int argc, const TChar* argv[])
 {
     if (argc < 2)
         return 0;
@@ -390,19 +390,16 @@ int wmain(int argc, const wchar_t* argv[])
 
     return 0;
 }
+
+#if defined(_WIN32)
+int wmain(int argc, const wchar_t* argv[])
+{
+    return wmain_impl(argc, argv);
+}
 #elif defined (__linux__)
 int main(int argc, const char* argv[])
 {
-    if (argc < 2)
-        return 0;
-
-    const auto image_file = std::filesystem::path(argv[1]).replace_extension(".png");
-
-    Render(std::filesystem::path(argv[1]), image_file);
-
-    openImageFileForDisplay(image_file.c_str());
-
-    return 0;
+    return wmain_impl(argc, argv);
 }
 
 #endif
