@@ -227,35 +227,35 @@ void RenderRegular(const std::filesystem::path& scene_file,
                     );
 
                     return integrator;
-                }, stopToken);
+                },
+                0,
+                stopToken);
 
-            reportRenderingFinihsed(film);
+            reportRenderingFinihsed(film, 1);
 
             renderer.PrintStats(std::wcout);
 
             film.SaveAsPng(output_image_file);
+
         }
     );
 }
 
-void RenderCloudscape(const std::filesystem::path& scene_file,
-                       const std::filesystem::path& output_image_file_without_extension
+
+template <CApplication TApplication>
+void RenderCloudscapeImpl(
+    TApplication application,
+    const std::filesystem::path& scene_file,
+    const std::filesystem::path& output_image_file_without_extension
 )
 {
-#if false
-    applications::ConsoleApplication application;
-#else
-    applications::NanaApplicaion application;
-#endif
-
-
     application.run(
         [&scene_file, &output_image_file_without_extension](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
         const auto& reportAreaStarted,
-        const auto& reportRenderingFinihsed,
+        const auto& reportRenderingFinished,
         const auto& print_info)
         {
             cloudscape::cloudscape_scene scene{};
@@ -332,33 +332,56 @@ void RenderCloudscape(const std::filesystem::path& scene_file,
             participating_media::VoidMedium atmospheric_medium;
             participating_media::VoidMedium cloud_medium;
 
-            renderer.Render(
-                film,
-                {uint_vector2::zero(), film.size()},
-                 // { uint_vector2 { 200, 200 }, {1, 1}},
-                prepared_scene.camera,
-                scene.rendering.samples,
-                [&prepared_scene, &accelerator, &atmospheric_medium, &cloud_medium]
-                {
-                    auto raytracer = Raytracer{accelerator.CreateMarcher()};
-                    return cloudscape::CloudscapeIntegrator{
-                        prepared_scene,
-                        raytracer
-                    };
-                }, stopToken);
+            for (int i = 0; !stopToken.stop_requested(); ++i) {
+                renderer.Render(
+                    film,
+                    {uint_vector2::zero(), film.size()},
+                     // { uint_vector2 { 200, 200 }, {1, 1}},
+                    prepared_scene.camera,
+                    scene.rendering.samples,
+                    [&prepared_scene, &accelerator, &atmospheric_medium, &cloud_medium]
+                    {
+                        auto raytracer = Raytracer{accelerator.CreateMarcher()};
+                        return cloudscape::CloudscapeIntegrator{
+                            prepared_scene,
+                            raytracer
+                        };
+                    },
+                    i,
+                    stopToken);
 
-            reportRenderingFinihsed(film);
+                reportRenderingFinished(film, i + 1);
 
-            // renderer.PrintStats(std::wcout);
+                // renderer.PrintStats(std::wcout);
 
-            auto output_image_file = output_image_file_without_extension;
+                if (i == 0 || !stopToken.stop_requested()) {
+                    auto output_image_file = output_image_file_without_extension;
 
-            output_image_file.replace_extension(".exr");
-            film.SaveAsExr(output_image_file);
-            output_image_file.replace_extension(".png");
-            film.SaveAsPng(output_image_file);
+                    output_image_file.replace_extension(".exr");
+                    film.SaveAsExr(output_image_file);
+                    output_image_file.replace_extension(".png");
+                    film.SaveAsPng(output_image_file);
+                }
+            }
         }
     );
+}
+
+#if defined(ENABLE_UI_DEF)
+constexpr bool ENABLE_UI = true;
+#else
+constexpr bool ENABLE_UI = false;
+#endif
+
+void RenderCloudscape(
+    const std::filesystem::path& scene_file,
+    const std::filesystem::path& output_image_file_without_extension
+) {
+    if constexpr (ENABLE_UI) {
+        RenderCloudscapeImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension);
+    } else {
+        RenderCloudscapeImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension);
+    }
 }
 
 template <class TChar>

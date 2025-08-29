@@ -77,6 +77,7 @@ namespace renderers
             const Camera& camera,
             const std::size_t samplesPerPixel,
             typename IRenderer<TRayIntegrator>::ray_integrator_factory_t rayIntegratorFactory,
+            const uint32_t seed,
             const std::stop_token& stopToken) const override
         {
             const auto cropStart = rectToRender.top_left;
@@ -109,14 +110,24 @@ namespace renderers
                             bucketCoord.has_value() && !stopToken.stop_requested();
                             bucketCoord = sequence->getNext())
                         {
+                            subFilm.clear();
+
                             const uint_vector2 bucketMinCorner = cropStart + bucketSize_ * *bucketCoord;
                             const uint_vector2 bucketMaxCorner = math::min(bucketMinCorner + bucketSize_, cropEnd);
                             const uint_vector2 bucketSize = bucketMaxCorner - bucketMinCorner;
 
                             auto reportAreaFinished = areaStartedCallback_(bucketMinCorner, bucketMaxCorner);
 
-                            ProcessBucket(subFilm, film.size(), camera, samplesPerPixel, integrator, Bucket{bucketMinCorner, bucketSize},
-                                          stopToken);
+                            ProcessBucket(
+                                subFilm,
+                                film.size(),
+                                camera,
+                                samplesPerPixel,
+                                integrator,
+                                Bucket{bucketMinCorner, bucketSize},
+                                seed,
+                                stopToken);
+
                             film.transferFilm(subFilm, bucketMinCorner, bucketSize);
 
                             reportAreaFinished(subFilm);
@@ -163,6 +174,7 @@ namespace renderers
             const std::size_t samplesPerPixel,
             RayIntegrator& rayIntegrator,
             const Bucket& bucket,
+            const uint32_t seed,
             const std::stop_token& stopToken) const
         {
             for (size_t y = 0; y < bucket.size[1]; ++y)
@@ -173,7 +185,7 @@ namespace renderers
                         return;
                     const uint_vector2 localCoord{x, y};
                     ProcessPixel(film, wholeFilmSize, camera, samplesPerPixel, rayIntegrator, localCoord,
-                                 bucket.start + localCoord);
+                                 bucket.start + localCoord, seed);
                 }
             }
         }
@@ -185,14 +197,14 @@ namespace renderers
             const std::size_t samplesPerPixel,
             RayIntegrator& rayIntegrator,
             const uint_vector2& subFilmCoord,
-            const uint_vector2& wholeFilmCoord) const
+            const uint_vector2& wholeFilmCoord,
+            const uint32_t seed) const
         {
-            const unsigned seed = hashing::default_1d_hash(wholeFilmCoord);
-            math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
+            const unsigned finalSeed = hashing::default_1d_hash(uint_vector3(wholeFilmCoord, seed));
+            math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{finalSeed});
 
             const bool doJitter = samplesPerPixel > 1U;
-            const color_real sampleWeight = color_real(1.0) / color_real(samplesPerPixel);
-            color_rgb averageColor = color_rgb::zero();
+            color_rgb accumulatedColor = color_rgb::zero();
             const vector2 pixelLeftBottomCoord = wholeFilmCoord;
             const vector2 sizeNormalizationFactor =
                 vector2(1.0, 1.0) / wholeFilmSize; //(1.0 / subFilm.width(), 1.0 / subFilm.height());
@@ -209,15 +221,14 @@ namespace renderers
                 const auto ray = camera.GetViewRay(jitteredCoord * sizeNormalizationFactor, aspectRatio);
 
                 const auto rayPayload =
-                    rayIntegrator.EvaluateRay(ray, space_real(0.0), pixelPersonalSampler) *
-                    sampleWeight;
+                    rayIntegrator.EvaluateRay(ray, space_real(0.0), pixelPersonalSampler);
 
                 assert(!math::anyNan(rayPayload));
 
-                averageColor += rayPayload;
+                accumulatedColor += rayPayload;
             }
 
-            subFilm.setPixel(subFilmCoord, averageColor);
+            subFilm.registerAtPixel(subFilmCoord, std::make_pair(accumulatedColor, samplesPerPixel));
         }
     };
 }

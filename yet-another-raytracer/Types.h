@@ -21,6 +21,7 @@ using space_real_precise = double;
 
 using int_vector2 = math::vector<int, 2>;
 using uint_vector2 = math::vector<unsigned int, 2>;
+using uint_vector3 = math::vector<unsigned int, 3>;
 
 using vector2 = math::vector<space_real, 2>;
 using vector3 = math::vector<space_real, 3>;

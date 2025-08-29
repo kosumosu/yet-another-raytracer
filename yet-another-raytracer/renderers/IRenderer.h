@@ -35,6 +35,7 @@ namespace renderers
 			const Camera& camera,
 			std::size_t samplesPerPixel,
 			ray_integrator_factory_t rayIntegratorFactory,
+			uint32_t seed,
 			const std::stop_token& stopToken
 			) const = 0;
 

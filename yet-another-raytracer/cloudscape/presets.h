@@ -320,7 +320,7 @@ namespace cloudscape
 
 
         //scene.rendering.samples = 4096*16*4;
-        scene.rendering.samples = 256;
+        scene.rendering.samples = 64;
 
         scene.rendering.width = 640; //1920;
         scene.rendering.height = 360; //1080;

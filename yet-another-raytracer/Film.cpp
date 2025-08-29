@@ -47,7 +47,7 @@ void Film::SaveAsExr(const std::filesystem::path &filename) const {
     {
         for (unsigned int x = 0; x < width(); x++)
         {
-            const auto film_pixel = tonemap_(getPixel(x, y));
+            const auto film_pixel = tonemap_(getAveragePixelValue(x, y));
             pixels[y][x] = Imf::Rgba{ film_pixel[0], film_pixel[1], film_pixel[2] };
         }
     }

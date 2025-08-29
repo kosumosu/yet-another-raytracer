@@ -62,6 +62,8 @@ namespace applications
 
             form.show();
 
+            uint32_t iteration = 0;
+
             std::jthread worker_thread{
                 [&, this](const std::stop_token& stop_token)
                 {
@@ -72,7 +74,7 @@ namespace applications
                             graphics = nana::paint::graphics{{film_size[0], film_size[1]}};
                             form.size({film_size[0], film_size[1] + 16});
                         },
-                        [&progress_bar, &progress_label, &form, this](const size_t nom, const size_t denom)
+                        [&progress_bar, &progress_label, &form, &iteration, this](const size_t nom, const size_t denom)
                         {
                             std::lock_guard guard{mutex_};
                             progress_bar.amount(denom);
@@ -82,7 +84,7 @@ namespace applications
                             progress_bar.caption(progress_text);
                             progress_label.caption(std::move(progress_text));
 
-                            form.caption(std::format(L"YART {:.2f}%", progress_percent));
+                            form.caption(std::format(L"YART {:.2f}% #{}", progress_percent, iteration + 1));
                             //std::wcout << "Done " << std::setprecision(2) << std::fixed << progress * 100.0f << "%\n";
                         },
                         [&drawing, &graphics, /*&pb,*/ this](const auto& top_left, const auto& bottom_right)
@@ -128,8 +130,9 @@ namespace applications
                                 drawing.update();
                             };
                         },
-                        [](const auto& film)
+                        [&iteration](const auto& film, size_t iteration_index)
                         {
+                            iteration = iteration_index;
                         },
                         [this](const std::wstring& text)
                         {

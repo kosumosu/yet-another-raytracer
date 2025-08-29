@@ -94,3 +94,11 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "IPO / LTO not supported: <${error}>")
     endif ()
 endif ()
+
+IF (NOT DEFINED ENABLE_UI)
+    SET(ENABLE_UI true)
+ENDIF()
+
+if (ENABLE_UI)
+    ADD_DEFINITIONS(-DENABLE_UI_DEF)
+endif ()

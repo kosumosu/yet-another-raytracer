@@ -41,6 +41,7 @@ namespace renderers
             const Camera& camera,
             const std::size_t samplesPerPixel,
             typename IRenderer<TRayIntegrator>::ray_integrator_factory_t rayIntegratorFactory,
+            const uint32_t seed,
             const std::stop_token& stopToken
         ) const override
         {
@@ -90,14 +91,14 @@ namespace renderers
             const Camera& camera,
             const std::size_t samplesPerPixel,
             RayIntegrator& rayIntegrator,
-            const uint_vector2& wholeFilmCoord) const
+            const uint_vector2& wholeFilmCoord,
+            const uint32_t seed) const
         {
-            const unsigned seed = hashing::default_1d_hash(wholeFilmCoord);
-            math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{seed});
+            const unsigned finalSeed = hashing::default_1d_hash(uint_vector3(wholeFilmCoord, seed));
+            math::SimpleSampler<space_real, std::mt19937> pixelPersonalSampler(std::mt19937{finalSeed});
 
             const bool doJitter = samplesPerPixel > 1;
-            const color_real sampleWeight = color_real(1.0) / color_real(samplesPerPixel);
-            color_rgb averageColor = color_rgb::zero();
+            color_rgb accumulatedColor = color_rgb::zero();
             const vector2 pixelLeftBottomCoord = math::cast<space_real>(wholeFilmCoord);
             const vector2 sizeNormalizationFactor(1.0 / film.width(), 1.0 / film.height());
 
@@ -111,11 +112,11 @@ namespace renderers
 
                 const auto ray = camera.GetViewRay(jitteredCoord * sizeNormalizationFactor,
                                                    space_real(film.width()) / space_real(film.height()));
-                averageColor += rayIntegrator.EvaluateRay(ray, space_real(0.0),
-                                                          pixelPersonalSampler) * sampleWeight;
+                accumulatedColor += rayIntegrator.EvaluateRay(ray, space_real(0.0),
+                                                          pixelPersonalSampler);
             }
 
-            film.setPixel(wholeFilmCoord, averageColor);
+            film.registerAtPixel(wholeFilmCoord, std::make_pair(accumulatedColor, samplesPerPixel));
         }
     };
 }

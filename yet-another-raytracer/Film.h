@@ -20,28 +20,39 @@ private:
     const tonemap_t tonemap_;
 
     std::vector<color_rgb> pixels_;
+    std::vector<uint32_t> sample_counts_;
 
 public:
     explicit Film(uint_vector2 size, tonemap_t tonemap = [](const auto& color) { return color; })
         : size_{std::move(size)}
           , tonemap_(std::move(tonemap))
           , pixels_{std::size_t(size_[0]) * size_[1], color_rgb::zero()}
+          , sample_counts_(std::size_t(size_[0]) * size_[1], 0)
     {
     }
 
     [[nodiscard]] unsigned int width() const { return size_[0]; }
     [[nodiscard]] unsigned int height() const { return size_[1]; }
 
-    [[nodiscard]] const std::vector<color_rgb>& pixels() const { return pixels_; }
+    void clear() {
+        pixels_.assign(size_[0] * size_[1], color_rgb::zero());
+        sample_counts_.assign(size_[0] * size_[1], 0);
+    }
 
-    [[nodiscard]] const color_rgb& getPixel(unsigned int x, unsigned int y) const
+    [[nodiscard]] std::pair<color_rgb, uint32_t> getPixelData(unsigned int x, unsigned int y) const
     {
-        return pixels_[std::size_t(y) * width() + x];
+        return std::make_pair(pixels_[std::size_t(y) * width() + x], sample_counts_[std::size_t(y) * width() + x]);
+    }
+
+    [[nodiscard]] color_rgb getAveragePixelValue(unsigned int x, unsigned int y) const
+    {
+        const auto index = std::size_t(y) * width() + x;
+        return pixels_[index] / sample_counts_[index];
     }
 
     [[nodiscard]] color_rgb getPixelTonemapped(unsigned int x, unsigned int y) const
     {
-        return math::clamp(linear_to_storage(lumaBasedReinhardToneMapping(tonemap_(getPixel(x, y)))), color_0, color_1);
+        return math::clamp(linear_to_storage(lumaBasedReinhardToneMapping(tonemap_(getAveragePixelValue(x, y)))), color_0, color_1);
     }
 
     [[nodiscard]] color_u8rgb getPixelTonemappedU8(unsigned int x, unsigned int y) const
@@ -50,14 +61,22 @@ public:
             color_u8rgb::element_t>::max();
     }
 
-    void setPixel(uint_vector2 coord, const color_rgb& value)
+    void setPixelData(uint_vector2 coord, const std::pair<color_rgb, uint32_t>& data)
     {
-        pixels_[std::size_t(coord[1]) * width() + coord[0]] = value;
+        pixels_[std::size_t(coord[1]) * width() + coord[0]] = data.first;
+        sample_counts_[std::size_t(coord[1]) * width() + coord[0]] = data.second;
+    }
+
+    void registerAtPixel(uint_vector2 coord, const std::pair<color_rgb, uint32_t>& data)
+    {
+        pixels_[std::size_t(coord[1]) * width() + coord[0]] += data.first;
+        sample_counts_[std::size_t(coord[1]) * width() + coord[0]] += data.second;
     }
 
     // Blits a block from another film.
     // Must support multithreaded access. It is guaranteed that different threads don't write to the same pixels.
-    void transferFilm(const Film& sourceFilm, const uint_vector2& destinationMinCoord, const uint_vector2& blockSize)
+    // Copies back aggregated result into sourceFilm
+    void transferFilm(Film& sourceFilm, const uint_vector2& destinationMinCoord, const uint_vector2& blockSize)
     {
         for (unsigned int y = 0; y < blockSize[1]; ++y)
         {
@@ -65,7 +84,8 @@ public:
 
             for (unsigned int x = 0; x < blockSize[0]; ++x)
             {
-                setPixel({x + destinationMinCoord[0], destY}, sourceFilm.getPixel(x, y));
+                registerAtPixel({x + destinationMinCoord[0], destY}, sourceFilm.getPixelData(x, y));
+                sourceFilm.setPixelData({x, y}, getPixelData(x + destinationMinCoord[0], destY));
             }
         }
     }
