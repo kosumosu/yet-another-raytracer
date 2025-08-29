@@ -33,6 +33,14 @@
 #include <tchar.h>
 #endif
 
+
+#if defined(ENABLE_UI_DEF)
+constexpr bool ENABLE_UI = true;
+#else
+constexpr bool ENABLE_UI = false;
+#endif
+
+
 using namespace std::string_view_literals;
 
 //////////////////////////////////////////////////////////////////////////
@@ -82,16 +90,12 @@ renderers::Rect getCroppedRectToRender(const Scene scene)
     return {std::move(cropStart), std::move(cropSize)};
 }
 
-void RenderRegular(const std::filesystem::path& scene_file,
-                   const std::filesystem::path& output_image_file
-)
-{
-#if false
-    applications::ConsoleApplication application;
-#else
-    applications::NanaApplicaion application;
-#endif
-
+template <CApplication TApplication>
+void RenderRegularImpl(
+    TApplication application,
+    const std::filesystem::path& scene_file,
+    const std::filesystem::path& output_image_file
+) {
 
     application.run(
         [&scene_file, &output_image_file](
@@ -241,6 +245,17 @@ void RenderRegular(const std::filesystem::path& scene_file,
     );
 }
 
+void RenderRegular(const std::filesystem::path& scene_file,
+                   const std::filesystem::path& output_image_file
+)
+{
+    if constexpr (ENABLE_UI) {
+        RenderRegularImpl(applications::NanaApplicaion(), scene_file, output_image_file);
+    } else {
+        RenderRegularImpl(applications::ConsoleApplication(), scene_file, output_image_file);
+    }
+}
+
 
 template <CApplication TApplication>
 void RenderCloudscapeImpl(
@@ -366,12 +381,6 @@ void RenderCloudscapeImpl(
         }
     );
 }
-
-#if defined(ENABLE_UI_DEF)
-constexpr bool ENABLE_UI = true;
-#else
-constexpr bool ENABLE_UI = false;
-#endif
 
 void RenderCloudscape(
     const std::filesystem::path& scene_file,

@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_UI_DEF)
+
 #include <iostream>
 #include <thread>
 #include <nana/gui/widgets/picture.hpp>
@@ -189,3 +191,13 @@ namespace applications
         }
     };
 }
+
+#else
+
+namespace applications {
+    class NanaApplicaion final : IApplication {
+    public:
+        void run(worker_t worker) override;
+    };
+}
+#endif
