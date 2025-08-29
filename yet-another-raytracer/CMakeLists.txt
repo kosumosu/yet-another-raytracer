@@ -57,17 +57,16 @@ target_link_libraries(yet_another_raytracer PRIVATE OpenEXR::OpenEXR)
 if (TRUE)
     include(FetchContent)
 
+
     FetchContent_Declare(
             nana
-            GIT_REPOSITORY https://github.com/cnjinhao/nana.git
-            GIT_TAG v1.7.4
+            GIT_REPOSITORY https://github.com/kosumosu/nana.git
+            GIT_TAG develop-1.8
     )
 
     FetchContent_GetProperties(nana)
     if (NOT nana_POPULATED)
-        FetchContent_Populate(nana)
         FetchContent_MakeAvailable(nana)
-        add_subdirectory("${nana_SOURCE_DIR}" "${nana_BINARY_DIR}")
     endif ()
 
     target_link_libraries(yet_another_raytracer PRIVATE
