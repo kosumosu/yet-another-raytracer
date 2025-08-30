@@ -22,15 +22,16 @@
 #include "applications/ConsoleApplication.h"
 #include "applications/NanaApplication.h"
 
+#include "cloudscape/presets.h"
+#include "participating_media/VoidMedium.h"
+
 #include <iostream>
 #include <iomanip>
 #include <memory>
 #include <mutex>
 
-#include "cloudscape/presets.h"
-#include "participating_media/VoidMedium.h"
 #if defined(_WIN32)
-#include <tchar.h>
+#include <windows.h>
 #endif
 
 
@@ -423,14 +424,21 @@ int wmain_impl(int argc, const TChar* argv[], std::basic_string_view<TChar> clou
     return 0;
 }
 
-#if defined(_WIN32)
-int wmain(int argc, const wchar_t* argv[])
-{
-    return wmain_impl(argc, argv, L"-c"sv);
-}
-#elif defined (__linux__)
+#if defined (__linux__)
+
 int main(int argc, const char* argv[])
 {
+    return wmain_impl(argc, argv, "-c"sv);
+}
+
+#elif defined(_WIN32) // && defined(__MINGW32__)
+
+int main(int argc, const char* argv[])
+{
+#if defined(_WIN32)
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+    setlocale(LC_ALL, ".UTF8");
     return wmain_impl(argc, argv, "-c"sv);
 }
 

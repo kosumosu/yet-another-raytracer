@@ -37,9 +37,23 @@ add_executable(yet_another_raytracer
         TransformCommandFactory.cpp
         TransformCommandProcessor.cpp
         main.cpp
-        applications/NanaApplication.cpp
         debug_printing.cpp
+        #        applications/NanaApplication.cpp
 )
+
+if (WIN32)
+    if (MINGW)
+        target_sources(yet_another_raytracer PRIVATE
+                resources.rc
+        )
+    elseif (MSVC)
+        target_sources(yet_another_raytracer PRIVATE
+                yet-another-raytracer.manifest
+        )
+    else()
+        message(FATAL_ERROR, "Ensure manifest file is included properly for your compiler!")
+    endif ()
+endif ()
 
 target_include_directories(yet_another_raytracer PRIVATE ".")
 include_directories(${PNGPP_INCLUDE_DIR})
@@ -56,7 +70,7 @@ target_link_libraries(yet_another_raytracer PRIVATE OpenEXR::OpenEXR)
 
 IF (NOT DEFINED ENABLE_UI)
     SET(ENABLE_UI true)
-ENDIF()
+ENDIF ()
 
 if (ENABLE_UI)
     ADD_DEFINITIONS(-DENABLE_UI_DEF)
@@ -79,9 +93,9 @@ if (ENABLE_UI)
     )
 endif ()
 
-if (MINGW)
-    target_link_options(yet_another_raytracer PRIVATE "-municode")
-endif ()
+#if (MINGW)
+#    target_link_options(yet_another_raytracer PRIVATE "-municode")
+#endif ()
 
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
