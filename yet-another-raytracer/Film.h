@@ -39,6 +39,9 @@ public:
         sample_counts_.assign(size_[0] * size_[1], 0);
     }
 
+    void TryLoadFromFile(const std::filesystem::path &filename);
+    void PersistToFile(const std::filesystem::path &filename);
+
     [[nodiscard]] std::pair<color_rgb, uint32_t> getPixelData(unsigned int x, unsigned int y) const
     {
         return std::make_pair(pixels_[std::size_t(y) * width() + x], sample_counts_[std::size_t(y) * width() + x]);

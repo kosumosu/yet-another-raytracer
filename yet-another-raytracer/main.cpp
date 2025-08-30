@@ -269,11 +269,12 @@ template <CApplication TApplication>
 void RenderCloudscapeImpl(
     TApplication application,
     const std::filesystem::path& scene_file,
-    const std::filesystem::path& output_image_file_without_extension
+    const std::filesystem::path& output_image_file_without_extension,
+    bool persistent_mode
 )
 {
     application.run(
-        [&scene_file, &output_image_file_without_extension](
+        [&scene_file, &output_image_file_without_extension, persistent_mode](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -303,6 +304,19 @@ void RenderCloudscapeImpl(
             realTimeStopwatch.Restart();
 
             Film film({scene.rendering.width, scene.rendering.height}, color::cas_to_rgb);
+
+            auto persistent_file = [&] -> std::optional<std::filesystem::path> {
+                if (persistent_mode) {
+                    auto persistent_file = output_image_file_without_extension;
+                    persistent_file.replace_extension(".framebuffer");
+
+                    film.TryLoadFromFile(persistent_file);
+                    return std::make_optional(persistent_file);
+                } else {
+                    return std::nullopt;
+                }
+            }();
+
             float processInitTime;
             float realInitTime;
 
@@ -377,6 +391,11 @@ void RenderCloudscapeImpl(
 
                 // renderer.PrintStats(std::wcout);
 
+
+                if (!stopToken.stop_requested() && persistent_file) {
+                    film.PersistToFile(*persistent_file);
+                }
+
                 if (i == 0 || !stopToken.stop_requested()) {
                     auto output_image_file = output_image_file_without_extension;
 
@@ -392,12 +411,13 @@ void RenderCloudscapeImpl(
 
 void RenderCloudscape(
     const std::filesystem::path& scene_file,
-    const std::filesystem::path& output_image_file_without_extension
+    const std::filesystem::path& output_image_file_without_extension,
+    bool persistent_mode
 ) {
     if constexpr (ENABLE_UI) {
-        RenderCloudscapeImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension);
+        RenderCloudscapeImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension, persistent_mode);
     } else {
-        RenderCloudscapeImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension);
+        RenderCloudscapeImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension, persistent_mode);
     }
 }
 
@@ -408,6 +428,7 @@ int main_impl(int argc, const char* argv[])
 
     arguments.add_argument("-c").flag().help("Switches to cloudscape mode instead of regular renderer.");
     arguments.add_argument("scene_file").help("The scene file path.");
+    arguments.add_argument("-p").flag().help("Persist frame buffer between runs");
 
     try {
         arguments.parse_args(argc, argv); // Example: ./main --input_files config.yml System.xml
@@ -417,24 +438,20 @@ int main_impl(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
+    const bool persistent_mode = arguments.get<bool>("-p");
+
+    const auto scene_path = std::filesystem::path(arguments.get<std::string>("scene_file"));
+    auto image_path = std::filesystem::path(scene_path);
+    image_path.replace_extension("");
+
     if (arguments["-c"] == true) {
-        const auto scene_path = std::filesystem::path(arguments.get<std::string>("scene_file"));
-        auto image_path = std::filesystem::path(scene_path);
-        image_path.replace_extension("");
-
-        RenderCloudscape(scene_path, image_path);
-
-        image_path.replace_extension(".png");
-        openImageFileForDisplay(image_path);
+        RenderCloudscape(scene_path, image_path, persistent_mode);
     } else {
-        const auto scene_path = std::filesystem::path(arguments.get<std::string>("scene_file"));
-        auto image_path = std::filesystem::path(scene_path);
-        image_path.replace_extension("");
         RenderRegular(scene_path, image_path);
-
-        image_path.replace_extension(".png");
-        openImageFileForDisplay(image_path.c_str());
     }
+
+    image_path.replace_extension(".png");
+    openImageFileForDisplay(image_path);
 
     return 0;
 }

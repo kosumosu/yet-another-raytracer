@@ -15,6 +15,35 @@ void setToInteger(T& output, const color_real& input)
     output = T(input * std::numeric_limits<T>::max());
 }
 
+void Film::TryLoadFromFile(const std::filesystem::path &filename) {
+    std::ifstream stream(filename, std::ios::binary);
+    if (!stream.good())
+        return;
+
+    uint_vector2 size_from_file = uint_vector2::zero();
+
+
+    stream.read(reinterpret_cast<char*>(&size_from_file), sizeof(size_from_file));
+
+    if (size_from_file != size_) {
+        throw std::runtime_error("Persisted data dimensions mismatch");
+    }
+
+    stream.read(reinterpret_cast<char *>(pixels_.data()), pixels_.size() * sizeof(pixels_[0]));
+
+    stream.read(reinterpret_cast<char *>(sample_counts_.data()), sample_counts_.size() * sizeof(sample_counts_[0]));
+}
+
+void Film::PersistToFile(const std::filesystem::path &filename) {
+    std::ofstream stream(filename, std::ios::binary);
+
+    stream.write(reinterpret_cast<const char*>(&size_), sizeof(size_));
+
+    stream.write(reinterpret_cast<const char *>(pixels_.data()), pixels_.size() * sizeof(pixels_[0]));
+
+    stream.write(reinterpret_cast<const char *>(sample_counts_.data()), sample_counts_.size() * sizeof(sample_counts_[0]));
+}
+
 void Film::SaveAsPng(const std::filesystem::path& filename) const
 {
     std::ofstream stream(filename, std::ios::binary);
