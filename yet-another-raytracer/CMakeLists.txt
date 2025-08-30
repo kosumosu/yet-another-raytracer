@@ -93,9 +93,16 @@ if (ENABLE_UI)
     )
 endif ()
 
-#if (MINGW)
-#    target_link_options(yet_another_raytracer PRIVATE "-municode")
-#endif ()
+if (TRUE)
+    FetchContent_Declare(
+            argparse
+            GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+            GIT_TAG v3.2
+    )
+    FetchContent_MakeAvailable(argparse)
+
+    target_link_libraries(yet_another_raytracer PRIVATE argparse)
+endif ()
 
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")

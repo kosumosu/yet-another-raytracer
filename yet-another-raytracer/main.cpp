@@ -25,6 +25,8 @@
 #include "cloudscape/presets.h"
 #include "participating_media/VoidMedium.h"
 
+#include <argparse/argparse.hpp>
+
 #include <iostream>
 #include <iomanip>
 #include <memory>
@@ -95,11 +97,11 @@ template <CApplication TApplication>
 void RenderRegularImpl(
     TApplication application,
     const std::filesystem::path& scene_file,
-    const std::filesystem::path& output_image_file
+    const std::filesystem::path& output_image_file_without_extension
 ) {
 
     application.run(
-        [&scene_file, &output_image_file](
+        [&scene_file, &output_image_file_without_extension](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -238,22 +240,27 @@ void RenderRegularImpl(
 
             reportRenderingFinihsed(film, 1);
 
-            renderer.PrintStats(std::wcout);
+            renderer.PrintStats(std::wcout); {
+                auto output_image_file = output_image_file_without_extension;
 
-            film.SaveAsPng(output_image_file);
+                output_image_file.replace_extension(".exr");
+                film.SaveAsExr(output_image_file);
+                output_image_file.replace_extension(".png");
+                film.SaveAsPng(output_image_file);
+            }
 
         }
     );
 }
 
 void RenderRegular(const std::filesystem::path& scene_file,
-                   const std::filesystem::path& output_image_file
+                   const std::filesystem::path& output_image_file_without_extension
 )
 {
     if constexpr (ENABLE_UI) {
-        RenderRegularImpl(applications::NanaApplicaion(), scene_file, output_image_file);
+        RenderRegularImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension);
     } else {
-        RenderRegularImpl(applications::ConsoleApplication(), scene_file, output_image_file);
+        RenderRegularImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension);
     }
 }
 
@@ -394,30 +401,38 @@ void RenderCloudscape(
     }
 }
 
-template <class TChar>
-int wmain_impl(int argc, const TChar* argv[], std::basic_string_view<TChar> cloudscape_key)
-{
-    if (argc < 2)
-        return 0;
 
-    if (cloudscape_key == argv[1])
-    {
-        const auto scene_path = std::filesystem::path(argv[2]);
+int main_impl(int argc, const char* argv[])
+{
+    argparse::ArgumentParser arguments("yet-another-raytracer");
+
+    arguments.add_argument("-c").flag().help("Switches to cloudscape mode instead of regular renderer.");
+    arguments.add_argument("scene_file").help("The scene file path.");
+
+    try {
+        arguments.parse_args(argc, argv); // Example: ./main --input_files config.yml System.xml
+    } catch (const std::exception &err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << arguments;
+        return EXIT_FAILURE;
+    }
+
+    if (arguments["-c"] == true) {
+        const auto scene_path = std::filesystem::path(arguments.get<std::string>("scene_file"));
         auto image_path = std::filesystem::path(scene_path);
         image_path.replace_extension("");
 
-        RenderCloudscape(std::filesystem::path(argv[2]), image_path);
+        RenderCloudscape(scene_path, image_path);
 
         image_path.replace_extension(".png");
         openImageFileForDisplay(image_path);
-    }
-    else
-    {
-        const auto scene_path = std::filesystem::path(argv[1]);
+    } else {
+        const auto scene_path = std::filesystem::path(arguments.get<std::string>("scene_file"));
         auto image_path = std::filesystem::path(scene_path);
-        image_path.replace_extension(".png");
-        RenderRegular(std::filesystem::path(argv[1]), image_path);
+        image_path.replace_extension("");
+        RenderRegular(scene_path, image_path);
 
+        image_path.replace_extension(".png");
         openImageFileForDisplay(image_path.c_str());
     }
 
@@ -428,7 +443,7 @@ int wmain_impl(int argc, const TChar* argv[], std::basic_string_view<TChar> clou
 
 int main(int argc, const char* argv[])
 {
-    return wmain_impl(argc, argv, "-c"sv);
+    return main_impl(argc, argv);
 }
 
 #elif defined(_WIN32) // && defined(__MINGW32__)
@@ -439,7 +454,7 @@ int main(int argc, const char* argv[])
     SetConsoleOutputCP(CP_UTF8);
 #endif
     setlocale(LC_ALL, ".UTF8");
-    return wmain_impl(argc, argv, "-c"sv);
+    return main_impl(argc, argv);
 }
 
 #endif
