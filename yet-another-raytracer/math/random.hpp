@@ -4,6 +4,7 @@
 #include "vector.hpp"
 #include <algorithm>
 #include <cassert>
+#include <numbers>
 #include <random>
 
 #include "vector3_functions.hpp"
