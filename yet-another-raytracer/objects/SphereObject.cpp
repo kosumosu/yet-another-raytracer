@@ -43,13 +43,17 @@ namespace objects
 					return Hit();
 
 				auto world_space_hit_point = inversed_ray.origin() + inversed_ray.direction() * x;
-				auto normal = (world_space_hit_point - m_center) * normal_scalar_for_inversion_; // normal is non-normalized
+				auto normal = math::normalize(world_space_hit_point - m_center) * normal_scalar_for_inversion_; // normal is non-normalized
 
 				auto transformed_hit_point = (this->transform() * vector4(world_space_hit_point, 1.0)).reduce();
-				auto transformed_normal = math::normalize((this->normal_transform() * vector4(normal, space_real(0.0))).reduce());
+				auto transformed_normal = (this->normal_transform() * vector4(normal, space_real(0.0))).reduce();
 
+				vector2 uvs{
+					std::atan2(normal[1], normal[0]) * std::numbers::inv_pi_v<space_real> * space_real(0.5) + space_real(0.5),
+					std::acos(normal[2]) * std::numbers::inv_pi_v<space_real>
+				};
 
-				return Hit(transformed_hit_point, transformed_normal, this, x, uvs_t{vector2::zero()});
+				return Hit(std::move(transformed_hit_point), std::move(transformed_normal), this, x, uvs_t{std::move(uvs)});
 			}
 		}
 	}
