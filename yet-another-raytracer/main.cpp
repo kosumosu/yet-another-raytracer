@@ -122,16 +122,17 @@ void savePersistentData(const Film& film, std::uint32_t iteration, const std::fi
     persistentFile1.replace_extension(".framebuffer1");
     persistentFileTmp.replace_extension(".framebuffer_tmp");
 
-    std::error_code _ec;
-    std::filesystem::remove(persistentFile1, _ec);
-    std::filesystem::rename(persistentFile0, persistentFile1, _ec);
-
     {
         std::ofstream stream(persistentFileTmp, std::ios::binary);
         stream.write(reinterpret_cast<const char *>(&iteration), sizeof(iteration));
         film.PersistToFile(stream);
     }
 
+    std::error_code _ec;
+    if (std::filesystem::exists(persistentFile0, _ec)) {
+        std::filesystem::remove(persistentFile1, _ec);
+        std::filesystem::rename(persistentFile0, persistentFile1, _ec);
+    }
     std::filesystem::rename(persistentFileTmp, persistentFile0);
     std::filesystem::remove(persistentFile1, _ec);
 }
