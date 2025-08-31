@@ -7,6 +7,8 @@
 #include <Types.h>
 #include <materials/DielectricMaterial.h>
 
+#include "Bitmap8Texture.h"
+#include "VisualizeUVTexture.h"
 #include "color/cas_colorspace.h"
 #include "lights/SunLightSource.h"
 #include "materials/NullMaterial.h"
@@ -42,6 +44,8 @@ namespace cloudscape
         std::shared_ptr<participating_media::ParticipatingMedium> homogenous_medium;
         std::shared_ptr<participating_media::ParticipatingMedium> cloud_medium;
         std::shared_ptr<participating_media::ParticipatingMedium> haze_medium;
+
+        std::vector<std::shared_ptr<Texture>> textures;
 
         std::shared_ptr<materials::Material> planet_material;
         std::shared_ptr<materials::Material> null_material;
@@ -184,9 +188,12 @@ namespace cloudscape
         //auto cloud_medium = std::move(homogenous_cloud_medium);
         auto cloud_medium = std::move(perlin_cloud_medium);
 
+        auto visualize_uvs_map = std::make_shared<VisualizeUVTexture>();
+        auto earth_texture = std::make_shared<Bitmap8Texture>("_cloudscape/textures/world.200409.3x 5400x2700.png", vector2{ 0.75, 0 });
+
         auto planet_material = std::make_shared<materials::BlinnMaterial>(
             color_rgb::zero(),
-            nullptr,
+            earth_texture.get(),
             int_to_working_color_space(scene.planet.groundcolor),
             color_rgb::zero(),
             0.0,
@@ -285,6 +292,7 @@ namespace cloudscape
             std::move(homogeneous_medium),
             std::move(cloud_medium),
             std::move(haze_medium),
+            { std::move(visualize_uvs_map), std::move(earth_texture) },
             std::move(planet_material),
             std::move(null_material),
             std::move(extra_material),
