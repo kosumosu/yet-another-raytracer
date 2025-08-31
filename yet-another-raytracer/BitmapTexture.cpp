@@ -1,4 +1,7 @@
 #include "BitmapTexture.h"
+
+#include "color/color_functions.hpp"
+
 #include "png.hpp"
 
 using pixel_t = png::rgb_pixel_16;
@@ -6,16 +9,10 @@ using pixel_component_t = png::pixel_traits<pixel_t>::component_type;
 
 constexpr pixel_component_t maxPixelValue = std::numeric_limits<png::pixel_traits<pixel_t>::component_type>::max();
 constexpr color_real pixelValueNormalizationFactor = color_real(1.0) / color_real(maxPixelValue);
-constexpr color_real gammaPower = color_real(2.2);
-
-color_real convertChannel(const pixel_component_t& component)
-{
-	return std::pow(color_real(component) * pixelValueNormalizationFactor, gammaPower);
-}
 
 color_rgbx convertColor(const pixel_t& pixel)
 {
-	return color_rgbx(convertChannel(pixel.red), convertChannel(pixel.green), convertChannel(pixel.blue), 0);
+	return color_rgbx(color::srgb_to_linear(color_rgb(pixel.red, pixel.green, pixel.green) * pixelValueNormalizationFactor), 0);
 }
 
 BitmapTexture::BitmapTexture(const std::filesystem::path& filename)
