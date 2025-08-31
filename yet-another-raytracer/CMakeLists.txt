@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
+
+include(FetchContent)
+
 project(yet_another_raytracer)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -68,14 +71,13 @@ target_link_libraries(yet_another_raytracer PRIVATE PNG::PNG)
 find_package(OpenEXR CONFIG REQUIRED)
 target_link_libraries(yet_another_raytracer PRIVATE OpenEXR::OpenEXR)
 
+
 IF (NOT DEFINED ENABLE_UI)
     SET(ENABLE_UI true)
 ENDIF ()
 
 if (ENABLE_UI)
     ADD_DEFINITIONS(-DENABLE_UI_DEF)
-
-    include(FetchContent)
 
     FetchContent_Declare(
             nana
