@@ -27,6 +27,7 @@
 
 #include <argparse/argparse.hpp>
 
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <memory>
@@ -269,12 +270,12 @@ template <CApplication TApplication>
 void RenderCloudscapeImpl(
     TApplication application,
     const std::filesystem::path& scene_file,
-    const std::filesystem::path& output_image_file_without_extension,
+    const std::filesystem::path& outputImageFileWithoutExtension,
     bool persistent_mode
 )
 {
     application.run(
-        [&scene_file, &output_image_file_without_extension, persistent_mode](
+        [&scene_file, &outputImageFileWithoutExtension, persistent_mode](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -305,13 +306,20 @@ void RenderCloudscapeImpl(
 
             Film film({scene.rendering.width, scene.rendering.height}, color::cas_to_rgb);
 
-            auto persistent_file = [&] -> std::optional<std::filesystem::path> {
-                if (persistent_mode) {
-                    auto persistent_file = output_image_file_without_extension;
-                    persistent_file.replace_extension(".framebuffer");
+            std::uint32_t start_iteration = 0;
 
-                    film.TryLoadFromFile(persistent_file);
-                    return std::make_optional(persistent_file);
+            auto persistentFileName = [&] -> std::optional<std::filesystem::path> {
+                if (persistent_mode) {
+                    auto persistentFile = outputImageFileWithoutExtension;
+                    persistentFile.replace_extension(".framebuffer");
+
+                    std::ifstream stream(persistentFile, std::ios::binary);
+                    if (stream.good()) {
+                        stream.read(reinterpret_cast<char *>(&start_iteration), sizeof(start_iteration));
+
+                        film.TryLoadFromFile(stream);
+                    }
+                    return std::make_optional(persistentFile);
                 } else {
                     return std::nullopt;
                 }
@@ -369,7 +377,7 @@ void RenderCloudscapeImpl(
             participating_media::VoidMedium atmospheric_medium;
             participating_media::VoidMedium cloud_medium;
 
-            for (int i = 0; !stopToken.stop_requested(); ++i) {
+            for (auto i = start_iteration; !stopToken.stop_requested(); ++i) {
                 renderer.Render(
                     film,
                     {uint_vector2::zero(), film.size()},
@@ -391,18 +399,19 @@ void RenderCloudscapeImpl(
 
                 // renderer.PrintStats(std::wcout);
 
-
-                if (!stopToken.stop_requested() && persistent_file) {
-                    film.PersistToFile(*persistent_file);
+                if (!stopToken.stop_requested() && persistentFileName) {
+                    std::ofstream stream(*persistentFileName, std::ios::binary);
+                    stream.write(reinterpret_cast<const char *>(&i), sizeof(i));
+                    film.PersistToFile(stream);
                 }
 
                 if (i == 0 || !stopToken.stop_requested()) {
-                    auto output_image_file = output_image_file_without_extension;
+                    auto outputImageFile = outputImageFileWithoutExtension;
 
-                    output_image_file.replace_extension(".exr");
-                    film.SaveAsExr(output_image_file);
-                    output_image_file.replace_extension(".png");
-                    film.SaveAsPng(output_image_file);
+                    outputImageFile.replace_extension(".exr");
+                    film.SaveAsExr(outputImageFile);
+                    outputImageFile.replace_extension(".png");
+                    film.SaveAsPng(outputImageFile);
                 }
             }
         }

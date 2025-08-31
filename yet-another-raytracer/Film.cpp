@@ -15,13 +15,8 @@ void setToInteger(T& output, const color_real& input)
     output = T(input * std::numeric_limits<T>::max());
 }
 
-void Film::TryLoadFromFile(const std::filesystem::path &filename) {
-    std::ifstream stream(filename, std::ios::binary);
-    if (!stream.good())
-        return;
-
+void Film::TryLoadFromFile(std::istream& stream) {
     uint_vector2 size_from_file = uint_vector2::zero();
-
 
     stream.read(reinterpret_cast<char*>(&size_from_file), sizeof(size_from_file));
 
@@ -34,9 +29,7 @@ void Film::TryLoadFromFile(const std::filesystem::path &filename) {
     stream.read(reinterpret_cast<char *>(sample_counts_.data()), sample_counts_.size() * sizeof(sample_counts_[0]));
 }
 
-void Film::PersistToFile(const std::filesystem::path &filename) {
-    std::ofstream stream(filename, std::ios::binary);
-
+void Film::PersistToFile(std::ostream& stream) const {
     stream.write(reinterpret_cast<const char*>(&size_), sizeof(size_));
 
     stream.write(reinterpret_cast<const char *>(pixels_.data()), pixels_.size() * sizeof(pixels_[0]));
