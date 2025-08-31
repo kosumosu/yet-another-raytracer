@@ -1,5 +1,7 @@
 #include "BitmapTexture.h"
 
+#include <utility>
+
 #include "color/color_functions.hpp"
 
 #include "png.hpp"
@@ -15,8 +17,9 @@ color_rgbx convertColor(const pixel_t& pixel)
 	return color_rgbx(color::srgb_to_linear(color_rgb(pixel.red, pixel.green, pixel.green) * pixelValueNormalizationFactor), 0);
 }
 
-BitmapTexture::BitmapTexture(const std::filesystem::path& filename)
-	: size_{0, 0}
+BitmapTexture::BitmapTexture(const std::filesystem::path& filename, vector2 uvShift)
+	: uvShift_{std::move(uvShift)}
+	, size_{0, 0}
 	, halfTexel_{vector2::zero()}
 {
 	std::ifstream stream(filename, std::ifstream::binary);
@@ -40,7 +43,8 @@ BitmapTexture::BitmapTexture(const std::filesystem::path& filename)
 color_rgbx BitmapTexture::Sample(const TextureCoords& coords) const
 {
 	// tiled coords
-	const auto floatXY = (coords.uvs[0] - halfTexel_) * size_;
+	const auto transformedUVs = coords.uvs[0] + uvShift_;
+	const auto floatXY = (transformedUVs - halfTexel_) * size_;
 	const auto minIntXY = (math::fast_floor_int<int>(floatXY) % size_ + size_) % size_;
 
 	const auto maxIntXY = (minIntXY + int_vector2{1, 1}) % size_;
