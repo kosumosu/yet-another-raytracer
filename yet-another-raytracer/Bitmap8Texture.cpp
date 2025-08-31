@@ -11,16 +11,17 @@ using pixel_component_t = png::pixel_traits<pixel_t>::component_type;
 
 namespace {
 	constexpr pixel_component_t MAX_PIXEL_VALUE = std::numeric_limits<pixel_component_t>::max();
+	constexpr std::size_t PIXEL_VALUE_COUNT = std::size_t(MAX_PIXEL_VALUE) + 1;
 
-	constexpr std::array<color_real, MAX_PIXEL_VALUE> calculate_srgb_to_linear_lut() {
-		std::array<color_real, MAX_PIXEL_VALUE> lut = {};
-		for (std::size_t i = 0; i < MAX_PIXEL_VALUE; ++i) {
+	constexpr std::array<color_real, PIXEL_VALUE_COUNT> calculate_srgb_to_linear_lut() {
+		std::array<color_real, PIXEL_VALUE_COUNT> lut = {};
+		for (std::size_t i = 0; i < PIXEL_VALUE_COUNT; ++i) {
 			lut[i] = color::srgb_to_linear( color_real(i) / MAX_PIXEL_VALUE);
 		}
 		return lut;
 	}
 
-	constexpr std::array<color_real, MAX_PIXEL_VALUE> SRGB_TO_LINEAR_LUT = calculate_srgb_to_linear_lut();
+	constexpr std::array<color_real, PIXEL_VALUE_COUNT> SRGB_TO_LINEAR_LUT = calculate_srgb_to_linear_lut();
 }
 
 Bitmap8Texture::Bitmap8Texture(const std::filesystem::path& filename, vector2 uvShift)

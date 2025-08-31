@@ -20,7 +20,7 @@ namespace math
 	public:
 		using element_t = TSpace;
 
-		using MyT = vector<TSpace, DIMENSIONS, void>;
+		using MyT = vector<TSpace, DIMENSIONS>;
 
 		constexpr static MyT fill(const TSpace& value) { return vector<TSpace, DIMENSIONS>{value, std::make_index_sequence<DIMENSIONS>()}; }
 		constexpr static MyT zero() { return fill(0); }
@@ -49,7 +49,7 @@ namespace math
 			return *this;
 		}
 
-		constexpr vector(MyT&& other) noexcept
+		constexpr explicit vector(MyT&& other) noexcept
 			: m_elements{ std::move(other.m_elements) }
 		{
 		}
