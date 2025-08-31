@@ -2,7 +2,7 @@
 #include "ParserHelper.h"
 #include "SolidColorTexture.h"
 #include "VisualizeUVTexture.h"
-#include "BitmapTexture.h"
+#include "Bitmap8Texture.h"
 
 #include <filesystem>
 
@@ -33,7 +33,7 @@ void TextureCommandProcessor::ProcessCommand(LoadingContext & context, const std
 		//ParserHelper::Read<std::string>(stream); // This is a workaround for the bug "std::quoted broken in 15.8, fails to properly extract characters from input stream after encountering delimiter" https://developercommunity.visualstudio.com/content/problem/314993/stdquoted-broken-in-158-fails-to-properly-extract.html
 		const auto fileName = getPathRelativeToScene(_sceneFileName, ParserHelper::ReadFileName(stream));
 
-		context.scene()->getMaps().insert(std::make_pair(id, std::make_shared<BitmapTexture>(fileName, vector2::zero())));
+		context.scene()->getMaps().insert(std::make_pair(id, std::make_shared<Bitmap8Texture>(fileName, vector2::zero())));
 	}
 	else if (command == "visualizeUVTexture")
 	{

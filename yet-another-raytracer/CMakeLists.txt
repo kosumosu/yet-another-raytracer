@@ -7,7 +7,7 @@ project(yet_another_raytracer)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(yet_another_raytracer
-        BitmapTexture.cpp
+        Bitmap8Texture.cpp
         materials/BlinnMaterial.cpp
         CameraCommandFactory.cpp
         CameraCommandProcessor.cpp
