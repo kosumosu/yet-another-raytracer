@@ -94,20 +94,64 @@ renderers::Rect getCroppedRectToRender(const Scene scene)
     return {std::move(cropStart), std::move(cropSize)};
 }
 
+// Returns start iteration if state was loaded.
+auto loadPersistentData(Film& film, const std::filesystem::path& outputImageFileWithoutExtension) -> std::optional<std::uint32_t> {
+    auto persistentFile = outputImageFileWithoutExtension;
+    for (int i = 0; i < 2; ++i) {
+        const auto extension = std::format(".framebuffer{}", i);
+        persistentFile.replace_extension(extension);
+
+        std::ifstream stream(persistentFile, std::ios::binary);
+
+        if (stream.good()) {
+            std::uint32_t startIteration = 0;
+            stream.read(reinterpret_cast<char *>(&startIteration), sizeof(startIteration));
+
+            film.TryLoadFromFile(stream);
+            return std::make_optional(startIteration);
+        }
+    }
+    return std::nullopt;
+}
+
+void savePersistentData(const Film& film, std::uint32_t iteration, const std::filesystem::path& outputImageFileWithoutExtension) {
+    auto persistentFile0 = outputImageFileWithoutExtension;
+    auto persistentFile1 = outputImageFileWithoutExtension;
+    auto persistentFileTmp = outputImageFileWithoutExtension;
+    persistentFile0.replace_extension(".framebuffer0");
+    persistentFile1.replace_extension(".framebuffer1");
+    persistentFileTmp.replace_extension(".framebuffer_tmp");
+
+    std::error_code _ec;
+    std::filesystem::remove(persistentFile1, _ec);
+    std::filesystem::rename(persistentFile0, persistentFile1, _ec);
+
+    {
+        std::ofstream stream(persistentFileTmp, std::ios::binary);
+        stream.write(reinterpret_cast<const char *>(&iteration), sizeof(iteration));
+        film.PersistToFile(stream);
+    }
+
+    std::filesystem::rename(persistentFileTmp, persistentFile0);
+    std::filesystem::remove(persistentFile1, _ec);
+}
+
+
 template <CApplication TApplication>
 void RenderRegularImpl(
     TApplication application,
     const std::filesystem::path& scene_file,
-    const std::filesystem::path& output_image_file_without_extension
+    const std::filesystem::path& outputImageFileWithoutExtension,
+    bool persistent_mode
 ) {
 
     application.run(
-        [&scene_file, &output_image_file_without_extension](
+        [&scene_file, &outputImageFileWithoutExtension, persistent_mode](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
         const auto& reportAreaStarted,
-        const auto& reportRenderingFinihsed,
+        const auto& reportRenderingFinished,
         const auto& print_info)
         {
             Scene scene;
@@ -143,6 +187,9 @@ void RenderRegularImpl(
             realTimeStopwatch.Restart();
 
             Film film({scene.viewport_width(), scene.viewport_height()});
+
+            const std::uint32_t start_iteration = loadPersistentData(film, outputImageFileWithoutExtension).value_or(0);
+
             float processInitTime;
             float realInitTime;
 
@@ -219,7 +266,8 @@ void RenderRegularImpl(
 			progressReporter);
 #endif
 
-            renderer.Render(
+            for (auto i = start_iteration; !stopToken.stop_requested(); ++i) {
+                renderer.Render(
                 film,
                 getCroppedRectToRender(scene),
                 *scene.camera(),
@@ -236,32 +284,39 @@ void RenderRegularImpl(
 
                     return integrator;
                 },
-                0,
+                i,
                 stopToken);
 
-            reportRenderingFinihsed(film, 1);
+                reportRenderingFinished(film, i + 1);
 
-            renderer.PrintStats(std::wcout); {
-                auto output_image_file = output_image_file_without_extension;
+                renderer.PrintStats(std::wcout);
 
-                output_image_file.replace_extension(".exr");
-                film.SaveAsExr(output_image_file);
-                output_image_file.replace_extension(".png");
-                film.SaveAsPng(output_image_file);
+                if (!stopToken.stop_requested() && persistent_mode) {
+                    savePersistentData(film, i, outputImageFileWithoutExtension);
+                }
+
+                if (i == 0 || !stopToken.stop_requested()) {
+                    auto outputImageFile = outputImageFileWithoutExtension;
+
+                    outputImageFile.replace_extension(".exr");
+                    film.SaveAsExr(outputImageFile);
+                    outputImageFile.replace_extension(".png");
+                    film.SaveAsPng(outputImageFile);
+                }
             }
-
         }
     );
 }
 
 void RenderRegular(const std::filesystem::path& scene_file,
-                   const std::filesystem::path& output_image_file_without_extension
+                   const std::filesystem::path& outputImageFileWithoutExtension,
+                   bool persistent_mode
 )
 {
     if constexpr (ENABLE_UI) {
-        RenderRegularImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension);
+        RenderRegularImpl(applications::NanaApplicaion(), scene_file, outputImageFileWithoutExtension, persistent_mode);
     } else {
-        RenderRegularImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension);
+        RenderRegularImpl(applications::ConsoleApplication(), scene_file, outputImageFileWithoutExtension, persistent_mode);
     }
 }
 
@@ -306,24 +361,7 @@ void RenderCloudscapeImpl(
 
             Film film({scene.rendering.width, scene.rendering.height}, color::cas_to_rgb);
 
-            std::uint32_t start_iteration = 0;
-
-            auto persistentFileName = [&] -> std::optional<std::filesystem::path> {
-                if (persistent_mode) {
-                    auto persistentFile = outputImageFileWithoutExtension;
-                    persistentFile.replace_extension(".framebuffer");
-
-                    std::ifstream stream(persistentFile, std::ios::binary);
-                    if (stream.good()) {
-                        stream.read(reinterpret_cast<char *>(&start_iteration), sizeof(start_iteration));
-
-                        film.TryLoadFromFile(stream);
-                    }
-                    return std::make_optional(persistentFile);
-                } else {
-                    return std::nullopt;
-                }
-            }();
+            const std::uint32_t start_iteration = loadPersistentData(film, outputImageFileWithoutExtension).value_or(0);
 
             float processInitTime;
             float realInitTime;
@@ -399,10 +437,8 @@ void RenderCloudscapeImpl(
 
                 // renderer.PrintStats(std::wcout);
 
-                if (!stopToken.stop_requested() && persistentFileName) {
-                    std::ofstream stream(*persistentFileName, std::ios::binary);
-                    stream.write(reinterpret_cast<const char *>(&i), sizeof(i));
-                    film.PersistToFile(stream);
+                if (!stopToken.stop_requested() && persistent_mode) {
+                    savePersistentData(film, i, outputImageFileWithoutExtension);
                 }
 
                 if (i == 0 || !stopToken.stop_requested()) {
@@ -456,7 +492,7 @@ int main_impl(int argc, const char* argv[])
     if (arguments["-c"] == true) {
         RenderCloudscape(scene_path, image_path, persistent_mode);
     } else {
-        RenderRegular(scene_path, image_path);
+        RenderRegular(scene_path, image_path, persistent_mode);
     }
 
     image_path.replace_extension(".png");
