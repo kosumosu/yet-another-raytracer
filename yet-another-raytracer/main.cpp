@@ -189,7 +189,8 @@ void RenderRegularImpl(
 
             Film film({scene.viewport_width(), scene.viewport_height()});
 
-            const std::uint32_t start_iteration = loadPersistentData(film, outputImageFileWithoutExtension).value_or(0);
+
+            const std::uint32_t start_iteration = persistent_mode ? loadPersistentData(film, outputImageFileWithoutExtension).value_or(0) : 0;
 
             float processInitTime;
             float realInitTime;
@@ -362,7 +363,7 @@ void RenderCloudscapeImpl(
 
             Film film({scene.rendering.width, scene.rendering.height}, color::cas_to_rgb);
 
-            const std::uint32_t start_iteration = loadPersistentData(film, outputImageFileWithoutExtension).value_or(0);
+            const std::uint32_t start_iteration = persistent_mode ? loadPersistentData(film, outputImageFileWithoutExtension).value_or(0) : 0;
 
             float processInitTime;
             float realInitTime;
