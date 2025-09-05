@@ -2,12 +2,12 @@
 
 #include "constants.hpp"
 #include "vector.hpp"
+#include "vector3_functions.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <numbers>
 #include <random>
-
-#include "vector3_functions.hpp"
 
 namespace math
 {
