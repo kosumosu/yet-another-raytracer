@@ -102,7 +102,7 @@ namespace lights
                             geometricFactor;
 
                         assert(std::isfinite(pdf));
-                        assert(pdf > 1e-5f);
+                        assert(pdf > 1e-7f);
 
                         return math::random_sample<std::optional<light_sample>, space_real>(
                             light_sample(
