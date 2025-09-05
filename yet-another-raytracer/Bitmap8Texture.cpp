@@ -21,7 +21,8 @@ namespace {
 		return lut;
 	}
 
-	constexpr std::array<color_real, PIXEL_VALUE_COUNT> SRGB_TO_LINEAR_LUT = calculate_srgb_to_linear_lut();
+	// Make constexpr when stl has better support of constexpr cmath across compilers (a C++26 feature)
+	const std::array<color_real, PIXEL_VALUE_COUNT> SRGB_TO_LINEAR_LUT = calculate_srgb_to_linear_lut();
 }
 
 Bitmap8Texture::Bitmap8Texture(const std::filesystem::path& filename, vector2 uvShift)

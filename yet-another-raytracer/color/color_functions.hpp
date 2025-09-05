@@ -32,7 +32,7 @@ namespace color
         if (val < color_real(0.04045))
             return val / color_real(12.92);
         else
-            return pow((val + color_real(0.055)) / color_real(1.055), color_real(2.4));
+            return std::pow((val + color_real(0.055)) / color_real(1.055), color_real(2.4));
     }
 
     constexpr color_rgb linear_to_srgb(const color_rgb& val)
