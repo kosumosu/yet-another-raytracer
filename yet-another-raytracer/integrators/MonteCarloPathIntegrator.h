@@ -149,7 +149,7 @@ public:
                                                       : bsdfColor * geometricTerm * color_real(math::oneOverPi) /
                                                       bsdfPdf;
 
-                    const auto importance = std::max(color_real(0.75), color::get_importance(vertexThroughput));
+                    const auto importance = std::max(color_real(0.9), color::get_importance(vertexThroughput));
 
                     // a workaround since uniform_random_generator occasionally generates 1.0f when it should not.
                     if (importance < color_real(1.0) && sampler.Get1D() >= importance || importance == color_real(0.0))
