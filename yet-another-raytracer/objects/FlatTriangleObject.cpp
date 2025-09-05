@@ -5,8 +5,6 @@
 namespace objects
 {
 	namespace {
-		constexpr space_real EPSILON = std::numeric_limits<space_real>::min() * space_real(16.0);
-
 		template<std::size_t... Indices>
 		uvs_t interpolateUVs_impl(const uvs_t &uvs0, const uvs_t &uvs1, const uvs_t &uvs2, space_real u, space_real v,
 								  std::index_sequence<Indices...>) {
@@ -19,70 +17,61 @@ namespace objects
 		}
 	}
 
-	// Implementation of "Fast, minimum storage ray/triangle intersection" by Tomas Moller & Ben Trumbore (MT97)
+	// Baldwin & Weber 2016
 	Hit FlatTriangleObject::FindHit(const ray3& ray, space_real minDistance, space_real maxDistance) const
 	{
-		const auto p = math::cross(ray.direction(), _edge02);
+		// Calculate the t value and barycentric coordinates at which the ray intersects the
+		// triangle. Do this in the triangle's local coordinate system, and exit if it's obvious
+		// from t or the barycentric coordinates that an intersection is impossible or unhelpful:
 
-		const auto det = math::dot(p, _edge01);
+		const auto dz = math::dot(worldToLocal[2].reduce(), ray.direction());
 
-		//if (det > -EPSILON && det < EPSILON)
-		if (det == space_real(0.0))
+		if ( dz == 0.0 )
 			return Hit();
 
-		const space_real inv_det = space_real(1.0) / det;
+		const auto oz = math::dot(worldToLocal[2], vector4(ray.origin(), 1.0));
 
-		const auto t = ray.origin() - _vertex0;
+		const auto t = - oz / dz;
 
-		const space_real u = math::dot(t, p) * inv_det;
-		if (u < space_real(0.0) || u > space_real(1.0))
+		if (  t < minDistance  ||  t > maxDistance  )
 			return Hit();
 
-		const auto q = math::cross(t, _edge01);
+		const auto hit = ray.point_along(t);
+		// Point where ray hits triangle plane, in world coordinates
 
-		const space_real v = math::dot(q, ray.direction()) * inv_det;
+		const auto b1 = math::dot(worldToLocal[0], vector4(hit, 1.0));
+		const auto b2 = math::dot(worldToLocal[1], vector4(hit, 1.0));
 
-		if (v < space_real(0.0) || u + v > space_real(1.0))
+		if (b1 < 0.0 | b2 < 0.0 | b1 + b2 > 1.0)
 			return Hit();
 
-		const space_real dist = math::dot(q, _edge02) * inv_det;
-
-		if (dist < minDistance || dist > maxDistance)
-			return Hit();
-
-		const auto hit_point = _vertex0 + u * _edge01 + v * _edge02;
-
-		return Hit(hit_point, _normal, this, dist, interpolateUVs(_uvs0, _uvs_edge01, _uvs_edge02, u, v));
+		return Hit(hit, _normal, this, t, interpolateUVs(_uvs0, _uvs_edge01, _uvs_edge02, b1, b2));
 	}
 
 	bool FlatTriangleObject::DoesHit(const ray3& ray, space_real minDistance, space_real maxDistance) const
 	{
-		const auto p = math::cross(ray.direction(), _edge02);
+		const auto dz = math::dot(worldToLocal[2].reduce(), ray.direction());
 
-		const space_real det = math::dot(p, _edge01);
-
-		//if (det > -EPSILON && det < EPSILON)
-		if (det == space_real(0.0))
+		if ( dz == 0.0 )
 			return false;
 
-		const space_real inv_det = space_real(1.0) / det;
+		const auto oz = math::dot(worldToLocal[2], vector4(ray.origin(), 1.0));
 
-		const auto t = ray.origin() - _vertex0;
+		const auto t = - oz / dz;
 
-		const space_real u = math::dot(t, p) * inv_det;
-		if (u < space_real(0.0) || u > space_real(1.0))
+		if (  t < minDistance  ||  t > maxDistance  )
 			return false;
 
-		const auto q = math::cross(t, _edge01);
+		const auto hit = ray.point_along(t);
+		// Point where ray hits triangle plane, in world coordinates
 
-		const space_real v = math::dot(q, ray.direction()) * inv_det;
+		const auto b1 = math::dot(worldToLocal[0], vector4(hit, 1.0));
+		const auto b2 = math::dot(worldToLocal[1], vector4(hit, 1.0));
 
-		if (v < space_real(0.0) || u + v > space_real(1.0))
+		if (b1 < 0.0 | b2 < 0.0 | b1 + b2 > 1.0)
 			return false;
 
-		const space_real dist = math::dot(q, _edge02) * inv_det;
-
-		return dist >= minDistance && dist <= maxDistance;
+		return true;
 	}
 
 
