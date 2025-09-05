@@ -144,11 +144,12 @@ void RenderRegularImpl(
     TApplication application,
     const std::filesystem::path& scene_file,
     const std::filesystem::path& outputImageFileWithoutExtension,
-    bool persistent_mode
+    bool persistent_mode,
+    std::uint32_t iterationsLimit
 ) {
 
     application.run(
-        [&scene_file, &outputImageFileWithoutExtension, persistent_mode](
+        [&scene_file, &outputImageFileWithoutExtension, persistent_mode, iterationsLimit](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -269,7 +270,7 @@ void RenderRegularImpl(
 			progressReporter);
 #endif
 
-            for (auto i = start_iteration; !stopToken.stop_requested(); ++i) {
+            for (auto i = start_iteration; i < iterationsLimit && !stopToken.stop_requested(); ++i) {
                 renderer.Render(
                 film,
                 getCroppedRectToRender(scene),
@@ -311,15 +312,17 @@ void RenderRegularImpl(
     );
 }
 
-void RenderRegular(const std::filesystem::path& scene_file,
-                   const std::filesystem::path& outputImageFileWithoutExtension,
-                   bool persistent_mode
-)
-{
+void RenderRegular(const std::filesystem::path &scene_file,
+                   const std::filesystem::path &outputImageFileWithoutExtension,
+                   bool persistent_mode,
+                   std::uint32_t iterationsLimit
+) {
     if constexpr (ENABLE_UI) {
-        RenderRegularImpl(applications::NanaApplicaion(), scene_file, outputImageFileWithoutExtension, persistent_mode);
+        RenderRegularImpl(applications::NanaApplicaion(), scene_file, outputImageFileWithoutExtension, persistent_mode,
+                          iterationsLimit);
     } else {
-        RenderRegularImpl(applications::ConsoleApplication(), scene_file, outputImageFileWithoutExtension, persistent_mode);
+        RenderRegularImpl(applications::ConsoleApplication(), scene_file, outputImageFileWithoutExtension,
+                          persistent_mode, iterationsLimit);
     }
 }
 
@@ -329,11 +332,12 @@ void RenderCloudscapeImpl(
     TApplication application,
     const std::filesystem::path& scene_file,
     const std::filesystem::path& outputImageFileWithoutExtension,
-    bool persistent_mode
+    bool persistent_mode,
+    std::uint32_t iterationsLimit
 )
 {
     application.run(
-        [&scene_file, &outputImageFileWithoutExtension, persistent_mode](
+        [&scene_file, &outputImageFileWithoutExtension, persistent_mode, iterationsLimit](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -418,7 +422,7 @@ void RenderCloudscapeImpl(
             participating_media::VoidMedium atmospheric_medium;
             participating_media::VoidMedium cloud_medium;
 
-            for (auto i = start_iteration; !stopToken.stop_requested(); ++i) {
+            for (auto i = start_iteration; i < iterationsLimit && !stopToken.stop_requested(); ++i) {
                 renderer.Render(
                     film,
                     {uint_vector2::zero(), film.size()},
@@ -458,14 +462,17 @@ void RenderCloudscapeImpl(
 }
 
 void RenderCloudscape(
-    const std::filesystem::path& scene_file,
-    const std::filesystem::path& output_image_file_without_extension,
-    bool persistent_mode
+    const std::filesystem::path &scene_file,
+    const std::filesystem::path &output_image_file_without_extension,
+    bool persistent_mode,
+    std::uint32_t iterationsLimit
 ) {
     if constexpr (ENABLE_UI) {
-        RenderCloudscapeImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension, persistent_mode);
+        RenderCloudscapeImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension,
+                             persistent_mode, iterationsLimit);
     } else {
-        RenderCloudscapeImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension, persistent_mode);
+        RenderCloudscapeImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension,
+                             persistent_mode, iterationsLimit);
     }
 }
 
@@ -477,6 +484,7 @@ int main_impl(int argc, const char* argv[])
     arguments.add_argument("-c").flag().help("Switches to cloudscape mode instead of regular renderer.");
     arguments.add_argument("scene_file").help("The scene file path.");
     arguments.add_argument("-p").flag().help("Persist frame buffer between runs");
+    arguments.add_argument("--max-iterations").help("Maximum number of iterations.").default_value(std::numeric_limits<std::uint32_t>::max()).scan<'u', std::uint32_t>();
 
     try {
         arguments.parse_args(argc, argv); // Example: ./main --input_files config.yml System.xml
@@ -487,15 +495,16 @@ int main_impl(int argc, const char* argv[])
     }
 
     const bool persistent_mode = arguments.get<bool>("-p");
+    const auto iterationsLimit = arguments.get<std::uint32_t>("--max-iterations");
 
     const auto scene_path = std::filesystem::path(arguments.get<std::string>("scene_file"));
     auto image_path = std::filesystem::path(scene_path);
     image_path.replace_extension("");
 
     if (arguments["-c"] == true) {
-        RenderCloudscape(scene_path, image_path, persistent_mode);
+        RenderCloudscape(scene_path, image_path, persistent_mode, iterationsLimit);
     } else {
-        RenderRegular(scene_path, image_path, persistent_mode);
+        RenderRegular(scene_path, image_path, persistent_mode, iterationsLimit);
     }
 
     image_path.replace_extension(".png");
