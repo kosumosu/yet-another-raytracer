@@ -24,7 +24,7 @@ public:
     using infinity_func = std::function<color_rgb(const ray3& ray)>;
 
 private:
-    constexpr static space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(1024.0);
+    constexpr static space_real BIAS = std::numeric_limits<space_real>::epsilon() * space_real(1024.0 * 8.0);
     //constexpr space_real BIAS = space_real(0); // std::numeric_limits<space_real>::epsilon() * space_real(32768.0);
 
     raytracer_t raytracer_;
