@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <optional>
 #include <cmath>
 
 #define ENABLE_TEMPLATE_LOOP false
@@ -115,5 +116,32 @@ namespace math
 	T safeSqrt(const T& a)
 	{
 		return std::sqrt(std::max(T(0), a));
+	}
+
+	/*
+	  diff_of_products() computes a*b-c*d with a maximum error <= 1.5 ulp
+
+	  Claude-Pierre Jeannerod, Nicolas Louvet, and Jean-Michel Muller,
+	  "Further Analysis of Kahan's Algorithm for the Accurate Computation
+	  of 2x2 Determinants". Mathematics of Computation, Vol. 82, No. 284,
+	  Oct. 2013, pp. 2245-2264
+	*/
+	template<class T>
+	T diffOfProducts(T a, T b, T c, T d) {
+		auto w = d * c;
+		auto e = std::fma(-d, c, w);
+		auto f = std::fma(a, b, -w);
+		return f + e;
+	}
+
+	template<class T>
+	std::optional<std::pair<T, T>> solveQuadratic(const T &a, const T &b, const T &c) {
+		const auto discriminant = diffOfProducts(b, b, T(4.0) * a, c);
+		if (discriminant < 0) {
+			return std::nullopt;
+		}
+		const auto q = -T(0.5) * (b + std::copysign(std::sqrt(discriminant), b));
+
+		return std::make_pair(q / a, c / q);
 	}
 }
