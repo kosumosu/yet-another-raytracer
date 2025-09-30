@@ -146,11 +146,12 @@ void RenderRegularImpl(
     const std::filesystem::path& scene_file,
     const std::filesystem::path& outputImageFileWithoutExtension,
     bool persistent_mode,
-    std::uint32_t iterationsLimit
+    std::uint32_t iterationsLimit,
+    std::uint32_t seed
 ) {
 
     application.run(
-        [&scene_file, &outputImageFileWithoutExtension, persistent_mode, iterationsLimit](
+        [&scene_file, &outputImageFileWithoutExtension, persistent_mode, iterationsLimit, seed](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -289,7 +290,7 @@ void RenderRegularImpl(
 
                     return integrator;
                 },
-                i,
+                hashing::default_1d_hash(uint_vector2 { i, seed }),
                 stopToken);
 
                 reportRenderingFinished(film, i + 1);
@@ -316,14 +317,25 @@ void RenderRegularImpl(
 void RenderRegular(const std::filesystem::path &scene_file,
                    const std::filesystem::path &outputImageFileWithoutExtension,
                    bool persistent_mode,
-                   std::uint32_t iterationsLimit
+                   std::uint32_t iterationsLimit,
+                   std::uint32_t seed
 ) {
     if constexpr (ENABLE_UI) {
-        RenderRegularImpl(applications::NanaApplicaion(), scene_file, outputImageFileWithoutExtension, persistent_mode,
-                          iterationsLimit);
+        RenderRegularImpl(
+            applications::NanaApplicaion(),
+            scene_file,
+            outputImageFileWithoutExtension,
+            persistent_mode,
+            iterationsLimit,
+            seed);
     } else {
-        RenderRegularImpl(applications::ConsoleApplication(), scene_file, outputImageFileWithoutExtension,
-                          persistent_mode, iterationsLimit);
+        RenderRegularImpl(
+            applications::ConsoleApplication(),
+            scene_file,
+            outputImageFileWithoutExtension,
+            persistent_mode,
+            iterationsLimit,
+            seed);
     }
 }
 
@@ -334,11 +346,12 @@ void RenderCloudscapeImpl(
     const std::filesystem::path& scene_file,
     const std::filesystem::path& outputImageFileWithoutExtension,
     bool persistent_mode,
-    std::uint32_t iterationsLimit
+    std::uint32_t iterationsLimit,
+    std::uint32_t seed
 )
 {
     application.run(
-        [&scene_file, &outputImageFileWithoutExtension, persistent_mode, iterationsLimit](
+        [&scene_file, &outputImageFileWithoutExtension, persistent_mode, iterationsLimit, seed](
         const auto& stopToken,
         const auto& initialize,
         const auto& reportProgress,
@@ -438,7 +451,7 @@ void RenderCloudscapeImpl(
                             raytracer
                         };
                     },
-                    i,
+                    hashing::default_1d_hash(uint_vector2 { i, seed }),
                     stopToken);
 
                 reportRenderingFinished(film, i + 1);
@@ -466,14 +479,25 @@ void RenderCloudscape(
     const std::filesystem::path &scene_file,
     const std::filesystem::path &output_image_file_without_extension,
     bool persistent_mode,
-    std::uint32_t iterationsLimit
+    std::uint32_t iterationsLimit,
+    std::uint32_t seed
 ) {
     if constexpr (ENABLE_UI) {
-        RenderCloudscapeImpl(applications::NanaApplicaion(), scene_file, output_image_file_without_extension,
-                             persistent_mode, iterationsLimit);
+        RenderCloudscapeImpl(
+            applications::NanaApplicaion(),
+            scene_file,
+            output_image_file_without_extension,
+            persistent_mode,
+            iterationsLimit,
+            seed);
     } else {
-        RenderCloudscapeImpl(applications::ConsoleApplication(), scene_file, output_image_file_without_extension,
-                             persistent_mode, iterationsLimit);
+        RenderCloudscapeImpl(
+            applications::ConsoleApplication(),
+            scene_file,
+            output_image_file_without_extension,
+            persistent_mode,
+            iterationsLimit,
+            seed);
     }
 }
 
@@ -486,6 +510,7 @@ int main_impl(int argc, const char* argv[])
     arguments.add_argument("scene_file").help("The scene file path.");
     arguments.add_argument("-p").flag().help("Persist frame buffer between runs");
     arguments.add_argument("--max-iterations").help("Maximum number of iterations.").default_value(std::numeric_limits<std::uint32_t>::max()).scan<'u', std::uint32_t>();
+    arguments.add_argument("--seed").help("Random seed.").default_value(std::uint32_t(0)).scan<'u', std::uint32_t>();
 
     try {
         arguments.parse_args(argc, argv); // Example: ./main --input_files config.yml System.xml
@@ -497,15 +522,16 @@ int main_impl(int argc, const char* argv[])
 
     const bool persistent_mode = arguments.get<bool>("-p");
     const auto iterationsLimit = arguments.get<std::uint32_t>("--max-iterations");
+    const auto seed = arguments.get<std::uint32_t>("--seed");
 
     const auto scene_path = std::filesystem::path(arguments.get<std::string>("scene_file"));
     auto image_path = std::filesystem::path(scene_path);
     image_path.replace_extension("");
 
     if (arguments["-c"] == true) {
-        RenderCloudscape(scene_path, image_path, persistent_mode, iterationsLimit);
+        RenderCloudscape(scene_path, image_path, persistent_mode, iterationsLimit, seed);
     } else {
-        RenderRegular(scene_path, image_path, persistent_mode, iterationsLimit);
+        RenderRegular(scene_path, image_path, persistent_mode, iterationsLimit, seed);
     }
 
     image_path.replace_extension(".png");
