@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "zlib",
+    "libpng",
+    "pngpp",
+    "openexr"
+  ],
+  "version": "1.0",
+  "name": "yet-another-raytracer"
+}
