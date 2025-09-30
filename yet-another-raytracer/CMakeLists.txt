@@ -59,7 +59,7 @@ if (WIN32)
 endif ()
 
 target_include_directories(yet_another_raytracer PRIVATE ".")
-include_directories(${PNGPP_INCLUDE_DIR})
+#include_directories(${PNGPP_INCLUDE_DIR})
 include_directories(../3rdparty)
 
 # Works on windows via vcpkg with

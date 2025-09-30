@@ -1,6 +1,6 @@
 #include "Film.h"
 
-#include <png.hpp>
+#include <png++/png.hpp>
 
 #include <ImfRgbaFile.h>
 #include <ImfArray.h>

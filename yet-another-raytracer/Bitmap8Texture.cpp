@@ -4,7 +4,7 @@
 
 #include "color/color_functions.hpp"
 
-#include "png.hpp"
+#include <png++/png.hpp>
 
 using pixel_t = png::rgb_pixel;
 using pixel_component_t = png::pixel_traits<pixel_t>::component_type;

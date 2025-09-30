@@ -4,7 +4,6 @@
 #include <math/base_matrix.hpp>
 #include <math/base_matrix_functions.hpp>
 
-#include "color.hpp"
 
 namespace color
 {
