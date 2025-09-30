@@ -15,7 +15,7 @@ namespace math
 		T res = one[0] * another[0];
 		iterate<1, N - 1>([&](std::size_t i)
 		{
-			res += one[i] * another[i];
+			res = std::fma(one[i], another[i], res);
 		});
 
 		return res;
@@ -330,6 +330,28 @@ namespace math
 				isZero = isZero && (one[i] == T(0));
 			});
 		return isZero;
+	}
+
+	template <typename T, std::size_t N>
+	constexpr vector<T, N> fma(const vector<T, N> & one, const vector<T, N> & two, const vector<T, N> & three)
+	{
+		vector<T, N> res = vector<T, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+		{
+			res[i] = std::fma(one[i], two[i], three[i]);
+		});
+		return res;
+	}
+
+	template <typename T, std::size_t N>
+	constexpr vector<T, N> fma(const T & one, const vector<T, N> & two, const vector<T, N> & three)
+	{
+		vector<T, N> res = vector<T, N>::zero();
+		iterate<0, N - 1>([&](std::size_t i)
+		{
+			res[i] = std::fma(one, two[i], three[i]);
+		});
+		return res;
 	}
 	
 }
