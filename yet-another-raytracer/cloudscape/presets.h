@@ -325,8 +325,8 @@ namespace cloudscape
         scene.rendering.width = 640; //1920;
         scene.rendering.height = 360; //1080;
 
-        // scene.rendering.width = 2560;
-        // scene.rendering.height = 1440;
+        scene.rendering.width = 2560;
+        scene.rendering.height = 1440;
 
         scene.rendering.bucketwidth = 24;
         scene.rendering.bucketheight = 24;
@@ -377,10 +377,10 @@ namespace cloudscape
         scene.clouds.color = 16777215;
         scene.clouds.trans_falloff = 1.0f;
         scene.clouds.fwd_bck = 0.8f;
-        scene.clouds.fog = 0.03f; //0.01;
-        scene.clouds.height = 10000.0f;
+        scene.clouds.fog = 0.05f; //0.01;
+        scene.clouds.height = 5000.0f;
         scene.clouds.thickness = 500.0f;
-        scene.clouds.thickness = 200.0f;
+        // scene.clouds.thickness = 200.0f;
         scene.clouds.coverage = 0.42f; //0.2;
         scene.clouds.coverage = 0.38f; //0.2;
 
