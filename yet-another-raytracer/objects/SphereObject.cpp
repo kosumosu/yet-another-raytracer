@@ -13,21 +13,20 @@ namespace objects
 
 		space_real a = math::length2(inversed_ray.direction());
 		space_real b = space_real(2.0) * math::dot(inversed_ray.direction(), center_to_origin);
+
+		// TODO: this can use diffOfProducts()
 		const auto center_to_origin_len2 = math::length2(center_to_origin);
-		const auto radius_squader = m_radius * m_radius;
-		space_real c = center_to_origin_len2 - radius_squader;
+		const auto radius_squared = m_radius * m_radius;
+		space_real c = center_to_origin_len2 - radius_squared;
 
-		space_real d = b * b - space_real(4.0) * a * c;
+		const auto solution = math::solveQuadratic(a, b, c);
 
-		if (d <= space_real(0.0))
-		{
+		if (!solution.has_value()) {
 			return Hit();
-		}
-		else // treat d == 0 as d > 0 i.e. think that we have two roots
-		{
-			space_real d_rooted = std::sqrt(d);
-			space_real biasedX1 = (b + d_rooted) / (space_real(-2.0) * a) - minDistance; // subtract it now to simplify calculation. Later it will be compensated.
-			space_real biasedX2 = (b - d_rooted) / (space_real(-2.0) * a) - minDistance;
+		} else {
+			// Actually, min and max distance also require some transform into local space. So below is wrong.
+			space_real biasedX1 = solution->first - minDistance; // subtract it now to simplify calculation. Later it will be compensated.
+			space_real biasedX2 = solution->second - minDistance;
 
 			if (biasedX1 < space_real(0.0) && biasedX2 < space_real(0.0))
 			{
@@ -42,8 +41,8 @@ namespace objects
 				if (x > maxDistance)
 					return Hit();
 
-				auto world_space_hit_point = inversed_ray.origin() + inversed_ray.direction() * x;
-				auto normal = math::normalize(world_space_hit_point - m_center) * normal_scalar_for_inversion_; // normal is non-normalized
+				auto world_space_hit_point = inversed_ray.point_along(x);
+				auto normal = (world_space_hit_point - m_center) / m_radius * normal_scalar_for_inversion_; // normal is non-normalized
 
 				auto transformed_hit_point = (this->transform() * vector4(world_space_hit_point, 1.0)).reduce();
 				auto transformed_normal = (this->normal_transform() * vector4(normal, space_real(0.0))).reduce();
@@ -68,16 +67,12 @@ namespace objects
 		space_real b = space_real(2.0) * math::dot(inversed_ray.direction(), center_to_origin);
 		space_real c = math::length2(center_to_origin) - m_radius * m_radius;
 
-		space_real d = b * b - space_real(4.0) * a * c;
+		const auto solution = math::solveQuadratic(a, b, c);
 
-		if (d < space_real(0.0))
+		if (!solution)
 			return false;
 
-		space_real d_rooted = std::sqrt(d);
-		space_real x1 = (b + d_rooted) / (space_real(-2.0) * a);
-		space_real x2 = (b - d_rooted) / (space_real(-2.0) * a);
-
-		return (x1 >= minDistance && x1 <= maxDistance) || (x2 > minDistance && x2 <= maxDistance);
+		return (solution->first >= minDistance && solution->first <= maxDistance) || (solution->second > minDistance && solution->second <= maxDistance);
 	}
 
 	bounding_box3 SphereObject::GetBoundsWithinBounds(const bounding_box3& box) const
