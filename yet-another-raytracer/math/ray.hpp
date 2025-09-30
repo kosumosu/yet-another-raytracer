@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector.hpp"
+#include "vector_functions.hpp"
 
 namespace math
 {
@@ -52,12 +53,12 @@ namespace math
 
 		vector<TSpace, DIMENSIONS> point_along(const TSpace& distance) const
 		{
-			return m_origin + m_direction * distance;
+			return math::fma(distance, m_direction, m_origin);
 		}
 
 		ray<TSpace, DIMENSIONS> ray_along(const TSpace& distance) const
 		{
-			return {m_origin + m_direction * distance, m_direction};
+			return {point_along(distance), m_direction};
 		}
 	
 	private:
